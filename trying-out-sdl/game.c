@@ -4,8 +4,9 @@
 
 #include "./constants.h"	// Sibling file in project folder
 #include "game.h"
-#include "player.h"
 #include "world.h"
+#include "player.h"
+#include "camera.h"
 
 // Defines
 
@@ -59,8 +60,14 @@ int initialize_window(void) {
 void game_init() {
 	program_running = initialize_window();
 
-	
-	tilemap_init();
+	init_tilemap();
+
+	if (init_camera()) {
+		printf("Error: Camera failed to initialize.");
+	}
+
+
+	init_player();
 
 }
 
@@ -69,7 +76,7 @@ void game_loop() {
 	while (program_running) {
 
 		// Process user input
-		if (game_process_input()) {
+		if (game_handle_input()) {
 			printf("Error: Input processing failed.");
 		}
 
@@ -95,7 +102,11 @@ void game_shutdown() {
 	SDL_Quit();
 }
 
-int game_process_input() {
+int game_handle_input() {
+
+	// Reset player speed
+	player->vel.x = 0;
+	player->vel.y = 0;
 
 	SDL_Event event;
 	SDL_PollEvent(&event);
@@ -110,10 +121,6 @@ int game_process_input() {
 		if (event.key.key == SDLK_ESCAPE) {		// Stop the game when escape key is pressed
 			program_running = FALSE;
 		}
-		if (event.key.key == SDLK_UP) {
-			//ball.vely *= -1;
-		}
-
 		break;
 	}
 
@@ -142,6 +149,12 @@ int game_update() {
 	// Update delta time
 	update_deltaTime();
 
+	// Update player
+	update_player(delta_time);
+
+	// Update camera positioning offset
+	update_camera();
+
 
 	return 0;
 }
@@ -154,7 +167,8 @@ int game_render() {
 
 	// Render elements
 
-	tilemap_render(renderer);		// World tilemap
+	render_tilemap(renderer);		// World tilemap
+	render_player(renderer);		// Player
 
 
 	// Render scene

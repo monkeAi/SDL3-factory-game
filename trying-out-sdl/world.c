@@ -2,6 +2,8 @@
 #include "constants.h"  
 #include "SDL3/SDL.h"
 #include "perlin_noise.h"
+#include "camera.h"
+#include "tools.h"
 
 struct GameTile {
 	int xIndex;
@@ -15,10 +17,27 @@ struct GameTile {
 // Create 2D map made of different tiles
 struct GameTile map[MAP_HEIGHT][MAP_WIDTH];	// [y][x]
 
+// Calculate world offset from window to tile border
+
+int world_offset_x = (WINDOW_WIDTH / 2) - (TILE_SIZE * MAP_WIDTH / 2);
+int world_offset_y = (WINDOW_HEIGHT / 2) - (TILE_SIZE * MAP_HEIGHT / 2);
+
+// Calculate world origin to translate 0,0 point to center of map
+int world_origin_x;
+int world_origin_y;
+
+// Function to initialize world_origin_x and world_origin_y
+void init_world_origin() {
+	world_origin_x = world_offset_x + (TILE_SIZE * MAP_WIDTH / 2);
+	world_origin_y = world_offset_y + (TILE_SIZE * MAP_HEIGHT / 2);
+}
+
 // Init world tilemap
-void tilemap_init() {
+void init_tilemap() {
 
 	GAME_SEED = SEED;
+
+	init_world_origin();
 	
 	// Loop throught every spot and create a tile
 	for (int y = 0; y < MAP_HEIGHT; y++) {
@@ -75,16 +94,17 @@ static void print_tilemap() {
 }
 
 // Render 
-int tilemap_render(SDL_Renderer* renderer) {
+int render_tilemap(SDL_Renderer* renderer) {
 
 	// Loop through entire map
 	for (int y = 0; y < MAP_HEIGHT; y++) {
 		for (int x = 0; x < MAP_WIDTH; x++) {
 
 			// Create a rect for selected tile
+			// Positions are calculated based on origin and player
 			SDL_FRect tile_rect = {
-				x * TILE_SIZE,
-				y * TILE_SIZE,
+				x * TILE_SIZE + world_offset_x - mainCamera->x_offset,
+				y * TILE_SIZE + world_offset_y - mainCamera->y_offset,
 				TILE_SIZE,
 				TILE_SIZE
 			};

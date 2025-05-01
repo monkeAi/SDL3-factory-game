@@ -2,6 +2,7 @@
 #define WORLD_H
 
 #include <SDL3/SDL.h>
+#include "tools.h"
 
 // All different tile types
 enum TileType {
@@ -20,8 +21,13 @@ enum TileState {
 	TILE_SELECTED
 };
 
-void tilemap_init();
-int tilemap_render(SDL_Renderer* renderer);
+int world_offset_x;
+int world_offset_y;
+int world_origin_x;
+int world_origin_y;
+
+void init_tilemap();
+int render_tilemap(SDL_Renderer* renderer);
 void print_tilemap();
 
 #endif

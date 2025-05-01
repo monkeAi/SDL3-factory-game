@@ -135,19 +135,23 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="camera.c" />
     <ClCompile Include="game.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="mainOld.c" />
     <ClCompile Include="perlin_noise.c" />
     <ClCompile Include="player.c" />
+    <ClCompile Include="tools.c" />
     <ClCompile Include="world.c" />
     <ClCompile Include="world.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="camera.h" />
     <ClInclude Include="constants.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="perlin_noise.h" />
     <ClInclude Include="player.h" />
+    <ClInclude Include="tools.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
