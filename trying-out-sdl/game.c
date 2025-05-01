@@ -5,12 +5,12 @@
 #include "./constants.h"	// Sibling file in project folder
 #include "game.h"
 #include "player.h"
+#include "world.h"
 
 // Defines
 
 SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
-
 
 // Global variables
 
@@ -58,6 +58,9 @@ int initialize_window(void) {
 
 void game_init() {
 	program_running = initialize_window();
+
+	
+	tilemap_init();
 
 }
 
@@ -148,6 +151,10 @@ int game_render() {
 	// Draw background
 	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 	SDL_RenderClear(renderer);
+
+	// Render elements
+
+	tilemap_render(renderer);		// World tilemap
 
 
 	// Render scene
