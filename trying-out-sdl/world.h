@@ -3,6 +3,7 @@
 
 #include <SDL3/SDL.h>
 #include "tools.h"
+#include "constants.h"
 
 // All different tile types
 enum TileType {
@@ -21,13 +22,24 @@ enum TileState {
 	TILE_SELECTED
 };
 
-int world_offset_x;
-int world_offset_y;
+struct GameTile {
+	int xIndex;
+	int yIndex;
+	enum TileType type;
+	enum TileState state;
+	//texture pointer
+};
+
+extern struct GameTile map[MAP_HEIGHT][MAP_WIDTH];
+
+float world_start_offset_x;
+float world_start_offset_y;
 int world_origin_x;
 int world_origin_y;
 
 void init_tilemap();
 int render_tilemap(SDL_Renderer* renderer);
 void print_tilemap();
+void cordinate_to_index(int* cordinates, int* tileIndex);
 
 #endif

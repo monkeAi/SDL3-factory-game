@@ -60,6 +60,13 @@ int initialize_window(void) {
 void game_init() {
 	program_running = initialize_window();
 
+	int cord[2] = {0, 0};
+	int output[2];
+
+	cordinate_to_index(&cord, &output);
+
+	printf("%d, %d\n", output[0], output[1]);
+
 	init_tilemap();
 
 	if (init_camera()) {
@@ -115,11 +122,13 @@ int game_handle_input() {
 
 	case SDL_EVENT_QUIT:
 		program_running = FALSE;	// Stop game when QUIT EVENT is called
+		printf("Quiting game.");
 		break;
 
 	case SDL_EVENT_KEY_DOWN:
 		if (event.key.key == SDLK_ESCAPE) {		// Stop the game when escape key is pressed
 			program_running = FALSE;
+			printf("Escape pressed.");
 		}
 		break;
 	}
@@ -149,8 +158,11 @@ int game_update() {
 	// Update delta time
 	update_deltaTime();
 
+	// Update tilemap
+	update_tilemap();
+
 	// Update player
-	update_player(delta_time);
+	update_player(&player, delta_time);
 
 	// Update camera positioning offset
 	update_camera();

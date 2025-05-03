@@ -2,8 +2,8 @@
 #define CAMERA_H
 
 struct Camera {
-    int x_offset;
-    int y_offset;
+    float x_offset;
+    float y_offset;
     float zoom;
 };
 

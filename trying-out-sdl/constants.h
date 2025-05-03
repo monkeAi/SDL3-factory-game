@@ -1,11 +1,11 @@
 #define FALSE 0
 #define TRUE 1
 
-#define WINDOW_WIDTH 1000
-#define WINDOW_HEIGHT 600
+#define WINDOW_WIDTH 1000			
+#define WINDOW_HEIGHT 800
 #define WINDOW_TITLE "Victorio the game"
 
-#define FPS 120
+#define FPS 240
 #define FRAME_TARGET_TIME (1000 / FPS)
 
 #define TILE_SIZE 32
@@ -15,8 +15,8 @@
 
 // Terrain generation
 
-#define SEED 2
-#define NOISE_FREQ 0.03
+#define SEED 15
+#define NOISE_FREQ 0.05
 #define NOISE_AMP 20
 
 #define TERRAIN_WATER_RANGE 40		// From 0 to 100
@@ -28,4 +28,4 @@
 
 // Player
 
-#define PLAYER_MAX_SPEED 120
+#define PLAYER_MAX_SPEED 300
