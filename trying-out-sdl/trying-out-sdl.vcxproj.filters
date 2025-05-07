@@ -13,54 +13,81 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\Inventory_System">
+      <UniqueIdentifier>{375a3ce0-502c-4db5-a77c-fd7fb2011617}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\World_generation">
+      <UniqueIdentifier>{e1f6b1d1-be99-4b0b-bc4e-38ad4371564a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Camera">
+      <UniqueIdentifier>{6df4e7a2-f2f9-4e14-af6e-6aaa6d827cf9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Player">
+      <UniqueIdentifier>{ecda5e48-ec03-4026-8a91-214f6ab4fd80}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game">
+      <UniqueIdentifier>{65baff2f-101b-4ecf-b9f2-8234619a0de2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tools">
+      <UniqueIdentifier>{884f3ebb-7292-4e68-beca-3d626f8be2dc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="player.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="world.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="world.h">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="mainOld.c">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="inventory.c">
+      <Filter>Source Files\Inventory_System</Filter>
     </ClCompile>
     <ClCompile Include="perlin_noise.c">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\World_generation</Filter>
+    </ClCompile>
+    <ClCompile Include="world.c">
+      <Filter>Source Files\World_generation</Filter>
+    </ClCompile>
+    <ClCompile Include="item.c">
+      <Filter>Source Files\Inventory_System</Filter>
+    </ClCompile>
+    <ClCompile Include="player.c">
+      <Filter>Source Files\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="world.h">
+      <Filter>Source Files\World_generation</Filter>
     </ClCompile>
     <ClCompile Include="camera.c">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="game.c">
+      <Filter>Source Files\Game</Filter>
     </ClCompile>
     <ClCompile Include="tools.c">
-      <Filter>Source Files</Filter>
+      <Filter>Tools</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="game.h">
+    <ClInclude Include="constants.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="player.h">
-      <Filter>Header Files</Filter>
+      <Filter>Source Files\Player</Filter>
     </ClInclude>
     <ClInclude Include="perlin_noise.h">
-      <Filter>Header Files</Filter>
+      <Filter>Source Files\World_generation</Filter>
+    </ClInclude>
+    <ClInclude Include="inventory.h">
+      <Filter>Source Files\Inventory_System</Filter>
+    </ClInclude>
+    <ClInclude Include="item.h">
+      <Filter>Source Files\Inventory_System</Filter>
     </ClInclude>
     <ClInclude Include="camera.h">
-      <Filter>Header Files</Filter>
+      <Filter>Source Files\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="game.h">
+      <Filter>Source Files\Game</Filter>
     </ClInclude>
     <ClInclude Include="tools.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="constants.h">
-      <Filter>Header Files</Filter>
+      <Filter>Tools</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

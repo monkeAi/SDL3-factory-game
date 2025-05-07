@@ -2,11 +2,13 @@
 #include <SDL3/SDL.h>
 #include <SDL_image.h>
 
-#include "./constants.h"	// Sibling file in project folder
+#include "constants.h"	// Sibling file in project folder
 #include "game.h"
 #include "world.h"
 #include "player.h"
 #include "camera.h"
+#include "inventory.h"
+#include "item.h"
 
 // Defines
 
@@ -19,6 +21,10 @@ int program_running = FALSE;
 
 float delta_time = 0;
 Uint64 last_frame_time = 0;
+
+// Create an inventory with 5 slots
+struct Inventory* inv = NULL;
+struct Inventory* inv2 = NULL;
 
 int initialize_window(void) {
 
@@ -60,22 +66,37 @@ int initialize_window(void) {
 void game_init() {
 	program_running = initialize_window();
 
-	int cord[2] = {0, 0};
-	int output[2];
-
-	cordinate_to_index(&cord, &output);
-
-	printf("%d, %d\n", output[0], output[1]);
-
 	init_tilemap();
 
 	if (init_camera()) {
 		printf("Error: Camera failed to initialize.");
 	}
 
-
 	init_player();
 
+	inv = Inventory_create(5);
+	inv2 = Inventory_create(3);
+
+	// Create some items
+	struct Item iron_ore = Item_create(ITEM_IRON_ORE, 100, 10); // 10 Iron Ore, max stack of 100
+	struct Item iron_plate = Item_create(ITEM_IRON_PLATE, 50, 5); // 5 Iron Plates, max stack of 50
+
+	// Add items to inventory
+	if (Inventory_push_item(inv, &iron_ore) == 0) {
+		printf("Iron Ore added to inventory.\n");
+	}
+	else {
+		printf("Failed to add Iron Ore.\n");
+	}
+
+	if (Inventory_push_item(inv, &iron_plate) == 0) {
+		printf("Iron Plate added to inventory.\n");
+	}
+	else {
+		printf("Failed to add Iron Plate.\n");
+	}
+
+	Inventory_print(inv);
 }
 
 void game_loop() {
@@ -130,6 +151,40 @@ int game_handle_input() {
 			program_running = FALSE;
 			printf("Escape pressed.");
 		}
+		if (event.key.key == SDLK_F) {
+
+			struct Item iron_ore = Item_create(ITEM_IRON_ORE, 100, 28); // 10 Iron Ore, max stack of 100
+			if (Inventory_push_item(inv, &iron_ore) == 0) {
+				printf("Iron Ore added to inventory.\n");
+			}
+			else {
+				printf("Failed to add %d Iron Ore.\n", iron_ore.quantity);
+			}
+			Inventory_print(inv);
+
+		}
+		if (event.key.key == SDLK_C) {
+			Inventory_transfer_item(inv, inv, 2, -1);
+			Inventory_print(inv);
+
+			
+		}
+		if (event.key.key == SDLK_T) {
+
+			int slot = 1;
+			if (Inventory_transfer_item(inv, player->inventory, slot, -1) == 0) {
+				printf("Items succesfully transfered.\n");
+			}
+			else {
+				printf("Failed to transfer %d Items.\n", inv->slots[slot].quantity);
+			}
+
+			printf("Inventory 1:\n");
+			Inventory_print(inv);
+			printf("Inventory Player:\n");
+			Inventory_print(player->inventory);
+
+		}
 		break;
 	}
 
@@ -167,7 +222,6 @@ int game_update() {
 	// Update camera positioning offset
 	update_camera();
 
-
 	return 0;
 }
 
@@ -181,7 +235,6 @@ int game_render() {
 
 	render_tilemap(renderer);		// World tilemap
 	render_player(renderer);		// Player
-
 
 	// Render scene
 	SDL_RenderPresent(renderer);

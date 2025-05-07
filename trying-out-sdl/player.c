@@ -1,16 +1,17 @@
+#include <stdio.h>
 #include "player.h"  
 #include "tools.h"  
 #include "camera.h"  
 #include "world.h"  
 #include "constants.h"
-#include <stdio.h>
+#include "inventory.h"
 
 struct Player* player;  
 
 void init_player() {
 
     // Allocate memory for player
-    player = malloc(sizeof(Player));
+    player = malloc(sizeof(player));
     if (player == NULL) {
         fprintf(stderr, "Failed to allocate memory for player\n");
         exit(111);
@@ -23,6 +24,7 @@ void init_player() {
     player->height = 32;
     player->vel.x = 0;
     player->vel.y = 0;
+    player->inventory = Inventory_create(10);
 }  
 
 void update_player(struct Player *p, float delta_time) {  
