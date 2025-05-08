@@ -99,9 +99,9 @@ void game_init() {
 
 	Inventory_print(inv);
 
-	void recipe_init();
+	init_recipes();
 
-	printf("Recipe :%d", CraftingRecipes[2].name);
+	printf("Crafting time :%f", CraftingRecipes[RECIPE_IRON_PLATE].crafting_time);
 }
 
 void game_loop() {

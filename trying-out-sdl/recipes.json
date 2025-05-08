@@ -1,5 +1,14 @@
 [
     {
+        "name": "RECIPE_NONE",
+        "state": "RECIPE_LOCKED",
+        "craft_method": [ "RECIPE_HAND" ],
+        "input": [],
+        "output": [],
+        "crafting_time": 0,
+        "required_energy": 0
+    },
+    {
         "name": "RECIPE_IRON_PLATE",
         "state": "RECIPE_AVAILABLE",
         "craft_method": [ "RECIPE_SMELTER" ],
@@ -17,6 +26,26 @@
         ],
         "crafting_time": 2.5,
         "required_energy": 10.0
+    },
+
+    {
+        "name": "RECIPE_IRON_GEAR",
+        "state": "RECIPE_LOCKED",
+        "craft_method": [ "RECIPE_CRAFTER_1" ],
+        "input": [
+            {
+                "type": "ITEM_IRON_PLATE",
+                "quantity": 2
+            }
+        ],
+        "output": [
+            {
+                "type": "ITEM_IRON_GEAR",
+                "quantity": 1
+            }
+        ],
+        "crafting_time": 3.5,
+        "required_energy": 15.0
     },
     {
         "name": "RECIPE_COPPER_PLATE",
@@ -36,24 +65,5 @@
         ],
         "crafting_time": 2.5,
         "required_energy": 10.0
-    },
-    {
-        "name": "RECIPE_IRON_GEAR",
-        "state": "RECIPE_LOCKED",
-        "craft_method": [ "RECIPE_CRAFTER_1" ],
-        "input": [
-            {
-                "type": "ITEM_IRON_PLATE",
-                "quantity": 2
-            }
-        ],
-        "output": [
-            {
-                "type": "ITEM_IRON_GEAR",
-                "quantity": 1
-            }
-        ],
-        "crafting_time": 3.0,
-        "required_energy": 15.0
     }
 ]

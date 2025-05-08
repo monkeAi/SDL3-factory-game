@@ -57,15 +57,15 @@ enum RecipeState {
 enum RecipeName {
 	RECIPE_NONE,
 	RECIPE_IRON_PLATE,
-	RECIPE_COPPER_PLATE,
-	RECIPE_IRON_GEAR
+	RECIPE_IRON_GEAR,
+	RECIPE_COPPER_PLATE
 };
 
 // Recipe is a list of parameters for the crafting system 
 
 extern struct CraftingRecipe CraftingRecipes[MAX_RECIPES];
 
-void recipe_init();
+void init_recipes();
 void recipe_load_from_json(const char* filename);
 
 static enum RecipeName str_to_recipe_name(const char* str);

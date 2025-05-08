@@ -12,7 +12,7 @@
 struct CraftingRecipe CraftingRecipes[MAX_RECIPES];
 int recipe_count = 0;
 
-void recipe_init() {
+void init_recipes() {
     recipe_load_from_json("recipes.json");
 }
 
@@ -130,7 +130,10 @@ static const ItemTypeMap item_type_map[] = {
 // Convert string to enum and return it
 static enum RecipeName str_to_recipe_name(const char* str) {
     for (size_t i = 0; i < sizeof(recipe_name_map) / sizeof(recipe_name_map[0]); i++) {
-        if (strcmp(str, recipe_name_map[i].name) == 0) return recipe_name_map[i].value;
+        if (strcmp(str, recipe_name_map[i].name) == 0) {
+            printf("Recipe name map: %d\n", recipe_name_map[i].value);
+            return recipe_name_map[i].value;
+        }
     }
     return RECIPE_NONE;
 }
