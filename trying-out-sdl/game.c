@@ -9,6 +9,7 @@
 #include "camera.h"
 #include "inventory.h"
 #include "item.h"
+#include "recipes.h"
 
 // Defines
 
@@ -97,6 +98,10 @@ void game_init() {
 	}
 
 	Inventory_print(inv);
+
+	void recipe_init();
+
+	printf("Recipe :%d", CraftingRecipes[2].name);
 }
 
 void game_loop() {
@@ -164,14 +169,12 @@ int game_handle_input() {
 
 		}
 		if (event.key.key == SDLK_C) {
-			Inventory_transfer_item(inv, inv, 2, -1);
-			Inventory_print(inv);
 
 			
 		}
 		if (event.key.key == SDLK_T) {
 
-			int slot = 1;
+			int slot = 0;
 			if (Inventory_transfer_item(inv, player->inventory, slot, -1) == 0) {
 				printf("Items succesfully transfered.\n");
 			}

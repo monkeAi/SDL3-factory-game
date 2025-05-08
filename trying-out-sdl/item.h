@@ -11,7 +11,10 @@ struct Item {
 enum ItemType {
     ITEM_NONE,
     ITEM_IRON_ORE,
-    ITEM_IRON_PLATE
+    ITEM_IRON_PLATE,
+    ITEM_IRON_GEAR,
+    ITEM_COPPER_ORE,
+    ITEM_COPPER_PLATE
 };
 
 struct Item Item_create(enum ItemType type, unsigned int max_quantity, unsigned int quantity);

@@ -13,9 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Source Files\Inventory_System">
-      <UniqueIdentifier>{375a3ce0-502c-4db5-a77c-fd7fb2011617}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\World_generation">
       <UniqueIdentifier>{e1f6b1d1-be99-4b0b-bc4e-38ad4371564a}</UniqueIdentifier>
     </Filter>
@@ -31,13 +28,16 @@
     <Filter Include="Tools">
       <UniqueIdentifier>{884f3ebb-7292-4e68-beca-3d626f8be2dc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Crafting_system">
+      <UniqueIdentifier>{bb5956d2-7e3c-4d07-9a13-4c58a9ada321}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Inventory_system">
+      <UniqueIdentifier>{375a3ce0-502c-4db5-a77c-fd7fb2011617}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="inventory.c">
-      <Filter>Source Files\Inventory_System</Filter>
+      <Filter>Source Files\Inventory_system</Filter>
     </ClCompile>
     <ClCompile Include="perlin_noise.c">
       <Filter>Source Files\World_generation</Filter>
@@ -46,7 +46,7 @@
       <Filter>Source Files\World_generation</Filter>
     </ClCompile>
     <ClCompile Include="item.c">
-      <Filter>Source Files\Inventory_System</Filter>
+      <Filter>Source Files\Inventory_system</Filter>
     </ClCompile>
     <ClCompile Include="player.c">
       <Filter>Source Files\Player</Filter>
@@ -63,11 +63,17 @@
     <ClCompile Include="tools.c">
       <Filter>Tools</Filter>
     </ClCompile>
+    <ClCompile Include="main.c">
+      <Filter>Source Files\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="recipes.c">
+      <Filter>Source Files\Crafting_system</Filter>
+    </ClCompile>
+    <ClCompile Include="cJSON.c">
+      <Filter>Tools</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="constants.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="player.h">
       <Filter>Source Files\Player</Filter>
     </ClInclude>
@@ -75,10 +81,10 @@
       <Filter>Source Files\World_generation</Filter>
     </ClInclude>
     <ClInclude Include="inventory.h">
-      <Filter>Source Files\Inventory_System</Filter>
+      <Filter>Source Files\Inventory_system</Filter>
     </ClInclude>
     <ClInclude Include="item.h">
-      <Filter>Source Files\Inventory_System</Filter>
+      <Filter>Source Files\Inventory_system</Filter>
     </ClInclude>
     <ClInclude Include="camera.h">
       <Filter>Source Files\Camera</Filter>
@@ -89,5 +95,19 @@
     <ClInclude Include="tools.h">
       <Filter>Tools</Filter>
     </ClInclude>
+    <ClInclude Include="recipes.h">
+      <Filter>Source Files\Crafting_system</Filter>
+    </ClInclude>
+    <ClInclude Include="constants.h">
+      <Filter>Source Files\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="cJSON.h">
+      <Filter>Tools</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="recipes.json">
+      <Filter>Source Files\Crafting_system</Filter>
+    </None>
   </ItemGroup>
 </Project>

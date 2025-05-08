@@ -11,7 +11,7 @@ struct Player* player;
 void init_player() {
 
     // Allocate memory for player
-    player = malloc(sizeof(player));
+    player = malloc(sizeof(struct Player));
     if (player == NULL) {
         fprintf(stderr, "Failed to allocate memory for player\n");
         exit(111);

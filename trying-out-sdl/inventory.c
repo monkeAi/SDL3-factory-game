@@ -75,9 +75,13 @@ int Inventory_push_item(struct Inventory* inv, struct Item* item) {
 
 // Returns index of the first available slot for specified item
 static int Inventory_find_free_slot(struct Inventory* inv, enum ItemType item_type) {
+	if (inv == NULL || inv->slots == NULL) {
+		fprintf(stderr, "Error: Inventory is NULL or uninitialized.\n");
+		return -1; // Indicate an error
+	}
 
 	// Loop through the inventory slots
-	for (int i = 0; i < inv->max_slots; i++) {
+	for (unsigned int i = 0; i < inv->max_slots; i++) {
 
 		// Find free slot or with the same type and isn't full
 		if (inv->slots[i].type == item_type && !Item_is_full(&inv->slots[i])) {
@@ -113,14 +117,14 @@ int Inventory_search_item(struct Inventory* inv, enum ItemType item_type) {
 
 // Prints out inventory 
 int Inventory_print(struct Inventory* inv) {
-	for (int i = 0; i < inv->max_slots; i++) {
+	for (unsigned int i = 0; i < inv->max_slots; i++) {
 		printf("Slot %d: Type: %d, Quantity: %d\n", i, inv->slots[i].type, inv->slots[i].quantity);
 	}
 
 }
 
 // Transfers quantity of item from one inventory to another
-int Inventory_transfer_item(struct Inventory* from_inv, struct Inventory* to_inv, int from_slot, int quantity) {
+int Inventory_transfer_item(struct Inventory* from_inv, struct Inventory* to_inv, int from_slot, unsigned int quantity) {
 
 	// Check if from_inv slot is empty
 	if (from_inv->slots[from_slot].type == ITEM_NONE) return 1;
@@ -143,7 +147,7 @@ int Inventory_transfer_item(struct Inventory* from_inv, struct Inventory* to_inv
 		
 		if (Inventory_push_item(to_inv, &new_item)) {
 
-			from_inv->slots[from_slot].quantity + new_item.quantity;	// Add back the left over quantity
+			from_inv->slots[from_slot].quantity += new_item.quantity;	// Add back the left over quantity
 			return 2;  // to_inventory is full
 		}
 
@@ -154,4 +158,4 @@ int Inventory_transfer_item(struct Inventory* from_inv, struct Inventory* to_inv
 }
 
 // Transfers all items out of inventory and deletes it.
-void Inventory_delete();
+//void Inventory_delete();

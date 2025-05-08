@@ -150,5 +150,5 @@ void cordinate_to_index(int *cordinates, int *tileIndex) {
 	tileIndex[0] = world_map_center_x - cordinates[0] - 1;	//	X cordinate 
 	tileIndex[1] = world_map_center_y - cordinates[1] - 1;	//	Y cordinate
 
-	return 0;
+	//return 0;
 }

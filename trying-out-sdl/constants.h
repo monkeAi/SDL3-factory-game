@@ -29,3 +29,9 @@
 // Player
 
 #define PLAYER_MAX_SPEED 300
+
+
+// Recipes and Crafting
+
+#define MAX_RECIPES 128
+#define CRAFT_METHODS 4
