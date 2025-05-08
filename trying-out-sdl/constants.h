@@ -35,3 +35,4 @@
 
 #define MAX_RECIPES 128
 #define CRAFT_METHODS 4
+#define MAX_CRAFT_QUEUE 10

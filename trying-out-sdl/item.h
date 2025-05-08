@@ -7,7 +7,6 @@ struct Item {
     unsigned int quantity;
 };
 
-
 enum ItemType {
     ITEM_NONE,
     ITEM_IRON_ORE,

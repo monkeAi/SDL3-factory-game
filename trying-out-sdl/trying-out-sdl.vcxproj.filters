@@ -34,6 +34,9 @@
     <Filter Include="Source Files\Inventory_system">
       <UniqueIdentifier>{375a3ce0-502c-4db5-a77c-fd7fb2011617}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Buildings">
+      <UniqueIdentifier>{5008ceef-1335-4707-a0ff-a112b756ac41}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="inventory.c">
@@ -72,6 +75,9 @@
     <ClCompile Include="cJSON.c">
       <Filter>Tools</Filter>
     </ClCompile>
+    <ClCompile Include="crafting.c">
+      <Filter>Source Files\Buildings</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="player.h">
@@ -103,6 +109,9 @@
     </ClInclude>
     <ClInclude Include="cJSON.h">
       <Filter>Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="crafting.h">
+      <Filter>Source Files\Buildings</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

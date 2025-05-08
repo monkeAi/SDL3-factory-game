@@ -10,6 +10,7 @@
 #include "inventory.h"
 #include "item.h"
 #include "recipes.h"
+#include "crafting.h"
 
 // Defines
 
@@ -24,8 +25,8 @@ float delta_time = 0;
 Uint64 last_frame_time = 0;
 
 // Create an inventory with 5 slots
-struct Inventory* inv = NULL;
-struct Inventory* inv2 = NULL;
+//struct Inventory* inv = NULL;/*
+//struct Inventory* inv2 = NULL;*/
 
 int initialize_window(void) {
 
@@ -75,33 +76,32 @@ void game_init() {
 
 	init_player();
 
-	inv = Inventory_create(5);
-	inv2 = Inventory_create(3);
-
-	// Create some items
-	struct Item iron_ore = Item_create(ITEM_IRON_ORE, 100, 10); // 10 Iron Ore, max stack of 100
-	struct Item iron_plate = Item_create(ITEM_IRON_PLATE, 50, 5); // 5 Iron Plates, max stack of 50
-
-	// Add items to inventory
-	if (Inventory_push_item(inv, &iron_ore) == 0) {
-		printf("Iron Ore added to inventory.\n");
-	}
-	else {
-		printf("Failed to add Iron Ore.\n");
-	}
-
-	if (Inventory_push_item(inv, &iron_plate) == 0) {
-		printf("Iron Plate added to inventory.\n");
-	}
-	else {
-		printf("Failed to add Iron Plate.\n");
-	}
-
-	Inventory_print(inv);
-
 	init_recipes();
 
-	printf("Crafting time :%f", CraftingRecipes[RECIPE_IRON_PLATE].crafting_time);
+	//inv = Inventory_create(5);
+	//inv2 = Inventory_create(3);
+
+	//// Create some items
+	//struct Item iron_ore = Item_create(ITEM_IRON_ORE, 100, 10); // 10 Iron Ore, max stack of 100
+	//struct Item iron_plate = Item_create(ITEM_IRON_PLATE, 50, 5); // 5 Iron Plates, max stack of 50
+
+	//// Add items to inventory
+	//if (Inventory_push_item(inv, &iron_ore) == 0) {
+	//	printf("Iron Ore added to inventory.\n");
+	//}
+	//else {
+	//	printf("Failed to add Iron Ore.\n");
+	//}
+
+	//if (Inventory_push_item(inv, &iron_plate) == 0) {
+	//	printf("Iron Plate added to inventory.\n");
+	//}
+	//else {
+	//	printf("Failed to add Iron Plate.\n");
+	//}
+
+	//Inventory_print(inv);
+
 }
 
 void game_loop() {
@@ -158,32 +158,22 @@ int game_handle_input() {
 		}
 		if (event.key.key == SDLK_F) {
 
-			struct Item iron_ore = Item_create(ITEM_IRON_ORE, 100, 28); // 10 Iron Ore, max stack of 100
-			if (Inventory_push_item(inv, &iron_ore) == 0) {
-				printf("Iron Ore added to inventory.\n");
+			struct Item iron_plate = Item_create(ITEM_IRON_PLATE, 100, 1); // 10 Iron Ore, max stack of 100
+			if (Inventory_push_item(player->inventory, &iron_plate) == 0) {
+				printf("%d Iron Plates added to inventory.\n", iron_plate.quantity);
 			}
 			else {
-				printf("Failed to add %d Iron Ore.\n", iron_ore.quantity);
+				printf("Failed to add %d Iron Ore.\n", iron_plate.quantity);
 			}
-			Inventory_print(inv);
 
 		}
 		if (event.key.key == SDLK_C) {
 
+			craft_item(player->inventory, player->inventory, RECIPE_IRON_GEAR);
 			
 		}
-		if (event.key.key == SDLK_T) {
+		if (event.key.key == SDLK_E) {
 
-			int slot = 0;
-			if (Inventory_transfer_item(inv, player->inventory, slot, -1) == 0) {
-				printf("Items succesfully transfered.\n");
-			}
-			else {
-				printf("Failed to transfer %d Items.\n", inv->slots[slot].quantity);
-			}
-
-			printf("Inventory 1:\n");
-			Inventory_print(inv);
 			printf("Inventory Player:\n");
 			Inventory_print(player->inventory);
 
@@ -224,6 +214,8 @@ int game_update() {
 
 	// Update camera positioning offset
 	update_camera();
+
+	update_craft_queue(delta_time);
 
 	return 0;
 }
