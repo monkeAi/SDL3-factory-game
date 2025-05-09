@@ -10,15 +10,18 @@ unsigned int craft_queue_head = 0;
 // Crafts a new item from selected recipe, takes it from input inventory and puts it into output inventory
 void craft_item(struct Inventory* input_inv, struct Inventory* output_inv, enum RecipeName recipe) {
 
-	printf("Craft item \n");
+	
 	// If there is enough items in the input_inv for the recipe, move them to temporary inventory and start crafting timer
 	// Loop through each required item
 	for (int item = 0; item < CraftingRecipes[recipe].input_count; item++) {
-		// Return if there is no such item
-		if (Inventory_search_item(input_inv, CraftingRecipes[recipe].input_items[item].type) == -1) return;
-	}
 
-	printf("Enough ingredients \n");
+		// Return if there is no such item or there isnt enought of it
+		int searched_item_slot = Inventory_search_item(input_inv, CraftingRecipes[recipe].input_items[item].type);
+		if (searched_item_slot == -1 || input_inv->slots[searched_item_slot].quantity < CraftingRecipes[recipe].input_items[item].quantity) { 
+			printf("Not enough items.\n");
+			return;
+		}
+	}
 
 	// Create a temp inventory and place needed items inside
 

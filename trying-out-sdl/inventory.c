@@ -80,8 +80,11 @@ static int Inventory_find_free_slot(struct Inventory* inv, enum ItemType item_ty
 		return -1; // Indicate an error
 	}
 
+	int slot = -1;
+
 	// Loop through the inventory slots
 	for (unsigned int i = 0; i < inv->max_slots; i++) {
+
 
 		// Find free slot or with the same type and isn't full
 		if (inv->slots[i].type == item_type && !Item_is_full(&inv->slots[i])) {
@@ -89,12 +92,12 @@ static int Inventory_find_free_slot(struct Inventory* inv, enum ItemType item_ty
 			// return the index of slot
 			return i;
 		}
-		else if (inv->slots[i].type == ITEM_NONE) return i;
+		else if (inv->slots[i].type == ITEM_NONE && slot == -1) slot = i;
 	}
 	
 	// Return -1 if no free slot was found
 
-	return -1;
+	return slot;
 }
 
 // Returns the slot index of last item type in inventory, returns -1 if item not found
@@ -130,7 +133,7 @@ int Inventory_transfer_item(struct Inventory* from_inv, struct Inventory* to_inv
 	if (from_inv->slots[from_slot].type == ITEM_NONE) return 1;
 
 	//	If desired transfer quantity is -1 or larger than currently stored quantity -> transfer all of it
-	if (quantity == -1 || from_inv->slots[from_slot].quantity < quantity) {
+	if (quantity == -1 || from_inv->slots[from_slot].quantity <= quantity) {
 
 		if (Inventory_push_item(to_inv, &from_inv->slots[from_slot])) {
 			return 2;  // to_inventory is full
