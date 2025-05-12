@@ -24,7 +24,8 @@ void init_player() {
     player->height = 32;
     player->vel.x = 0;
     player->vel.y = 0;
-    player->inventory = Inventory_create(10);
+    player->available_inventory = PLAYER_START_INV_SIZE;
+    player->inventory = Inventory_create(PLAYER_MAX_INV_SIZE, PLAYER_START_INV_SIZE);
 }  
 
 void update_player(struct Player *p, float delta_time) {  

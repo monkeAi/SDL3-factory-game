@@ -29,10 +29,22 @@
 // Player
 
 #define PLAYER_MAX_SPEED 300
+#define PLAYER_MAX_INV_SIZE 30
+#define PLAYER_START_INV_SIZE 10
 
 
 // Recipes and Crafting
 
 #define MAX_RECIPES 128
 #define CRAFT_METHODS 4
-#define MAX_CRAFT_QUEUE 10
+#define MAX_CRAFT_QUEUE 100
+
+
+// Buildings
+
+#define MAX_BUILDINGS 10
+
+#define CRAFTER_MAX_INV_SLOTS 5
+#define CRAFTER_WIDTH 3
+#define CRAFTER_HEIGHT 3
+

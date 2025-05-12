@@ -27,17 +27,17 @@ void craft_item(struct Inventory* input_inv, struct Inventory* output_inv, enum 
 
 	struct Inventory* tempInv = NULL;
 
-	tempInv = Inventory_create(CraftingRecipes[recipe].input_count);
+	tempInv = Inventory_create(CraftingRecipes[recipe].input_count, CraftingRecipes[recipe].input_count);
 
 	for (int item = 0; item < CraftingRecipes[recipe].input_count; item++) {
 
-		//Inventory_push_item(tempInv, &input_inv->slots[Inventory_search_item(input_inv, CraftingRecipes[recipe].input_items[item].type)]);	// Ne sme pushat usega ampak samo requred amount
 		Inventory_transfer_item(input_inv, tempInv, Inventory_search_item(input_inv, CraftingRecipes[recipe].input_items[item].type), CraftingRecipes[recipe].input_items[item].quantity);
 	}
 	
-	// After crafting time is complete return items from temp inventory to output inventory
 
-	printf("Starting craft request \n");
+	// After crafting time is complete return items from temp inventory to output inventory
+	// Create a new crafting request and add it to the queue
+	printf("Starting craft request %d\n", craft_queue_head);
 	struct CraftRequest request = craft_request_create(output_inv, recipe);
 	CraftingQueue[craft_queue_head] = request;
 	craft_queue_head = (craft_queue_head + 1) % MAX_CRAFT_QUEUE;
@@ -66,11 +66,13 @@ void update_craft_queue(float delta_time) {
 				
 				Inventory_push_item(CraftingQueue[request].output_inv, &output_item);
 				// Handle full inventory case
+
+				// If output inventory is full then stop crafting queue
+				// Store crafted items in temporary inventory
 			}
 
 			// Remove craft request from queue
-			//craft_queue_tail = (craft_queue_tail + 1) % MAX_CRAFT_QUEUE;
-			printf("Item crafted. \n");
+			printf("%d Item crafted. \n", request);
 			craft_request_delete(request);
 		}
 	}

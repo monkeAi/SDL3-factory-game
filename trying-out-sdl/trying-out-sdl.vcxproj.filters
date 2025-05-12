@@ -76,6 +76,9 @@
       <Filter>Tools</Filter>
     </ClCompile>
     <ClCompile Include="crafting.c">
+      <Filter>Source Files\Crafting_system</Filter>
+    </ClCompile>
+    <ClCompile Include="buildings.c">
       <Filter>Source Files\Buildings</Filter>
     </ClCompile>
   </ItemGroup>
@@ -111,6 +114,9 @@
       <Filter>Tools</Filter>
     </ClInclude>
     <ClInclude Include="crafting.h">
+      <Filter>Source Files\Crafting_system</Filter>
+    </ClInclude>
+    <ClInclude Include="buildings.h">
       <Filter>Source Files\Buildings</Filter>
     </ClInclude>
   </ItemGroup>

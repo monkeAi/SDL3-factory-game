@@ -16,12 +16,20 @@
             {
                 "type": "ITEM_IRON_ORE",
                 "quantity": 1
+            },
+            {
+                "type": "ITEM_IRON_ORE",
+                "quantity": 1
+            },
+            {
+                "type": "ITEM_IRON_ORE",
+                "quantity": 1
             }
         ],
         "output": [
             {
                 "type": "ITEM_IRON_PLATE",
-                "quantity": 1
+                "quantity": 5
             }
         ],
         "crafting_time": 2.5,

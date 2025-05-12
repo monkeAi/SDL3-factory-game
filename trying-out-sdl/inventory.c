@@ -5,7 +5,7 @@
 #include "constants.h"
 
 // Create and initialize new inventory
-struct Inventory* Inventory_create(unsigned int max_slots) {
+struct Inventory* Inventory_create(unsigned int max_slots, unsigned int available_slots) {
 
 	// Create struct and allocate memory
 	struct Inventory* inv = (struct Inventory*)malloc(sizeof(struct Inventory));
@@ -14,7 +14,7 @@ struct Inventory* Inventory_create(unsigned int max_slots) {
 		exit(1);
 	}
 	inv->max_slots = max_slots;
-	inv->available_slots = max_slots;
+	inv->available_slots = available_slots;
 	inv->slots = (struct Item*)calloc(max_slots, sizeof(struct Item)); // Initialize all slots to ITEM_NONE
 
 	return inv;

@@ -11,6 +11,7 @@
 #include "item.h"
 #include "recipes.h"
 #include "crafting.h"
+#include "buildings.h"
 
 // Defines
 
@@ -23,10 +24,6 @@ int program_running = FALSE;
 
 float delta_time = 0;
 Uint64 last_frame_time = 0;
-
-// Create an inventory with 5 slots
-//struct Inventory* inv = NULL;/*
-//struct Inventory* inv2 = NULL;*/
 
 int initialize_window(void) {
 
@@ -77,30 +74,6 @@ void game_init() {
 	init_player();
 
 	init_recipes();
-
-	//inv = Inventory_create(5);
-	//inv2 = Inventory_create(3);
-
-	//// Create some items
-	//struct Item iron_ore = Item_create(ITEM_IRON_ORE, 100, 10); // 10 Iron Ore, max stack of 100
-	//struct Item iron_plate = Item_create(ITEM_IRON_PLATE, 50, 5); // 5 Iron Plates, max stack of 50
-
-	//// Add items to inventory
-	//if (Inventory_push_item(inv, &iron_ore) == 0) {
-	//	printf("Iron Ore added to inventory.\n");
-	//}
-	//else {
-	//	printf("Failed to add Iron Ore.\n");
-	//}
-
-	//if (Inventory_push_item(inv, &iron_plate) == 0) {
-	//	printf("Iron Plate added to inventory.\n");
-	//}
-	//else {
-	//	printf("Failed to add Iron Plate.\n");
-	//}
-
-	//Inventory_print(inv);
 
 }
 
@@ -154,7 +127,6 @@ int game_handle_input() {
 	case SDL_EVENT_KEY_DOWN:
 		if (event.key.key == SDLK_ESCAPE) {		// Stop the game when escape key is pressed
 			program_running = FALSE;
-			printf("Escape pressed.");
 		}
 		if (event.key.key == SDLK_F) {
 
@@ -176,6 +148,19 @@ int game_handle_input() {
 
 			printf("Inventory Player:\n");
 			Inventory_print(player->inventory);
+
+		}
+		if(event.key.key == SDLK_B) {
+
+			Buildings_print();
+
+		}
+		if (event.key.key == SDLK_X) {
+
+			int coords[2] = { 0, 0 };
+			if (Building_create(BUILDING_CRAFTER_1, coords, DOWN)) {
+				printf("Could not create a new building.\n");
+			}
 
 		}
 		break;

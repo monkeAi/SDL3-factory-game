@@ -12,6 +12,7 @@ struct Player {
     struct Vector2D vel;
     float mouse_pos[2];
     SDL_MouseButtonFlags mouse_state;
+    int available_inventory;
     struct Inventory* inventory;
 };
 
