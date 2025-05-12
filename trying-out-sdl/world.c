@@ -89,8 +89,7 @@ int update_tilemap() {
 		for (int x = 0; x < MAP_WIDTH; x++) {
 
 			// Deselect tile
-			map[y][x].state = TILE_FREE;
-
+			if (map[y][x].state == TILE_SELECTED) map[y][x].state = TILE_FREE;
 		}
 	}
 
@@ -147,7 +146,7 @@ int render_tilemap(SDL_Renderer* renderer) {
 // Transform world cordinates to table index of tile
 void cordinate_to_index(int *cordinates, int *tileIndex) {
 
-	tileIndex[0] = world_map_center_x - cordinates[0] - 1;	//	X cordinate 
+	tileIndex[0] = world_map_center_x + cordinates[0];	//	X cordinate 
 	tileIndex[1] = world_map_center_y - cordinates[1] - 1;	//	Y cordinate
 
 	//return 0;

@@ -8,13 +8,12 @@ struct Building {
 	enum BuildingType type;
 	struct Vector2D* coords;
 	enum BuildingRotation rotation;
+	int x_offset, y_offset;
 	enum BuildingState state;
-	int tile_width;
-	int tile_height;
+	int tile_width, tile_height;
 	struct Inventory* input_inv;
 	struct Inventory* output_inv;
-	int input_size;
-	int output_size;
+	int input_size, output_size;
 	enum RecipeName recipe;
 };
 
@@ -44,7 +43,10 @@ enum BuildingRotation {
 
 // Functions
 int Building_create(enum BuildingType type, int* coordinates, enum BuildingRotation rotation);
+void Building_destroy(struct Building* building);
+void Building_rotate(struct Building* b, enum BuildingRotation rotation);
 void Buildings_print();
+void Building_free(struct Building* building);
 
 // Global buildings list
 

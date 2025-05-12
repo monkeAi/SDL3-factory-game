@@ -1,12 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "SDL3/SDL.h"
 
 #include "buildings.h"
 #include "tools.h"
 #include "constants.h"
 #include "world.h"
+#include "inventory.h"
+#include "camera.h"
 
-// Create the list for all buildings
+// List for all building's pointers
 struct Building* Buildings[MAX_BUILDINGS] = { NULL };
 
 // Initialize new building struct
@@ -41,6 +44,13 @@ static struct Building* Building_init(enum BuildingType type) {
 		building->tile_width = CRAFTER_WIDTH;
 		building->tile_height = CRAFTER_HEIGHT;
 		break;
+
+	default:
+		building->input_inv = NULL;
+		building->output_inv = NULL;
+		building->tile_width = 0;
+		building->tile_height = 0;
+		break;
 	}
 
 	return building;
@@ -63,12 +73,20 @@ int Building_create(enum BuildingType type, int* coordinates, enum BuildingRotat
 
 	// Init a new building
 	struct Building* b = Building_init(type);
-	b->coords->x = coordinates[0];
-	b->coords->y = coordinates[1];
 	b->rotation = rotation;
 
+	Building_rotate(b, rotation);
+	b->coords->x = coordinates[0] - b->x_offset;
+	b->coords->y = coordinates[1] - b->y_offset + 3;		// FIX HERE
+
+	// Asign new tile state to occupied tiles
+	int selected_tile_index[2];
+	int selected_cords[2] = { b->coords->x, b->coords->y };
+	cordinate_to_index(selected_cords, selected_tile_index);
+
+	map[selected_tile_index[1]][selected_tile_index[0]].state = TILE_FULL;
+
 	// Add pointer of building to a list of all buildings
-	
 	Buildings[buildings_slot] = b;
 
 	printf("Building stored at %d. \n", buildings_slot);
@@ -78,6 +96,51 @@ int Building_create(enum BuildingType type, int* coordinates, enum BuildingRotat
 	return 0;
 }
 
+// Rotates the building struct to specified rotation
+void Building_rotate(struct Building* b, enum BuildingRotation rotation) {
+
+	int building_width = b->tile_width;
+	int building_height = b->tile_height;
+
+	// Apply rotation
+	// Left and right
+	if (rotation % 2 == 1) {
+		int temp = building_width;
+		building_width = building_height;
+		building_height = temp;
+	}
+
+	b->tile_height = building_height;
+	b->tile_width = building_width;
+
+	// Calculate new offsets
+
+	if (building_width % 2 == 1) b->x_offset = (building_width - 1) / 2;	// Odd numbers
+	else b->x_offset = (building_width / 2) - 1;							// Even numbers
+
+	if (building_height % 2 == 1) b->y_offset = (building_height - 1) / 2;	// Odd numbers
+	else b->y_offset = (building_height / 2) - 1;							// Even numbers
+
+	return;
+}
+
+
+// Destroys the building and stores the contents in temporary inventory
+void Building_destroy(struct Building* building) {
+
+	// Find the building in the Buildings list and remove it;
+	int slot;
+	for (slot = 0; Buildings[slot] != building && slot < MAX_BUILDINGS; slot++);
+	if (slot == MAX_BUILDINGS) return 1;
+	Buildings[slot] = NULL;
+
+	// Create the building item and give it to player
+		// Handle case when player inventory is full
+
+
+	// Free allocated memory 
+	Building_free(building);
+}
 
 // Return true if building can be placed in that spot
 static int Building_placement_available(enum BuildingType type, int* coordinates, enum BuildingRotation rotation) {
@@ -124,7 +187,7 @@ static int Building_placement_available(enum BuildingType type, int* coordinates
 			if (selected_tile_index[0] >= 0 && selected_tile_index[0] < MAP_WIDTH && selected_tile_index[1] >= 0 && selected_tile_index[1] < MAP_HEIGHT) return 1;
 			
 			// Check if tile is free and not water
-			if (map[y][x].state != TILE_FREE && map[y][x].type == TILE_WATER) return 1;
+			if (map[y][x].state == TILE_FULL && map[y][x].type == TILE_WATER) return 1;
 
 		}
 	}
@@ -152,12 +215,35 @@ void update_buildings() {
 
 
 // Loops through all the buildings and renders them
-void render_buildings() {
+void render_buildings(SDL_Renderer* renderer) {
 
+	for (int i = 0; i < MAX_BUILDINGS; i++) {
+
+		struct Building* b = Buildings[i];
+
+		// Skip if null
+		if (b == NULL) continue;	
+
+		//printf("x: %d, y: %d\n", b->x_offset, b->y_offset);
+
+		SDL_FRect building_rect = {
+			b->coords->x * TILE_SIZE + world_origin_x - mainCamera->x_offset,
+			b->coords->y * TILE_SIZE * -1 + world_origin_y - mainCamera->y_offset,
+			TILE_SIZE * b->tile_width,
+			TILE_SIZE * b->tile_height
+		};
+		// Correct the offset and account for rotation
+		// Set render color
+		SDL_SetRenderDrawColor(renderer, 255, 189, 51, 255);
+
+		// Add to render  
+		SDL_RenderFillRect(renderer, &building_rect);
+	}
 
 }
 
 
+// Prints out the buildings list in terminal
 void Buildings_print() {
 	for (unsigned int i = 0; i < MAX_BUILDINGS; i++) {
 		if (Buildings[i] != NULL) {
@@ -167,4 +253,26 @@ void Buildings_print() {
 			printf("Slot %d: NULL\n", i);
 		}
 	}
+}
+
+
+// Frees memory of building struct and its children
+static void Building_free(struct Building* building) {
+
+	if (building == NULL) return;
+
+	if (building->coords != NULL) {
+		free(building->coords);
+		building->coords == NULL;
+	}
+
+	if (building->input_inv != NULL) {
+		Inventory_free(building->input_inv);
+	}
+
+	if (building->output_inv != NULL) {
+		Inventory_free(building->output_inv);
+	}
+
+	free(building);
 }

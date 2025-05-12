@@ -5,6 +5,7 @@
 #include "world.h"  
 #include "constants.h"
 #include "inventory.h"
+#include "buildings.h"
 
 struct Player* player;  
 
@@ -109,13 +110,13 @@ static void handle_player_interaction(struct Player* p) {
 
     int selected_cords[2] = { 0 };
 
-    float world_x = (p->mouse_pos[0] * -1 + world_origin_x - mainCamera->x_offset);         // x
+    float world_x = (p->mouse_pos[0] * -1 + world_origin_x - mainCamera->x_offset) * -1;         // x
     float world_y = (p->mouse_pos[1] * -1 + world_origin_y - mainCamera->y_offset);         // y
 
     selected_cords[0] = (int)floorf(world_x / TILE_SIZE);
     selected_cords[1] = (int)floorf(world_y / TILE_SIZE);
 
-    //printf("World cords X:%d Y:%d ; ", selected_cords[0], selected_cords[1]);
+    //printf("World cords X:%d Y:%d \n", selected_cords[0], selected_cords[1]);
 
     // Select tile from world cordinates
 
@@ -129,6 +130,13 @@ static void handle_player_interaction(struct Player* p) {
     if (selected_tile_index[0] >= 0 && selected_tile_index[0] < MAP_WIDTH && selected_tile_index[1] >= 0 && selected_tile_index[1] < MAP_HEIGHT) {
 
         map[selected_tile_index[1]][selected_tile_index[0]].state = TILE_SELECTED;
+    }
+
+    // Place building if left click is pressed
+    if (p->mouse_state == 1) {
+        if (Building_create(BUILDING_CRAFTER_1, selected_cords, RIGHT)) {
+            printf("Could not create a new building.\n");
+        }
     }
 
 

@@ -156,12 +156,17 @@ int game_handle_input() {
 
 		}
 		if (event.key.key == SDLK_X) {
-
+	
 			int coords[2] = { 0, 0 };
-			if (Building_create(BUILDING_CRAFTER_1, coords, DOWN)) {
+			if (Building_create(BUILDING_CRAFTER_1, coords, RIGHT)) {
 				printf("Could not create a new building.\n");
 			}
 
+		}
+		if (event.key.key == SDLK_Z) {
+
+			Building_destroy(Buildings[0]);
+			printf("Building at slot 0 destroyed.\n");
 		}
 		break;
 	}
@@ -200,6 +205,10 @@ int game_update() {
 	// Update camera positioning offset
 	update_camera();
 
+	// Update every building
+	update_buildings();
+
+	// Update crafting queue
 	update_craft_queue(delta_time);
 
 	return 0;
@@ -214,7 +223,9 @@ int game_render() {
 	// Render elements
 
 	render_tilemap(renderer);		// World tilemap
+	render_buildings(renderer);
 	render_player(renderer);		// Player
+
 
 	// Render scene
 	SDL_RenderPresent(renderer);

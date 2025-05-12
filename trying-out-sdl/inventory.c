@@ -161,4 +161,10 @@ int Inventory_transfer_item(struct Inventory* from_inv, struct Inventory* to_inv
 }
 
 // Transfers all items out of inventory and deletes it.
-//void Inventory_delete();
+//void Inventory_delete()
+// 
+
+
+void Inventory_free(struct Inventory* inv) {
+	// Free memory of inventory struct
+}
