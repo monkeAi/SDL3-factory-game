@@ -134,7 +134,8 @@ static void handle_player_interaction(struct Player* p) {
 
     // Place building if left click is pressed
     if (p->mouse_state == 1) {
-        if (Building_create(BUILDING_CRAFTER_1, selected_cords, RIGHT)) {
+        printf("Mouse click world cords: X:%d Y:%d \n", selected_cords[0], selected_cords[1]);
+        if (Building_create(BUILDING_CRAFTER_1, selected_cords, DOWN)) {
             printf("Could not create a new building.\n");
         }
     }

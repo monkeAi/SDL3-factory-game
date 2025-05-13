@@ -64,7 +64,7 @@ int Building_create(enum BuildingType type, int* coordinates, enum BuildingRotat
 	int buildings_slot = Building_find_free_slot();
 	if (buildings_slot == -1) return 1;
 
-	printf("Creating new building. \n");
+	//printf("Creating new building. \n");
 
 	// Check if space is available at the cordinates for the selected building with rotation applied
 	if (!Building_placement_available(type, coordinates, rotation)) return 1;
@@ -77,19 +77,22 @@ int Building_create(enum BuildingType type, int* coordinates, enum BuildingRotat
 
 	Building_rotate(b, rotation);
 	b->coords->x = coordinates[0] - b->x_offset;
-	b->coords->y = coordinates[1] - b->y_offset + 3;		// FIX HERE
+	b->coords->y = coordinates[1] - b->y_offset;		// FIX HERE
+
+	printf("Building coordinates x: %d, y: %d\n", (int)b->coords->x, (int)b->coords->y);
 
 	// Asign new tile state to occupied tiles
 	int selected_tile_index[2];
 	int selected_cords[2] = { b->coords->x, b->coords->y };
 	cordinate_to_index(selected_cords, selected_tile_index);
 
-	map[selected_tile_index[1]][selected_tile_index[0]].state = TILE_FULL;
+	//printf("Tile state %d \n", map[selected_tile_index[1]][selected_tile_index[0]].state);/*
+	//map[selected_tile_index[1]][selected_tile_index[0]].state = TILE_FULL;*/
 
 	// Add pointer of building to a list of all buildings
 	Buildings[buildings_slot] = b;
 
-	printf("Building stored at %d. \n", buildings_slot);
+	//printf("Building stored at %d. \n", buildings_slot);
 
 	// Return 0 SUCESS
 	// Return 1 Invalid Space
@@ -110,8 +113,8 @@ void Building_rotate(struct Building* b, enum BuildingRotation rotation) {
 		building_height = temp;
 	}
 
-	b->tile_height = building_height;
 	b->tile_width = building_width;
+	b->tile_height = building_height;
 
 	// Calculate new offsets
 
@@ -120,6 +123,8 @@ void Building_rotate(struct Building* b, enum BuildingRotation rotation) {
 
 	if (building_height % 2 == 1) b->y_offset = (building_height - 1) / 2;	// Odd numbers
 	else b->y_offset = (building_height / 2) - 1;							// Even numbers
+
+	printf("Building offset x: %d, y: %d\n", b->x_offset, b->y_offset);
 
 	return;
 }
@@ -228,7 +233,7 @@ void render_buildings(SDL_Renderer* renderer) {
 
 		SDL_FRect building_rect = {
 			b->coords->x * TILE_SIZE + world_origin_x - mainCamera->x_offset,
-			b->coords->y * TILE_SIZE * -1 + world_origin_y - mainCamera->y_offset,
+			b->coords->y * TILE_SIZE * -1 - b->tile_height * TILE_SIZE + world_origin_y - mainCamera->y_offset,
 			TILE_SIZE * b->tile_width,
 			TILE_SIZE * b->tile_height
 		};
