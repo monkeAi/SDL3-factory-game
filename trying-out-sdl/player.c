@@ -129,14 +129,16 @@ static void handle_player_interaction(struct Player* p) {
     // Check if selected tile index is within table size
     if (selected_tile_index[0] >= 0 && selected_tile_index[0] < MAP_WIDTH && selected_tile_index[1] >= 0 && selected_tile_index[1] < MAP_HEIGHT) {
 
-        map[selected_tile_index[1]][selected_tile_index[0]].state = TILE_SELECTED;
+        if (map[selected_tile_index[1]][selected_tile_index[0]].state != TILE_FULL) map[selected_tile_index[1]][selected_tile_index[0]].state = TILE_SELECTED;
+        
     }
 
     // Place building if left click is pressed
     if (p->mouse_state == 1) {
-        printf("Mouse click world cords: X:%d Y:%d \n", selected_cords[0], selected_cords[1]);
+
+        //printf("Mouse click world cords: X:%d Y:%d \n", selected_cords[0], selected_cords[1]);
         if (Building_create(BUILDING_CRAFTER_1, selected_cords, DOWN)) {
-            printf("Could not create a new building.\n");
+            //printf("Could not create a new building.\n");
         }
     }
 

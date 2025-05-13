@@ -64,12 +64,8 @@ int Building_create(enum BuildingType type, int* coordinates, enum BuildingRotat
 	int buildings_slot = Building_find_free_slot();
 	if (buildings_slot == -1) return 1;
 
-	//printf("Creating new building. \n");
-
 	// Check if space is available at the cordinates for the selected building with rotation applied
 	if (!Building_placement_available(type, coordinates, rotation)) return 1;
-
-	printf("Building created. \n");
 
 	// Init a new building
 	struct Building* b = Building_init(type);
@@ -86,13 +82,25 @@ int Building_create(enum BuildingType type, int* coordinates, enum BuildingRotat
 	int selected_cords[2] = { b->coords->x, b->coords->y };
 	cordinate_to_index(selected_cords, selected_tile_index);
 
-	//printf("Tile state %d \n", map[selected_tile_index[1]][selected_tile_index[0]].state);/*
-	//map[selected_tile_index[1]][selected_tile_index[0]].state = TILE_FULL;*/
+	// Asign tile_full state to all occupied tiles
+	for (int y = b->coords->y; y <= b->coords->y + b->tile_height - 1; y++) {
+		for (int x = b->coords->x; x <= (b->coords->x + b->tile_width - 1); x++) {
+
+			// Convert coordinates to tile index
+			int selected_tile_index[2];
+			int selected_cords[2] = { x, y };
+			cordinate_to_index(selected_cords, selected_tile_index);
+
+			// Set map tiles to full
+			map[selected_tile_index[1]][selected_tile_index[0]].state = TILE_FULL;
+
+		}
+	}
 
 	// Add pointer of building to a list of all buildings
 	Buildings[buildings_slot] = b;
 
-	//printf("Building stored at %d. \n", buildings_slot);
+	printf("Building created. \n");
 
 	// Return 0 SUCESS
 	// Return 1 Invalid Space
@@ -131,11 +139,26 @@ void Building_rotate(struct Building* b, enum BuildingRotation rotation) {
 
 
 // Destroys the building and stores the contents in temporary inventory
-void Building_destroy(struct Building* building) {
+void Building_destroy(struct Building* b) {
+
+	// Free up all occupied tiles
+	for (int y = b->coords->y; y <= b->coords->y + b->tile_height - 1; y++) {
+		for (int x = b->coords->x; x <= (b->coords->x + b->tile_width - 1); x++) {
+
+			// Convert coordinates to tile index
+			int selected_tile_index[2];
+			int selected_cords[2] = { x, y };
+			cordinate_to_index(selected_cords, selected_tile_index);
+
+			// Set map tiles to full
+			map[selected_tile_index[1]][selected_tile_index[0]].state = TILE_FREE;
+
+		}
+	}
 
 	// Find the building in the Buildings list and remove it;
 	int slot;
-	for (slot = 0; Buildings[slot] != building && slot < MAX_BUILDINGS; slot++);
+	for (slot = 0; Buildings[slot] != b && slot < MAX_BUILDINGS; slot++);
 	if (slot == MAX_BUILDINGS) return 1;
 	Buildings[slot] = NULL;
 
@@ -144,7 +167,7 @@ void Building_destroy(struct Building* building) {
 
 
 	// Free allocated memory 
-	Building_free(building);
+	Building_free(b);
 }
 
 // Return true if building can be placed in that spot
@@ -180,26 +203,30 @@ static int Building_placement_available(enum BuildingType type, int* coordinates
 	else y_offset = (building_height / 2) - 1;							// Even numbers
 
 	// Loop through height and width
-	for (int y = coordinates[1] - y_offset; y < coordinates[1] - y_offset + building_height - 1; y++) {
-		for (int x = coordinates[0] - x_offset; x < coordinates[0] - x_offset + building_height - 1; x++) {
+	for (int y = coordinates[1] - y_offset; y <= coordinates[1] - y_offset + building_height - 1; y++) {
 
-			// Check if cordinate is out of bounds
+		for (int x = coordinates[0] - x_offset; x <= (coordinates[0] - x_offset + building_width - 1); x++) {
+
 			int selected_tile_index[2];
 			int selected_cords[2] = { x, y };
 
 			cordinate_to_index(selected_cords, selected_tile_index);
 
-			if (selected_tile_index[0] >= 0 && selected_tile_index[0] < MAP_WIDTH && selected_tile_index[1] >= 0 && selected_tile_index[1] < MAP_HEIGHT) return 1;
-			
+			// Check if tile is out of bounds
+			if (!(selected_tile_index[0] >= 0 && selected_tile_index[0] < MAP_WIDTH && selected_tile_index[1] >= 0 && selected_tile_index[1] < MAP_HEIGHT)) {
+				return 0;
+			}
+
 			// Check if tile is free and not water
-			if (map[y][x].state == TILE_FULL && map[y][x].type == TILE_WATER) return 1;
+			if (map[selected_tile_index[1]][selected_tile_index[0]].state == TILE_FULL || map[selected_tile_index[1]][selected_tile_index[0]].type == TILE_WATER) {
+				return 0;
+			}
 
 		}
 	}
 
 	// Return if space is available
-	printf("Space available");
-	return 0;	
+	return 1;	
 }
 
 

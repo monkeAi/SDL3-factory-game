@@ -42,7 +42,7 @@
 
 // Buildings
 
-#define MAX_BUILDINGS 1
+#define MAX_BUILDINGS 100
 
 #define CRAFTER_MAX_INV_SLOTS 5
 #define CRAFTER_WIDTH 3
