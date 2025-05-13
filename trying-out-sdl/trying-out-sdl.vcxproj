@@ -136,10 +136,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="buildings.c" />
+    <ClCompile Include="button.c" />
     <ClCompile Include="camera.c" />
     <ClCompile Include="cJSON.c" />
     <ClCompile Include="crafting.c" />
     <ClCompile Include="game.c" />
+    <ClCompile Include="gui.c" />
     <ClCompile Include="inventory.c" />
     <ClCompile Include="item.c" />
     <ClCompile Include="main.c" />
@@ -152,11 +154,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="buildings.h" />
+    <ClInclude Include="button.h" />
     <ClInclude Include="camera.h" />
     <ClInclude Include="cJSON.h" />
     <ClInclude Include="constants.h" />
     <ClInclude Include="crafting.h" />
     <ClInclude Include="game.h" />
+    <ClInclude Include="gui.h" />
     <ClInclude Include="inventory.h" />
     <ClInclude Include="item.h" />
     <ClInclude Include="perlin_noise.h" />

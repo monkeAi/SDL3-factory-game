@@ -6,6 +6,7 @@
 #include "constants.h"
 #include "inventory.h"
 #include "buildings.h"
+#include "gui.h"
 
 struct Player* player;  
 
@@ -27,6 +28,8 @@ void init_player() {
     player->vel.y = 0;
     player->available_inventory = PLAYER_START_INV_SIZE;
     player->inventory = Inventory_create(PLAYER_MAX_INV_SIZE, PLAYER_START_INV_SIZE);
+    player->gui_inventory = gui_create_player_inventory();
+    
 }  
 
 void update_player(struct Player *p, float delta_time) {  

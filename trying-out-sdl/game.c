@@ -75,6 +75,8 @@ void game_init() {
 
 	init_recipes();
 
+	init_gui();
+
 }
 
 void game_loop() {
@@ -146,8 +148,11 @@ int game_handle_input() {
 		}
 		if (event.key.key == SDLK_E) {
 
-			printf("Inventory Player:\n");
-			Inventory_print(player->inventory);
+			//printf("Inventory Player:\n");/*
+			//Inventory_print(player->inventory);*/
+
+			// Toggle inventory
+			player->gui_inventory->state = !player->gui_inventory->state;
 
 		}
 		if(event.key.key == SDLK_B) {
@@ -226,6 +231,9 @@ int game_render() {
 	render_buildings(renderer);
 	render_player(renderer);		// Player
 
+
+	// Render GUI
+	render_gui(renderer);
 
 	// Render scene
 	SDL_RenderPresent(renderer);

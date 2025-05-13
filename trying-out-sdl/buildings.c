@@ -75,7 +75,7 @@ int Building_create(enum BuildingType type, int* coordinates, enum BuildingRotat
 	b->coords->x = coordinates[0] - b->x_offset;
 	b->coords->y = coordinates[1] - b->y_offset;		// FIX HERE
 
-	printf("Building coordinates x: %d, y: %d\n", (int)b->coords->x, (int)b->coords->y);
+	//printf("Building coordinates x: %d, y: %d\n", (int)b->coords->x, (int)b->coords->y);
 
 	// Asign new tile state to occupied tiles
 	int selected_tile_index[2];
@@ -100,7 +100,7 @@ int Building_create(enum BuildingType type, int* coordinates, enum BuildingRotat
 	// Add pointer of building to a list of all buildings
 	Buildings[buildings_slot] = b;
 
-	printf("Building created. \n");
+	//printf("Building created. \n");
 
 	// Return 0 SUCESS
 	// Return 1 Invalid Space
@@ -132,7 +132,7 @@ void Building_rotate(struct Building* b, enum BuildingRotation rotation) {
 	if (building_height % 2 == 1) b->y_offset = (building_height - 1) / 2;	// Odd numbers
 	else b->y_offset = (building_height / 2) - 1;							// Even numbers
 
-	printf("Building offset x: %d, y: %d\n", b->x_offset, b->y_offset);
+	//printf("Building offset x: %d, y: %d\n", b->x_offset, b->y_offset);
 
 	return;
 }

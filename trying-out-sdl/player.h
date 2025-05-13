@@ -2,6 +2,7 @@
 #define PLAYER_H
 #include <SDL3/SDL.h>
 #include "tools.h"
+#include "gui.h"
 
 
 struct Player {
@@ -14,6 +15,7 @@ struct Player {
     SDL_MouseButtonFlags mouse_state;
     int available_inventory;
     struct Inventory* inventory;
+    struct GUI_frame* gui_inventory;
 };
 
 extern struct Player* player;

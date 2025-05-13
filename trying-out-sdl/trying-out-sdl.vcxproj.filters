@@ -37,6 +37,9 @@
     <Filter Include="Source Files\Buildings">
       <UniqueIdentifier>{5008ceef-1335-4707-a0ff-a112b756ac41}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\GUI">
+      <UniqueIdentifier>{8c86cbea-6f88-457e-94fd-8c48a1a405a8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="inventory.c">
@@ -81,6 +84,12 @@
     <ClCompile Include="buildings.c">
       <Filter>Source Files\Buildings</Filter>
     </ClCompile>
+    <ClCompile Include="gui.c">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="button.c">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="player.h">
@@ -118,6 +127,12 @@
     </ClInclude>
     <ClInclude Include="buildings.h">
       <Filter>Source Files\Buildings</Filter>
+    </ClInclude>
+    <ClInclude Include="gui.h">
+      <Filter>Source Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="button.h">
+      <Filter>Source Files\GUI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
