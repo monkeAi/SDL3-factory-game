@@ -1,8 +1,8 @@
 #define FALSE 0
 #define TRUE 1
 
-#define WINDOW_WIDTH 800				
-#define WINDOW_HEIGHT 600
+#define WINDOW_WIDTH 1200				
+#define WINDOW_HEIGHT 900
 #define WINDOW_TITLE "Victorio the game"
 
 #define FPS 60
@@ -52,8 +52,10 @@
 // GUI
 #define MAX_GUI_WINDOWS 32
 #define MAX_GUI_FLAGS 5
+#define MAX_GUI_CLASS 16
+#define MAX_GUI_CLASS_MATHCHES 256
 
-#define GUI_TILE_SIZE 32
+#define GUI_TILE_SIZE 40
 #define GUI_INVENTORY_WIDTH 10
-#define GUI_INVENTORY_HEIGHT 12
-#define GUI_TILE_MARGIN 2
+#define GUI_INVENTORY_HEIGHT 10
+#define GUI_TILE_MARGIN 1

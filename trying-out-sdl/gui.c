@@ -1,5 +1,6 @@
 #include <stdio.h>	
 #include "gui.h"
+#include "tools.h"
 
 // Main GUI frame
 
@@ -17,6 +18,7 @@
 // Table of all gui window instances
 struct GUI_frame* GUI_WINDOWS[MAX_GUI_WINDOWS] = { NULL };
 
+// Init all importat gui
 void init_gui() {
 	
 }
@@ -42,10 +44,13 @@ static struct GUI_frame* gui_frame_init(struct GUI_frame* parent, const int max_
 	frame->height = 50;
 	frame->width = 50;
 
-	// Background color
-	gui_set_color(frame, 255, 255, 255, 255);
+	frame->class = 0;
 
-	frame->state = SHOWN;
+	// Background color
+	frame->default_color = 0xFFFFFFFF;
+	frame->set_color = frame->default_color;
+
+	frame->visibility = SHOWN;
 
 	// If parent isnt NULL then addapt some parameters from it
 	if (parent != NULL) {
@@ -123,12 +128,14 @@ void gui_move(struct GUI_frame* frame, int x, int y, enum GUI_flags* FLAGS) {
 	}
 }
 
-// Sets a new background color of frame
-void gui_set_color(struct GUI_frame* frame, int r, int g, int b, int a) {
-	frame->background[0] = r;
-	frame->background[1] = g;
-	frame->background[2] = b;
-	frame->background[3] = a;
+// Resets clor to default
+void gui_reset_color(struct GUI_frame* frame) {
+	frame->set_color = frame->default_color;
+}
+
+// Sets a new color of frame
+void gui_set_color(struct GUI_frame* frame, unsigned int new_color) {
+	frame->default_color = new_color;
 }
 
 // Add child to a parent, return 1 if not enough space
@@ -146,13 +153,92 @@ int gui_add_child(struct GUI_frame* parent, struct GUI_frame* child) {
 
 }
 
+// Returns a number of children with that class name, writes to a table of pointers to children with provided class name, it searches recursevly
+int gui_find_children(struct GUI_frame* parent, enum GUI_class class_name, struct GUI_frame** matches) {
+
+	// Amount of found mathches
+	int matches_count = 0;
+
+	// Loop through every child
+	for (int i = 0; i < parent->max_children; i++) {
+
+		// If child is NULL continue
+		if (parent->children[i] == NULL) continue;
+
+		int free_space = gui_get_first_index(matches);
+		
+		// If class name matches and there is still spase in the list, add pointer to end of list
+		if (parent->children[i]->class == class_name && free_space != -1) {
+			matches[free_space] = parent->children[i];
+			matches_count++;
+		}
+
+		// Run function on the children as well
+		matches_count += gui_find_children(parent->children[i], class_name, matches);
+	}
+
+	return matches_count;
+}
+
+// Find first free space in matches
+int gui_get_first_index(struct GUI_frame** matches) {
+
+	for (int j = 0; j < MAX_GUI_CLASS_MATHCHES; j++) {
+		if (matches[j] == NULL) return j;
+	}
+
+	// If no free space is available
+	return -1;
+}
+
+// Updates the gui frame and its children
+void gui_frame_update(struct GUI_frame* frame) {
+
+	// Return if null or hidden
+	if (frame == NULL || frame->visibility == HIDDEN) return;
+
+	// Reset color
+	gui_reset_color(frame);
+
+
+	// Update values
+	switch (frame->state) {
+		case GUI_HOVERING: {
+			frame->set_color = 0x111111FF;
+			break;
+		}
+	}
+
+	frame->state = GUI_NONE;
+
+	// Update children
+	for (int c = 0; c < frame->max_children; c++) {
+		// If child isnt NULL then render that child as well
+		if (frame->children[c] == NULL) continue;
+		gui_frame_update(frame->children[c]);
+	}
+
+	return;
+
+}
+
+// Updates all gui
+void update_gui() {
+
+	// Loop through all visible gui and update it
+	for (int i = 0; i < MAX_GUI_WINDOWS; i++) {
+		if (GUI_WINDOWS[i] == NULL) continue;
+		gui_frame_update(GUI_WINDOWS[i]);
+	}
+}
+
 // Renders a passed GUI frame and its children
 static void gui_frame_render(SDL_Renderer* renderer, struct GUI_frame* frame) {
 
 	// Render parent
 	
 	// Return if null or hidden
-	if (frame == NULL || frame->state == HIDDEN) return;
+	if (frame == NULL || frame->visibility == HIDDEN) return;
 
 	SDL_FRect frame_rect = {
 		frame->position[0],
@@ -161,8 +247,11 @@ static void gui_frame_render(SDL_Renderer* renderer, struct GUI_frame* frame) {
 		frame->height
 	};
 
+	unsigned int rgba_colors[4] = { 0 };
+	Hex2RGBA(frame->set_color, rgba_colors);
+
 	// Set render color
-	SDL_SetRenderDrawColor(renderer, frame->background[0], frame->background[1], frame->background[2], frame->background[3]);
+	SDL_SetRenderDrawColor(renderer, rgba_colors[0], rgba_colors[1], rgba_colors[2], rgba_colors[3]);
 
 	// Add to render  
 	SDL_RenderFillRect(renderer, &frame_rect);
@@ -193,28 +282,45 @@ static int gui_find_free_slot() {
 	return slot;
 }
 
+// Returns true if coordinate is inside gui frame
+int gui_is_inside_frame(struct GUI_frame* frame, int x, int y) {
+
+	if (x >= frame->position[0] && x <= frame->position[0] + frame->width && y >= frame->position[1] && y <= frame->position[1] + frame->height) return TRUE;
+	else return FALSE;
+
+}
+
+
+
+
 // Creates a player inventory with all needed elements
 struct GUI_frame* gui_create_player_inventory() {
 
+	int tiles_width = GUI_INVENTORY_WIDTH * GUI_TILE_SIZE + (GUI_INVENTORY_WIDTH - 1) * GUI_TILE_MARGIN;
+	int tiles_height = GUI_INVENTORY_HEIGHT * GUI_TILE_SIZE + (GUI_INVENTORY_HEIGHT - 1) * GUI_TILE_MARGIN;
+
+	int padding = 15;
+
 	// Create all components and add them together
 	struct GUI_frame* main_frame = gui_frame_init(NULL, 5);
-	gui_resize(main_frame, 210, 260);
-	gui_move(main_frame, 100, 100, NULL);
-	gui_set_color(main_frame, 80, 80, 80, 255);
-	main_frame->state = HIDDEN;
+	gui_resize(main_frame, tiles_width + 4 * padding, tiles_height + 4 * padding);
+	gui_move(main_frame, 100, 100, (enum GUI_flags[]) { POS_CENTERED_X, POS_CENTERED_Y});
+	gui_set_color(main_frame, 0x505050FF);
+	main_frame->visibility = HIDDEN;
+	main_frame->class = C_inventory;
 
 	// Create all components and add them together
 	struct GUI_frame* inv_frame_border = gui_frame_init(main_frame, 5);
-	gui_resize(inv_frame_border, 190, 240);
+	gui_resize(inv_frame_border, tiles_width + 2 * padding, tiles_height + 2 * padding);
 	gui_move(inv_frame_border, 100, 100, (enum GUI_flags[]) { POS_CENTERED_X, POS_CENTERED_Y });
-	gui_set_color(inv_frame_border, 100, 100, 100, 255);
+	gui_set_color(inv_frame_border, 0x646464FF);
 
 	// Create a child frame for inventory tiles
 	struct GUI_frame* inv_frame = gui_frame_init(inv_frame_border, GUI_INVENTORY_WIDTH * GUI_INVENTORY_HEIGHT);
 	// Set size to grid of tiles inside
-	gui_resize(inv_frame, GUI_INVENTORY_WIDTH * GUI_TILE_SIZE + (GUI_INVENTORY_WIDTH - 1) * GUI_TILE_MARGIN, GUI_INVENTORY_HEIGHT * GUI_TILE_SIZE + (GUI_INVENTORY_HEIGHT - 1) * GUI_TILE_MARGIN);
+	gui_resize(inv_frame, tiles_width, tiles_height);
 	gui_move(inv_frame, 0, 0, (enum GUI_flags[]) { POS_CENTERED_X, POS_CENTERED_Y });
-	gui_set_color(inv_frame, inv_frame_border->background[0], inv_frame_border->background[1], inv_frame_border->background[2], inv_frame_border->background[3]);
+	gui_set_color(inv_frame, inv_frame_border->default_color);
 
 	// Create tiles for inventroy frame
 	for (int y = 0; y < GUI_INVENTORY_HEIGHT; y++) {
@@ -226,8 +332,8 @@ struct GUI_frame* gui_create_player_inventory() {
 			// Set size 
 			gui_resize(inv_tile, GUI_TILE_SIZE, GUI_TILE_SIZE);
 			gui_move(inv_tile, x * GUI_TILE_SIZE + x * GUI_TILE_MARGIN, y * GUI_TILE_SIZE + y * GUI_TILE_MARGIN, NULL);
-			gui_set_color(inv_tile, 70, 70, 70, 255);
-
+			gui_set_color(inv_tile, 0x464646FF);
+			inv_tile->class = C_inventory_tile;
 		}
 	}
 
@@ -237,6 +343,17 @@ struct GUI_frame* gui_create_player_inventory() {
 	GUI_WINDOWS[gui_find_free_slot()] = main_frame;
 
 	return main_frame;
+}
+
+
+// Every tile has an item 
+// On player side detect if its over gui then get pointer to that gui
+
+// Creates player crafting menu
+struct GUI_frame* gui_create_player_crafting() {
+
+
+
 }
 
 // Automatic parent resize function

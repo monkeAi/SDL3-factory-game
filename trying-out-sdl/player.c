@@ -114,7 +114,7 @@ static void handle_player_interaction(struct Player* p) {
     int selected_cords[2] = { 0 };
 
     float world_x = (p->mouse_pos[0] * -1 + world_origin_x - mainCamera->x_offset) * -1;         // x
-    float world_y = (p->mouse_pos[1] * -1 + world_origin_y - mainCamera->y_offset);         // y
+    float world_y = (p->mouse_pos[1] * -1 + world_origin_y - mainCamera->y_offset);              // y
 
     selected_cords[0] = (int)floorf(world_x / TILE_SIZE);
     selected_cords[1] = (int)floorf(world_y / TILE_SIZE);
@@ -127,7 +127,54 @@ static void handle_player_interaction(struct Player* p) {
 
     cordinate_to_index(selected_cords, selected_tile_index);
 
-    //printf("Index: %d, %d\n", selected_tile_index[0], selected_tile_index[1]);
+    // 1) Check if mouse is over visible gui
+
+    for (int window = 0; window < MAX_GUI_WINDOWS; window++) {
+
+        // if mouse cord is larger than window cord and smaller than window cord + width AND the window is visible then its inside
+        if (GUI_WINDOWS[window] == NULL) continue;
+        if (!GUI_WINDOWS[window]->visibility) continue;
+        if (!gui_is_inside_frame(GUI_WINDOWS[window], p->mouse_pos[0], p->mouse_pos[1])) continue;
+
+        // Determine class
+        switch (GUI_WINDOWS[window]->class) {
+        case C_NONE: {
+            break;
+        }
+
+        // In case of it beeing inventory then check witch inventory tile iss hovered
+        case C_inventory: {
+
+            struct GUI_frame* inv_tiles[MAX_GUI_CLASS_MATHCHES] = { 0 };
+
+            // Break if it finds no children
+            if (!gui_find_children(GUI_WINDOWS[window], C_inventory_tile, inv_tiles)) break;
+
+            // Determine over witch tile it is hovering
+            for (int tile = 0; tile < MAX_GUI_CLASS_MATHCHES; tile++) {
+
+                // Skip if null or hidden
+                if (inv_tiles[tile] == NULL) continue;
+                if (!inv_tiles[tile]->visibility) continue;
+                // Skip if mouse pos is outside of acctual tile
+                if (!gui_is_inside_frame(inv_tiles[tile], p->mouse_pos[0], p->mouse_pos[1])) continue;
+
+                inv_tiles[tile]->state = GUI_HOVERING;  // This is the selected tile!
+
+            }
+
+            break;
+        }
+        }
+
+    }
+
+
+    // 2) Else check if mouse is over any building
+
+
+    // 3) Else check if mouse is over any tile
+
 
     // Check if selected tile index is within table size
     if (selected_tile_index[0] >= 0 && selected_tile_index[0] < MAP_WIDTH && selected_tile_index[1] >= 0 && selected_tile_index[1] < MAP_HEIGHT) {
@@ -140,9 +187,7 @@ static void handle_player_interaction(struct Player* p) {
     if (p->mouse_state == 1) {
 
         //printf("Mouse click world cords: X:%d Y:%d \n", selected_cords[0], selected_cords[1]);
-        if (Building_create(BUILDING_CRAFTER_1, selected_cords, DOWN)) {
-            //printf("Could not create a new building.\n");
-        }
+        //Building_create(BUILDING_CRAFTER_1, selected_cords, DOWN);
     }
 
 

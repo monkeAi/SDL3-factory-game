@@ -6,4 +6,8 @@ struct Vector2D {
 	float y;
 };
 
+
+void Hex2RGBA(unsigned int hex_color, int* rgba_colors);
+
+
 #endif

@@ -16,6 +16,7 @@ struct Player {
     int available_inventory;
     struct Inventory* inventory;
     struct GUI_frame* gui_inventory;
+    // looking at object
 };
 
 extern struct Player* player;

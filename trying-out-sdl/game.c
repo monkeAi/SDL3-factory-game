@@ -77,6 +77,9 @@ void game_init() {
 
 	init_gui();
 
+	int selected_cords[2] = { 0 };
+	Building_create(BUILDING_CRAFTER_1, selected_cords, DOWN);
+
 }
 
 void game_loop() {
@@ -151,8 +154,8 @@ int game_handle_input() {
 			//printf("Inventory Player:\n");/*
 			//Inventory_print(player->inventory);*/
 
-			// Toggle inventory
-			player->gui_inventory->state = !player->gui_inventory->state;
+			// Toggle inventory visibility
+			player->gui_inventory->visibility = !player->gui_inventory->visibility;
 
 		}
 		if(event.key.key == SDLK_B) {
@@ -215,6 +218,9 @@ int game_update() {
 
 	// Update crafting queue
 	update_craft_queue(delta_time);
+
+	// Update all gui
+	update_gui();
 
 	return 0;
 }
