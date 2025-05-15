@@ -16,7 +16,14 @@ struct Player {
     int available_inventory;
     struct Inventory* inventory;
     struct GUI_frame* gui_inventory;
-    // looking at object
+    enum Player_looking_at looking_at_type;
+};
+
+enum Player_looking_at {
+    PLAYER_NONE,
+    PLAYER_GUI,
+    PLAYER_BUILDING,
+    PLAYER_TILE
 };
 
 extern struct Player* player;

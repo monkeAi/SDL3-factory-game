@@ -47,6 +47,7 @@ void Building_destroy(struct Building* building);
 void Building_rotate(struct Building* b, enum BuildingRotation rotation);
 void Buildings_print();
 void Building_free(struct Building* building);
+int Building_is_inside(struct Building* b, int x_coord, int y_coord);
 
 // Global buildings list
 

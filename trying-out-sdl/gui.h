@@ -17,6 +17,7 @@ struct GUI_frame {
 	int max_children;
 	struct GUI_frame** children;
 	enum GUI_class class;
+
 };
 
 
@@ -63,7 +64,6 @@ int gui_add_child(struct GUI_frame* parent, struct GUI_frame* child);
 int gui_get_first_index(struct GUI_frame** matches);
 int gui_find_children(struct GUI_frame* parent, enum GUI_class class_name, struct GUI_frame** matches);
 void gui_frame_update(struct GUI_frame* frame);
-
 int gui_is_inside_frame(struct GUI_frame* frame, int x, int y);
 
 struct GUI_frame* gui_create_player_inventory();

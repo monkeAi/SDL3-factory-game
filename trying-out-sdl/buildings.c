@@ -288,6 +288,15 @@ void Buildings_print() {
 }
 
 
+// Return true if cursor coordinate is inside building
+int Building_is_inside(struct Building* b, int x_coord, int y_coord) {
+
+	if (x_coord >= b->coords->x && x_coord < b->coords->x + b->tile_width && y_coord >= b->coords->y && y_coord < b->coords->y + b->tile_height) return TRUE;
+	else return FALSE;
+
+}
+
+
 // Frees memory of building struct and its children
 static void Building_free(struct Building* building) {
 

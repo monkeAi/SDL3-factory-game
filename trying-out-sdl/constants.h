@@ -50,7 +50,7 @@
 
 
 // GUI
-#define MAX_GUI_WINDOWS 32
+#define MAX_GUI_WINDOWS 5
 #define MAX_GUI_FLAGS 5
 #define MAX_GUI_CLASS 16
 #define MAX_GUI_CLASS_MATHCHES 256

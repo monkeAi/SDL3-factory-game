@@ -152,3 +152,9 @@ void cordinate_to_index(int *cordinates, int *tileIndex) {
 
 	//return 0;
 }
+
+// Returns true if index coordinates are inside the world map
+int world_is_inside(int x, int y) {
+	if (x >= 0 && x < MAP_WIDTH && y >= 0 && y < MAP_HEIGHT) return TRUE;
+	else return FALSE;
+}

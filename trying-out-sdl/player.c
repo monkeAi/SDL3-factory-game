@@ -109,8 +109,7 @@ static void handle_player_interaction(struct Player* p) {
         // GUI
         // Entity
     
-    // Translate screen cordinates to world cordinates
-
+    // Translate screen coordinates to world cordinates
     int selected_cords[2] = { 0 };
 
     float world_x = (p->mouse_pos[0] * -1 + world_origin_x - mainCamera->x_offset) * -1;         // x
@@ -121,20 +120,24 @@ static void handle_player_interaction(struct Player* p) {
 
     //printf("World cords X:%d Y:%d \n", selected_cords[0], selected_cords[1]);
 
-    // Select tile from world cordinates
-
+    // Translate world coordinates to tile coordinates
     int selected_tile_index[2];
 
     cordinate_to_index(selected_cords, selected_tile_index);
 
-    // 1) Check if mouse is over visible gui
+    // Get what player is looking at:
 
+    p->looking_at_type = PLAYER_NONE;
+
+    // 1) Check if mouse is over visible gui
     for (int window = 0; window < MAX_GUI_WINDOWS; window++) {
 
         // if mouse cord is larger than window cord and smaller than window cord + width AND the window is visible then its inside
         if (GUI_WINDOWS[window] == NULL) continue;
         if (!GUI_WINDOWS[window]->visibility) continue;
         if (!gui_is_inside_frame(GUI_WINDOWS[window], p->mouse_pos[0], p->mouse_pos[1])) continue;
+
+        p->looking_at_type = PLAYER_GUI;
 
         // Determine class
         switch (GUI_WINDOWS[window]->class) {
@@ -171,17 +174,38 @@ static void handle_player_interaction(struct Player* p) {
 
 
     // 2) Else check if mouse is over any building
+    if (p->looking_at_type == PLAYER_NONE) {
+
+        // Loop through all buildings
+        for (int b = 0; b < MAX_BUILDINGS; b++) {
+
+            // Skip if NULL or outside of window
+            if (Buildings[b] == NULL) continue;
+
+            // Check if reaching tile is inside tile world  // Possible problem 
+            if (!world_is_inside(selected_tile_index[0], selected_tile_index[1])) continue;
+
+            // Check if cursor is inside building
+            if (!Building_is_inside(Buildings[b], selected_cords[0], selected_cords[1])) continue;
+
+            p->looking_at_type = PLAYER_BUILDING;
+        }
+
+    }
 
 
     // 3) Else check if mouse is over any tile
+    if (p->looking_at_type == PLAYER_NONE) {
 
+        // Check if selected tile index is within table size
+        if (world_is_inside(selected_tile_index[0], selected_tile_index[1])) {
 
-    // Check if selected tile index is within table size
-    if (selected_tile_index[0] >= 0 && selected_tile_index[0] < MAP_WIDTH && selected_tile_index[1] >= 0 && selected_tile_index[1] < MAP_HEIGHT) {
+            if (map[selected_tile_index[1]][selected_tile_index[0]].state != TILE_FULL) map[selected_tile_index[1]][selected_tile_index[0]].state = TILE_SELECTED;
 
-        if (map[selected_tile_index[1]][selected_tile_index[0]].state != TILE_FULL) map[selected_tile_index[1]][selected_tile_index[0]].state = TILE_SELECTED;
-        
+        }
+
     }
+
 
     // Place building if left click is pressed
     if (p->mouse_state == 1) {

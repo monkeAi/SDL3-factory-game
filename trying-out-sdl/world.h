@@ -41,5 +41,6 @@ void init_tilemap();
 int render_tilemap(SDL_Renderer* renderer);
 void print_tilemap();
 void cordinate_to_index(int* cordinates, int* tileIndex);
+int world_is_inside(int x, int y);
 
 #endif
