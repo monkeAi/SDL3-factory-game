@@ -78,7 +78,11 @@ void game_init() {
 	init_gui();
 
 	int selected_cords[2] = { 0 };
+	int selected_cords2[2] = { 10, 8 };
+	int selected_cords3[2] = { -4, - 15 };
 	Building_create(BUILDING_CRAFTER_1, selected_cords, DOWN);
+	Building_create(BUILDING_CRAFTER_1, selected_cords2, RIGHT);
+	Building_create(BUILDING_CRAFTER_1, selected_cords3, LEFT);
 
 }
 
@@ -208,7 +212,7 @@ int game_update() {
 	update_tilemap();
 
 	// Update player
-	update_player(&player, delta_time);
+	update_player(player, delta_time);
 
 	// Update camera positioning offset
 	update_camera();
@@ -232,9 +236,9 @@ int game_render() {
 	SDL_RenderClear(renderer);
 
 	// Render elements
-
 	render_tilemap(renderer);		// World tilemap
 	render_buildings(renderer);
+	render_player_cursor(renderer);
 	render_player(renderer);		// Player
 
 

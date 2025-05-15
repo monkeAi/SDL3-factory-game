@@ -16,14 +16,24 @@ struct Player {
     int available_inventory;
     struct Inventory* inventory;
     struct GUI_frame* gui_inventory;
-    enum Player_looking_at looking_at_type;
+    struct PlayerCursor* cursor;
 };
 
-enum Player_looking_at {
-    PLAYER_NONE,
-    PLAYER_GUI,
-    PLAYER_BUILDING,
-    PLAYER_TILE
+struct PlayerCursor {
+    int x_pos;
+    int y_pos;
+    int width;
+    int height;
+    unsigned int set_color;
+    enum GUI_visibility visibility;
+    enum CursorWatching watching_type;
+};
+
+enum CursorWatching {
+    CURSOR_NONE,
+    CURSOR_GUI,
+    CURSOR_BUILDING,
+    CURSOR_TILE
 };
 
 extern struct Player* player;
@@ -34,6 +44,9 @@ void render_player(SDL_Renderer* renderer);
 void handle_player_movement(float delta_time);
 static void handle_player_interaction(struct Player* p);
 void get_mouse_update(struct Player* p);
+struct PlayerCursor* player_cursor_create();
+void player_cursor_update();
+void render_player_cursor(SDL_Renderer* renderer);
 
 
 #endif

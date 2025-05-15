@@ -29,6 +29,10 @@ void init_player() {
     player->available_inventory = PLAYER_START_INV_SIZE;
     player->inventory = Inventory_create(PLAYER_MAX_INV_SIZE, PLAYER_START_INV_SIZE);
     player->gui_inventory = gui_create_player_inventory();
+    player->cursor = player_cursor_create();
+
+    if (player->cursor == NULL) printf("Null cursor!\n");
+
     
 }  
 
@@ -39,7 +43,8 @@ void update_player(struct Player *p, float delta_time) {
    }  
 
    handle_player_movement(delta_time);
-   handle_player_interaction(&p);
+   player_cursor_update();
+   handle_player_interaction(p);
 }  
 
 void render_player(SDL_Renderer* renderer) {  
@@ -61,7 +66,6 @@ void render_player(SDL_Renderer* renderer) {
    // Add to render  
    SDL_RenderFillRect(renderer, &player_rect);  
 }
-
 
 // Hanlde player movement
 static void handle_player_movement(float delta_time) {
@@ -127,7 +131,7 @@ static void handle_player_interaction(struct Player* p) {
 
     // Get what player is looking at:
 
-    p->looking_at_type = PLAYER_NONE;
+    p->cursor->watching_type = CURSOR_NONE;
 
     // 1) Check if mouse is over visible gui
     for (int window = 0; window < MAX_GUI_WINDOWS; window++) {
@@ -137,7 +141,7 @@ static void handle_player_interaction(struct Player* p) {
         if (!GUI_WINDOWS[window]->visibility) continue;
         if (!gui_is_inside_frame(GUI_WINDOWS[window], p->mouse_pos[0], p->mouse_pos[1])) continue;
 
-        p->looking_at_type = PLAYER_GUI;
+        p->cursor->watching_type = CURSOR_GUI;
 
         // Determine class
         switch (GUI_WINDOWS[window]->class) {
@@ -174,7 +178,7 @@ static void handle_player_interaction(struct Player* p) {
 
 
     // 2) Else check if mouse is over any building
-    if (p->looking_at_type == PLAYER_NONE) {
+    if (p->cursor->watching_type == CURSOR_NONE) {
 
         // Loop through all buildings
         for (int b = 0; b < MAX_BUILDINGS; b++) {
@@ -188,21 +192,44 @@ static void handle_player_interaction(struct Player* p) {
             // Check if cursor is inside building
             if (!Building_is_inside(Buildings[b], selected_cords[0], selected_cords[1])) continue;
 
-            p->looking_at_type = PLAYER_BUILDING;
+            p->cursor->watching_type = CURSOR_BUILDING;
+            p->cursor->visibility = SHOWN;
+
+            // Set cursor position to building position
+            p->cursor->x_pos = Buildings[b]->coords->x;
+            p->cursor->y_pos = Buildings[b]->coords->y + Buildings[b]->tile_height - 1;     // small offset for drawing
+
+            p->cursor->width = Buildings[b]->tile_width;
+            p->cursor->height = Buildings[b]->tile_height;
         }
 
     }
 
 
     // 3) Else check if mouse is over any tile
-    if (p->looking_at_type == PLAYER_NONE) {
+    if (p->cursor->watching_type == CURSOR_NONE) {
 
         // Check if selected tile index is within table size
         if (world_is_inside(selected_tile_index[0], selected_tile_index[1])) {
 
-            if (map[selected_tile_index[1]][selected_tile_index[0]].state != TILE_FULL) map[selected_tile_index[1]][selected_tile_index[0]].state = TILE_SELECTED;
+            if (map[selected_tile_index[1]][selected_tile_index[0]].state != TILE_FULL && map[selected_tile_index[1]][selected_tile_index[0]].type != TILE_WATER) {
+
+                map[selected_tile_index[1]][selected_tile_index[0]].state = TILE_SELECTED;
+
+                p->cursor->visibility = SHOWN;
+                // Set cursor position
+                p->cursor->x_pos = selected_cords[0];
+                p->cursor->y_pos = selected_cords[1];
+
+                p->cursor->width = 1;
+                p->cursor->height = 1;
+
+
+            }
 
         }
+
+        p->cursor->watching_type = CURSOR_TILE;
 
     }
 
@@ -214,5 +241,59 @@ static void handle_player_interaction(struct Player* p) {
         //Building_create(BUILDING_CRAFTER_1, selected_cords, DOWN);
     }
 
+
+}
+
+
+// Creates a new player cursor struct and returns its pointer
+struct PlayerCursor* player_cursor_create() {
+
+    // Allocate enough memory to the pointer
+    struct PlayerCursor* cursor = (struct PlayerCursor*)malloc(sizeof(struct PlayerCursor));
+    if (cursor == NULL) {
+        fprintf(stderr, "Failed to allocate memory for player cursor.\n");
+        exit(1);
+    }
+
+    // Init parameters
+    cursor->x_pos = 0;
+    cursor->y_pos = 0;
+    cursor->width = 1;
+    cursor->height = 1;
+    cursor->set_color = 0xFFA500FF;
+    cursor->watching_type = 0;
+    cursor->visibility = SHOWN;
+
+    return cursor;
+}
+
+void player_cursor_update() {
+    player->cursor->visibility = HIDDEN;
+}
+
+void render_player_cursor(SDL_Renderer* renderer) {
+
+    if (player->cursor == NULL) {
+        fprintf(stderr, "Player cursor is not initialized\n");
+        return;
+    }
+
+    if (player->cursor->visibility == HIDDEN) return;
+
+    // Create a rect for player  
+    SDL_FRect cursor_rect = {
+        (float)player->cursor->x_pos * TILE_SIZE + world_origin_x - mainCamera->x_offset,
+        (float)(player->cursor->y_pos + 1) * TILE_SIZE * -1 + world_origin_y - mainCamera->y_offset,
+        player->cursor->width * TILE_SIZE,
+        player->cursor->height * TILE_SIZE
+    };
+
+    // Set render color
+    unsigned int rgba_colors[4] = { 0 };
+    Hex2RGBA(player->cursor->set_color, rgba_colors);
+    SDL_SetRenderDrawColor(renderer, rgba_colors[0], rgba_colors[1], rgba_colors[2], rgba_colors[3]);
+
+    // Add to render  
+    SDL_RenderFillRect(renderer, &cursor_rect);
 
 }

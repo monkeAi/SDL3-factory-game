@@ -130,7 +130,7 @@ int render_tilemap(SDL_Renderer* renderer) {
 			}
 
 			switch (map[y][x].state) {
-			case TILE_SELECTED: rgba[0] = 0; rgba[1] = 0; rgba[2] = 0; break;
+			//case TILE_SELECTED: rgba[0] = 0; rgba[1] = 0; rgba[2] = 0; break;
 			case TILE_FULL: rgba[0] = 100; rgba[1] = 0; rgba[2] = 0; break;
 			}
 
