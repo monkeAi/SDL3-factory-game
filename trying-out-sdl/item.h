@@ -5,6 +5,7 @@ struct Item {
     enum ItemType type;
     unsigned int max_quantity;
     unsigned int quantity;
+    unsigned int color;
 };
 
 enum ItemType {
@@ -19,5 +20,6 @@ enum ItemType {
 struct Item Item_create(enum ItemType type, unsigned int max_quantity, unsigned int quantity);
 int Item_is_full(struct Item* item);
 void Item_delete(struct Item* item);
+int Item_get_color(enum ItemType type);
 
 #endif

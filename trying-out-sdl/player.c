@@ -28,7 +28,7 @@ void init_player() {
     player->vel.y = 0;
     player->available_inventory = PLAYER_START_INV_SIZE;
     player->inventory = Inventory_create(PLAYER_MAX_INV_SIZE, PLAYER_START_INV_SIZE);
-    player->gui_inventory = gui_create_player_inventory();
+    player->gui_inventory = gui_create_player_inventory(player);
     player->cursor = player_cursor_create();
 
     if (player->cursor == NULL) printf("Null cursor!\n");
@@ -149,7 +149,7 @@ static void handle_player_interaction(struct Player* p) {
             break;
         }
 
-        // In case of it beeing inventory then check witch inventory tile iss hovered
+        // In case of it beeing inventory then check witch inventory tile is hovered
         case C_inventory: {
 
             struct GUI_frame* inv_tiles[MAX_GUI_CLASS_MATHCHES] = { 0 };
@@ -234,11 +234,13 @@ static void handle_player_interaction(struct Player* p) {
     }
 
 
-    // Place building if left click is pressed
+    // Place building if left click is pressed and its not inside inv
     if (p->mouse_state == 1) {
 
         //printf("Mouse click world cords: X:%d Y:%d \n", selected_cords[0], selected_cords[1]);
-        //Building_create(BUILDING_CRAFTER_1, selected_cords, DOWN);
+        if (p->cursor->watching_type != CURSOR_GUI) {
+            Building_create(BUILDING_CRAFTER_1, selected_cords, DOWN);
+        }
     }
 
 

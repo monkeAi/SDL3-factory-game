@@ -1,6 +1,8 @@
 #include <stdio.h>	
 #include "gui.h"
 #include "tools.h"
+#include "inventory.h"
+#include "player.h"
 
 // Main GUI frame
 
@@ -45,6 +47,7 @@ static struct GUI_frame* gui_frame_init(struct GUI_frame* parent, const int max_
 	frame->width = 50;
 
 	frame->class = 0;
+	frame->id = 0;
 
 	// Background color
 	frame->default_color = 0xFFFFFFFF;
@@ -67,6 +70,36 @@ static struct GUI_frame* gui_frame_init(struct GUI_frame* parent, const int max_
 
 	return frame;
 
+}
+
+// Free and delete gui frame
+void gui_frame_destroy(struct GUI_frame* frame) {
+	if (!frame) return;
+
+	// Recursively destroy children first
+	if (frame->children && frame->max_children > 0) {
+		for (int i = 0; i < frame->max_children; i++) {
+			struct GUI_frame* child = frame->children[i];
+			if (child) {
+				gui_frame_destroy(child);
+				frame->children[i] = NULL;   // prevent stale pointer
+			}
+		}
+		free(frame->children);
+		frame->children = NULL;
+	}
+
+	// If this frame is linked to a parent, clear that slot too
+	if (frame->parent && frame->parent->children) {
+		for (int i = 0; i < frame->parent->max_children; i++) {
+			if (frame->parent->children[i] == frame) {
+				frame->parent->children[i] = NULL;
+				break;
+			}
+		}
+	}
+
+	free(frame);
 }
 
 // Resizes the provided gui frame
@@ -167,7 +200,7 @@ int gui_find_children(struct GUI_frame* parent, enum GUI_class class_name, struc
 
 		int free_space = gui_get_first_index(matches);
 		
-		// If class name matches and there is still spase in the list, add pointer to end of list
+		// If class name matches and there is still space in the list, add pointer to end of list
 		if (parent->children[i]->class == class_name && free_space != -1) {
 			matches[free_space] = parent->children[i];
 			matches_count++;
@@ -178,6 +211,25 @@ int gui_find_children(struct GUI_frame* parent, enum GUI_class class_name, struc
 	}
 
 	return matches_count;
+}
+
+// Returns pointer to gui frame with matching id
+struct GUI_frame* gui_get_frame_by_id(struct GUI_frame* parent, enum GUI_ID id) {
+
+	// Loop through every child
+	for (int i = 0; i < parent->max_children; i++) {
+
+		// If child is NULL continue
+		if (parent->children[i] == NULL) continue;
+
+		// If id matches return struct
+		if (parent->children[i]->id == id) {
+			return parent->children[i];
+		}
+
+		// Run function on the children as well
+		return gui_get_frame_by_id(parent->children[i], id);
+	}
 }
 
 // Find first free space in matches
@@ -229,6 +281,12 @@ void update_gui() {
 	for (int i = 0; i < MAX_GUI_WINDOWS; i++) {
 		if (GUI_WINDOWS[i] == NULL) continue;
 		gui_frame_update(GUI_WINDOWS[i]);
+	}
+
+
+	// Update GUI Player Inventory
+	if (player->gui_inventory->visibility == SHOWN) {
+		gui_update_inventory(player->gui_inventory, player->inventory);
 	}
 }
 
@@ -291,8 +349,6 @@ int gui_is_inside_frame(struct GUI_frame* frame, int x, int y) {
 }
 
 
-
-
 // Creates a player inventory with all needed elements
 struct GUI_frame* gui_create_player_inventory() {
 
@@ -321,19 +377,24 @@ struct GUI_frame* gui_create_player_inventory() {
 	gui_resize(inv_frame, tiles_width, tiles_height);
 	gui_move(inv_frame, 0, 0, (enum GUI_flags[]) { POS_CENTERED_X, POS_CENTERED_Y });
 	gui_set_color(inv_frame, inv_frame_border->default_color);
+	inv_frame->id = ID_inventory_frame;
+	
+	int slot = 0;
 
 	// Create tiles for inventroy frame
 	for (int y = 0; y < GUI_INVENTORY_HEIGHT; y++) {
 		for (int x = 0; x < GUI_INVENTORY_WIDTH; x++) {
 
 			// Create a tile
-			struct GUI_frame* inv_tile = gui_frame_init(inv_frame, 0);
+			struct GUI_frame* inv_tile = gui_frame_init(inv_frame, 1);
 
 			// Set size 
 			gui_resize(inv_tile, GUI_TILE_SIZE, GUI_TILE_SIZE);
 			gui_move(inv_tile, x * GUI_TILE_SIZE + x * GUI_TILE_MARGIN, y * GUI_TILE_SIZE + y * GUI_TILE_MARGIN, NULL);
 			gui_set_color(inv_tile, 0x464646FF);
 			inv_tile->class = C_inventory_tile;
+
+			slot++;
 		}
 	}
 
@@ -348,6 +409,67 @@ struct GUI_frame* gui_create_player_inventory() {
 
 // Every tile has an item 
 // On player side detect if its over gui then get pointer to that gui
+
+void gui_create_item(struct GUI_frame* parent, struct Item* item) {
+
+	struct GUI_frame* item_frame = gui_frame_init(parent, 0);
+	// Set params
+	gui_resize(item_frame, parent->width, parent->height);
+	item_frame->default_color = item->color;
+	printf("Item color: %x\n", item->color);
+	gui_set_color(item_frame, item->color);
+	item_frame->class = C_inventory_item;
+}
+
+
+// Updates gui and game inventory (inventory sync)
+void gui_update_inventory(struct GUI_frame* gui_inv, struct Inventory* game_inv) {
+
+	struct GUI_frame* gui_slots = gui_get_frame_by_id(gui_inv, ID_inventory_frame);
+
+	// Loop through game inventory and compare it to gui inventory tiles
+	for (int slot = 0; slot < game_inv->max_slots; slot++) {
+
+		// Game inv slot is empty and gui inv slot has item
+		if (game_inv->slots[slot].type == ITEM_NONE && gui_slots->children[slot]->children[0] != NULL) {
+
+			// Delete item in slot
+			//printf("Slot: %d, delete item \n", slot);
+			gui_frame_destroy(gui_slots->children[slot]->children[0]);
+		}
+
+		// Game inv slot has an item
+		else if (game_inv->slots[slot].type != ITEM_NONE) {
+
+			// Gui inv slot is empty
+			if (gui_slots->children[slot]->children[0] == NULL) {
+
+				// Create new gui item
+				//printf("Slot: %d, create gui item \n", slot);
+				gui_create_item(gui_slots->children[slot], &player->inventory->slots[slot]);
+			}
+
+			// Gui inv slot has the right item
+			else {
+
+				// Update gui quantity if needed
+				//printf("Slot: %d, Update gui item if needed\n", slot);
+			}
+		}
+
+		else {
+			//printf("Slot: %d, Continue\n", slot);
+		}
+
+
+	}
+
+	// If it finds item in real inventory 
+		// if gui tile is empty -> create inv item
+		// else update quantity
+	// Else skip
+
+}
 
 // Creates player crafting menu
 struct GUI_frame* gui_create_player_crafting() {

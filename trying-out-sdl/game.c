@@ -155,11 +155,12 @@ int game_handle_input() {
 		}
 		if (event.key.key == SDLK_E) {
 
-			//printf("Inventory Player:\n");/*
-			//Inventory_print(player->inventory);*/
+			printf("Inventory Player:\n");
+			Inventory_print(player->inventory);
 
 			// Toggle inventory visibility
 			player->gui_inventory->visibility = !player->gui_inventory->visibility;
+
 
 		}
 		if(event.key.key == SDLK_B) {

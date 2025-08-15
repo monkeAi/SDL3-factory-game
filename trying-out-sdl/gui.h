@@ -17,6 +17,7 @@ struct GUI_frame {
 	int max_children;
 	struct GUI_frame** children;
 	enum GUI_class class;
+	enum GUI_ID id;
 
 };
 
@@ -46,6 +47,12 @@ enum GUI_class {
 	C_NONE,
 	C_inventory,
 	C_inventory_tile,
+	C_inventory_item,
+};
+
+enum GUI_ID {
+	ID_none,
+	ID_inventory_frame,
 };
 
 extern struct GUI_frame* GUI_WINDOWS[MAX_GUI_WINDOWS];
@@ -53,6 +60,7 @@ extern struct GUI_frame* GUI_WINDOWS[MAX_GUI_WINDOWS];
 void init_gui();
 void update_gui();
 static struct GUI_frame* gui_frame_init(struct GUI_frame* parent, const int max_children);
+void gui_frame_destroy(struct GUI_frame* frame);
 void gui_frame_render(SDL_Renderer* renderer, struct GUI_frame* frame);
 static int gui_find_free_slot();
 void render_gui(SDL_Renderer* renderer);
@@ -65,7 +73,11 @@ int gui_get_first_index(struct GUI_frame** matches);
 int gui_find_children(struct GUI_frame* parent, enum GUI_class class_name, struct GUI_frame** matches);
 void gui_frame_update(struct GUI_frame* frame);
 int gui_is_inside_frame(struct GUI_frame* frame, int x, int y);
+struct GUI_frame* gui_get_frame_by_id(struct GUI_frame* parent, enum GUI_ID id);
 
 struct GUI_frame* gui_create_player_inventory();
+void gui_update_inventory(struct GUI_frame* gui_inv, struct Inventory* game_inv);
+void gui_create_item(struct GUI_frame* parent, struct Item* item);
+void gui_delete_item(struct GUI_frame* item);
 
 #endif
