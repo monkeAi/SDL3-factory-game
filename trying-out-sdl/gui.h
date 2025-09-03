@@ -54,7 +54,13 @@ enum GUI_class {
 
 enum GUI_ID {
 	ID_none,
-	ID_inventory_frame,
+	ID_inventory_frame
+};
+
+enum GUI_side_menu {
+	SM_HIDDEN,
+	SM_CRAFTING,
+	SM_BUILDING
 };
 
 extern struct GUI_frame* GUI_WINDOWS[MAX_GUI_WINDOWS];
@@ -67,7 +73,7 @@ void gui_frame_render(SDL_Renderer* renderer, struct GUI_frame* frame);
 static int gui_find_free_slot();
 void render_gui(SDL_Renderer* renderer);
 void gui_resize(struct GUI_frame* frame, int width, int height);
-void gui_move(struct GUI_frame* frame, int x, int y, enum GUI_flags* FLAGS);
+void gui_move(struct GUI_frame* frame, int x, int y, int margin_x, int margin_y, enum GUI_flags* FLAGS);
 void gui_set_color(struct GUI_frame* frame, unsigned int new_color);
 void gui_reset_color(struct GUI_frame* frame);
 int gui_add_child(struct GUI_frame* parent, struct GUI_frame* child);

@@ -113,7 +113,7 @@ void gui_resize(struct GUI_frame* frame, int width, int height) {
 }
 
 // Moves gui frame to a new position
-void gui_move(struct GUI_frame* frame, int x, int y, enum GUI_flags* FLAGS) {
+void gui_move(struct GUI_frame* frame, int x, int y, int margin_x, int margin_y, enum GUI_flags* FLAGS) {
 
 	int x_offset = x;
 	int	y_offset = y;
@@ -145,7 +145,30 @@ void gui_move(struct GUI_frame* frame, int x, int y, enum GUI_flags* FLAGS) {
 						y_offset = WINDOW_HEIGHT / 2 - frame->height / 2;
 					}
 					break;
+
 				// Add more cases for TOP, DOWN, LEFT, RIGHT
+
+				case POS_LEFT:
+					// If it has parent
+					if (frame->parent != NULL) {
+						x_offset = margin_x;
+					}
+					// If its based on window
+					else {
+						x_offset = margin_x;
+					}
+					break;
+
+				case POS_RIGHT:
+					// If it has parent
+					if (frame->parent != NULL) {
+						x_offset = frame->parent->width - frame->width - margin_x;
+					}
+					// If its based on window
+					else {
+						x_offset = WINDOW_WIDTH - frame->width - margin_x;
+					}
+					break;
 			}
 		}
 	}
@@ -372,27 +395,36 @@ struct GUI_frame* gui_create_player_inventory() {
 	int tiles_width = GUI_INVENTORY_WIDTH * GUI_TILE_SIZE + (GUI_INVENTORY_WIDTH - 1) * GUI_TILE_MARGIN;
 	int tiles_height = GUI_INVENTORY_HEIGHT * GUI_TILE_SIZE + (GUI_INVENTORY_HEIGHT - 1) * GUI_TILE_MARGIN;
 
+	int side_menu_width = 400;
+	int side_menu_height = 200;
+
 	int padding = 15;
 
 	// Create all components and add them together
-	struct GUI_frame* main_frame = gui_frame_init(NULL, 5);
-	gui_resize(main_frame, tiles_width + 4 * padding, tiles_height + 4 * padding);
-	gui_move(main_frame, 100, 100, (enum GUI_flags[]) { POS_CENTERED_X, POS_CENTERED_Y});
+
+	// MAIN FRAME
+	struct GUI_frame* main_frame = gui_frame_init(NULL, 6);
+	gui_resize(main_frame, tiles_width + 4 * padding + side_menu_width, tiles_height + 4 * padding);
+	gui_move(main_frame, 100, 100, 0, 0, (enum GUI_flags[]) { POS_CENTERED_X, POS_CENTERED_Y});
 	gui_set_color(main_frame, 0x505050FF);
 	main_frame->visibility = HIDDEN;
 	main_frame->class = C_inventory;
 
 	// Create all components and add them together
+	
+	
+
+	// INVENTORY FRAME BORDER
 	struct GUI_frame* inv_frame_border = gui_frame_init(main_frame, 5);
 	gui_resize(inv_frame_border, tiles_width + 2 * padding, tiles_height + 2 * padding);
-	gui_move(inv_frame_border, 100, 100, (enum GUI_flags[]) { POS_CENTERED_X, POS_CENTERED_Y });
+	gui_move(inv_frame_border, 100, 100, padding, 0, (enum GUI_flags[]) { POS_LEFT, POS_CENTERED_Y });
 	gui_set_color(inv_frame_border, 0x646464FF);
 
-	// Create a child frame for inventory tiles
+	// INVENTORY FRAME
 	struct GUI_frame* inv_frame = gui_frame_init(inv_frame_border, GUI_INVENTORY_WIDTH * GUI_INVENTORY_HEIGHT);
 	// Set size to grid of tiles inside
 	gui_resize(inv_frame, tiles_width, tiles_height);
-	gui_move(inv_frame, 0, 0, (enum GUI_flags[]) { POS_CENTERED_X, POS_CENTERED_Y });
+	gui_move(inv_frame, 0, 0, 0, 0, (enum GUI_flags[]) { POS_CENTERED_X, POS_CENTERED_Y });
 	gui_set_color(inv_frame, inv_frame_border->default_color);
 	inv_frame->id = ID_inventory_frame;
 	
@@ -407,13 +439,26 @@ struct GUI_frame* gui_create_player_inventory() {
 
 			// Set size 
 			gui_resize(inv_tile, GUI_TILE_SIZE, GUI_TILE_SIZE);
-			gui_move(inv_tile, x * GUI_TILE_SIZE + x * GUI_TILE_MARGIN, y * GUI_TILE_SIZE + y * GUI_TILE_MARGIN, NULL);
+			gui_move(inv_tile, x * GUI_TILE_SIZE + x * GUI_TILE_MARGIN, y * GUI_TILE_SIZE + y * GUI_TILE_MARGIN, 0, 0, NULL);
 			gui_set_color(inv_tile, 0x464646FF);
 			inv_tile->class = C_inventory_tile;
 
 			slot++;
 		}
 	}
+
+
+	// SIDE MENU
+	struct GUI_frame* side_menu = gui_frame_init(main_frame, 0);
+	gui_resize(side_menu, side_menu_width - padding, main_frame->height - 2 * padding);
+	gui_move(side_menu, 100, 100, padding, 0, (enum GUI_flags[]) { POS_RIGHT, POS_CENTERED_Y });
+	gui_set_color(side_menu, 0x646464FF);
+
+
+	// SIDE MENU CRAFTING
+
+
+	// SIDE MENU BUILDING INVENTORY
 
 
 
@@ -440,6 +485,10 @@ void gui_create_item(struct GUI_frame* parent, struct Item* item) {
 void gui_update_inventory(struct GUI_frame* gui_inv, struct Inventory* game_inv, SDL_Renderer* renderer, struct MediaBin* mediaBin) {
 
 	struct GUI_frame* gui_slots = gui_get_frame_by_id(gui_inv, ID_inventory_frame);
+
+	if (!gui_slots) {
+		printf("Null pointer ID");
+	}
 
 	// Loop through game inventory and compare it to gui inventory tiles
 	for (int slot = 0; slot < game_inv->max_slots; slot++) {
@@ -547,3 +596,6 @@ struct GUI_frame* gui_create_player_crafting() {
 // OPTIONAL, NOT IMPORTANT RN
 // Automatic parent resize function
 // Starts from a child and resizes parent to fit child plus padding
+
+
+

@@ -16,6 +16,7 @@ struct Player {
     int available_inventory;
     struct Inventory* inventory;
     struct GUI_frame* gui_inventory;
+    enum GUI_side_menu side_menu_state;
     struct PlayerCursor* cursor;
 };
 
