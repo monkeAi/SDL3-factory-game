@@ -5,6 +5,7 @@
 
 #include "constants.h"	
 #include "game.h"
+#include "media.h"
 #include "world.h"
 #include "player.h"
 #include "camera.h"
@@ -18,8 +19,7 @@
 
 SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
-SDL_Texture* texture = NULL;
-TTF_Font* font = NULL;
+MediaBin* game_media = NULL;
 
 extern unsigned char tiny_ttf[];
 extern unsigned int tiny_ttf_len;
@@ -80,6 +80,7 @@ int initialize_window(void) {
 void game_init() {
 	program_running = initialize_window();
 
+	game_media = init_media();
 
 	init_tilemap();
 
@@ -177,7 +178,7 @@ int game_handle_input() {
 		}
 		if (event.key.key == SDLK_E) {
 
-			printf("Inventory Player:\n");
+			//printf("Inventory Player:\n");
 			//Inventory_print(player->inventory);
 
 			// Toggle inventory visibility
@@ -269,8 +270,34 @@ int game_render() {
 	// Render GUI
 	render_gui(renderer);
 
+	
+	// Text rendering example
+	SDL_FRect t_rect = {
+		200,	// x
+		100,	// y
+		300,	// Width
+		100		// Height
+	};
+	render_text(renderer, game_media->font_text, &t_rect, "Hello", COLOR_WHITE);
+
 	// Render scene
 	SDL_RenderPresent(renderer);
 
 	return 0;
 }
+
+
+
+/*
+
+- load media
+	- loads all images and fonts and stores pointers in a list
+- render text function
+	- inputs string and size 
+	- renders text texture
+
+- each tile, player, building has texture and frect in their struct
+	- at start load images into textures.
+
+
+*/

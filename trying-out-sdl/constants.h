@@ -60,5 +60,10 @@
 #define GUI_INVENTORY_HEIGHT 10
 #define GUI_TILE_MARGIN 1
 
+
 // Fonts
-#define TEXT_SIZE 30
+#define TEXT_SIZE 20
+
+
+// Colors
+#define COLOR_WHITE (SDL_Color){255, 255, 255, 255}

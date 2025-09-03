@@ -90,6 +90,9 @@
     <ClCompile Include="button.c">
       <Filter>Source Files\GUI</Filter>
     </ClCompile>
+    <ClCompile Include="media.c">
+      <Filter>Source Files\Game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="player.h">
@@ -133,6 +136,9 @@
     </ClInclude>
     <ClInclude Include="button.h">
       <Filter>Source Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="media.h">
+      <Filter>Source Files\Game</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

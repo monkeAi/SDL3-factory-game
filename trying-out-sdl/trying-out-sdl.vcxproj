@@ -144,6 +144,7 @@
     <ClCompile Include="gui.c" />
     <ClCompile Include="inventory.c" />
     <ClCompile Include="item.c" />
+    <ClCompile Include="media.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="perlin_noise.c" />
     <ClCompile Include="player.c" />
@@ -163,6 +164,7 @@
     <ClInclude Include="gui.h" />
     <ClInclude Include="inventory.h" />
     <ClInclude Include="item.h" />
+    <ClInclude Include="media.h" />
     <ClInclude Include="perlin_noise.h" />
     <ClInclude Include="player.h" />
     <ClInclude Include="recipes.h" />
