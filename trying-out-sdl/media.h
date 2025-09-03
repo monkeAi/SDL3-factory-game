@@ -14,5 +14,6 @@ typedef struct MediaBin MediaBin;
 
 struct MediaBin* init_media(void);  
 int render_text(SDL_Renderer* renderer, TTF_Font* font, SDL_FRect* text_rect, char* text, SDL_Color color);
+void free_media_bin(struct MediaBin* bin);
 
 #endif

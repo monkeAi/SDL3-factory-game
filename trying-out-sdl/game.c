@@ -21,9 +21,6 @@ SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
 MediaBin* game_media = NULL;
 
-extern unsigned char tiny_ttf[];
-extern unsigned int tiny_ttf_len;
-
 // Global variables
 
 int program_running = FALSE;
@@ -128,6 +125,9 @@ void game_loop() {
 
 
 void game_shutdown() {
+
+	// Free fonts and images
+	free_media_bin(game_media);
 
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);

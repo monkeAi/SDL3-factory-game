@@ -32,8 +32,6 @@ struct MediaBin* init_media(void) {
 
 // Load sprites
 
-// Load fonts
-
 
 // Render text with font and color to x,y,w,h of FRect
 int render_text(SDL_Renderer* renderer, TTF_Font* font, SDL_FRect* text_rect, char* text, SDL_Color color) {
@@ -79,6 +77,23 @@ int render_text(SDL_Renderer* renderer, TTF_Font* font, SDL_FRect* text_rect, ch
 
 	// Render texture
 	SDL_RenderTexture(renderer, text_image, NULL, text_rect);
+
+	// Free texture
+	if (text_image) {
+		SDL_DestroyTexture(text_image);
+		text_image = NULL;
+	}
+}
+
+// Free media
+void free_media_bin(struct MediaBin* bin) {
+
+	if (bin->font_text) {
+		TTF_CloseFont(bin->font_text);
+		bin->font_text = NULL;
+	}
+
+	// Loop through image textures
 }
 
 
