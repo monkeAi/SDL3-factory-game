@@ -1,8 +1,9 @@
-#include <stdio.h>			// Special system folders from links
+#include <stdio.h>			
 #include <SDL3/SDL.h>
 #include <SDL_image.h>
+#include <SDL_ttf.h>
 
-#include "constants.h"	// Sibling file in project folder
+#include "constants.h"	
 #include "game.h"
 #include "world.h"
 #include "player.h"
@@ -12,11 +13,16 @@
 #include "recipes.h"
 #include "crafting.h"
 #include "buildings.h"
-
+ 
 // Defines
 
 SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
+SDL_Texture* texture = NULL;
+TTF_Font* font = NULL;
+
+extern unsigned char tiny_ttf[];
+extern unsigned int tiny_ttf_len;
 
 // Global variables
 
@@ -27,9 +33,17 @@ Uint64 last_frame_time = 0;
 
 int initialize_window(void) {
 
-	// Check if SDL initialization failed
+	SDL_Color color = { 255, 255, 255, SDL_ALPHA_OPAQUE };
+
+	// Init SDL
 	if (!SDL_InitSubSystem(0)) {
-		fprintf(stderr, "Error initializing SDL.\n");
+		fprintf(stderr, "Error initializing SDL: %s\n", SDL_GetError());
+		return FALSE;
+	}
+
+	// Init TTF
+	if (!TTF_Init()) {
+		fprintf(stderr, "Error initializing SDL3_ttf: %s\n", SDL_GetError());
 		return FALSE;
 	}
 
@@ -59,11 +73,13 @@ int initialize_window(void) {
 		return FALSE;
 	}
 
+
 	return TRUE;
 }
 
 void game_init() {
 	program_running = initialize_window();
+
 
 	init_tilemap();
 
@@ -109,13 +125,19 @@ void game_loop() {
 
 }
 
+
 void game_shutdown() {
+
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 
 	// Clean up
+	TTF_Quit();
 	SDL_Quit();
+
 }
+
+
 
 int game_handle_input() {
 
@@ -156,7 +178,7 @@ int game_handle_input() {
 		if (event.key.key == SDLK_E) {
 
 			printf("Inventory Player:\n");
-			Inventory_print(player->inventory);
+			//Inventory_print(player->inventory);
 
 			// Toggle inventory visibility
 			player->gui_inventory->visibility = !player->gui_inventory->visibility;
@@ -226,6 +248,7 @@ int game_update() {
 
 	// Update all gui
 	update_gui();
+
 
 	return 0;
 }

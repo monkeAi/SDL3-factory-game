@@ -421,7 +421,7 @@ void gui_create_item(struct GUI_frame* parent, struct Item* item) {
 	item_frame->class = C_inventory_item;
 }
 
-
+// Ale was here
 // Updates gui and game inventory (inventory sync)
 void gui_update_inventory(struct GUI_frame* gui_inv, struct Inventory* game_inv) {
 

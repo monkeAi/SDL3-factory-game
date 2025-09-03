@@ -59,3 +59,6 @@
 #define GUI_INVENTORY_WIDTH 10
 #define GUI_INVENTORY_HEIGHT 10
 #define GUI_TILE_MARGIN 1
+
+// Fonts
+#define TEXT_SIZE 30
