@@ -24,7 +24,7 @@ struct MediaBin* init_media(void) {
 		exit(1);
 	}
 
-	printf("Media bin init complete.");
+	printf("Media bin initialization complete. \n");
 	// Return pointer
 	return mediaBin;
 
@@ -58,6 +58,8 @@ int render_text(SDL_Renderer* renderer, TTF_Font* font, SDL_FRect* text_rect, ch
 		fprintf(stderr, "Error rendering text to Surface: %s\n", SDL_GetError());
 		return FALSE;
 	}
+
+	// Posible memory leak !!!!!
 
 	// Set width and height of surface to rect
 	text_rect->w = (float)surf->w;

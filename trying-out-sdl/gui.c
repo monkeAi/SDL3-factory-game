@@ -292,6 +292,12 @@ void update_gui(SDL_Renderer* renderer, struct MediaBin* mediaBin) {
 	if (player->gui_inventory->visibility == SHOWN) {
 		gui_update_inventory(player->gui_inventory, player->inventory, renderer, mediaBin);
 	}
+
+	// Update GUI Building Inventory
+
+		// Buildings have 2 inventorys to update
+
+
 }
 
 // Renders a passed GUI frame and its children
@@ -423,7 +429,6 @@ void gui_create_item(struct GUI_frame* parent, struct Item* item) {
 	// Set params
 	gui_resize(item_frame, parent->width, parent->height);
 	item_frame->default_color = item->color;
-	printf("Item color: %x\n", item->color);
 	gui_set_color(item_frame, item->color);
 	item_frame->class = C_inventory_item;
 	// Enable text in the frame so it can be rendered

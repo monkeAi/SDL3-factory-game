@@ -29,7 +29,7 @@
 // Player
 
 #define PLAYER_MAX_SPEED 300
-#define PLAYER_MAX_INV_SIZE 30
+#define PLAYER_MAX_INV_SIZE 100
 #define PLAYER_START_INV_SIZE 10
 
 
@@ -62,7 +62,7 @@
 
 
 // Fonts
-#define TEXT_SIZE 20
+#define TEXT_SIZE 15
 
 
 // Colors

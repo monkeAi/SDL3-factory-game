@@ -3,6 +3,7 @@
 
 #include "inventory.h"
 #include "recipes.h"
+#include "gui.h"
 
 struct Building {
 	enum BuildingType type;
@@ -11,10 +12,16 @@ struct Building {
 	int x_offset, y_offset;
 	enum BuildingState state;
 	int tile_width, tile_height;
+
 	struct Inventory* input_inv;
 	struct Inventory* output_inv;
+
 	int input_size, output_size;
 	enum RecipeName recipe;
+
+	struct GUI_frame* gui_input_inv;
+	struct GUI_frame* gui_output_inv;
+	enum GUI_visibility gui_visibility;
 };
 
 enum BuildingType {
