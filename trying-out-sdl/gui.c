@@ -449,7 +449,7 @@ struct GUI_frame* gui_create_player_inventory() {
 
 
 	// SIDE MENU
-	struct GUI_frame* side_menu = gui_frame_init(main_frame, 0);
+	struct GUI_frame* side_menu = gui_frame_init(main_frame, 1);
 	gui_resize(side_menu, side_menu_width - padding, main_frame->height - 2 * padding);
 	gui_move(side_menu, 100, 100, padding, 0, (enum GUI_flags[]) { POS_RIGHT, POS_CENTERED_Y });
 	gui_set_color(side_menu, 0x646464FF);
@@ -459,6 +459,10 @@ struct GUI_frame* gui_create_player_inventory() {
 
 
 	// SIDE MENU BUILDING INVENTORY
+	struct GUI_frame* building_inv = gui_frame_init(side_menu, 0);
+	gui_resize(building_inv, side_menu->width - 2 * padding, side_menu->height - 2 * padding);
+	gui_move(building_inv, 100, 100, 0, 0, (enum GUI_flags[]) { POS_CENTERED_X, POS_CENTERED_Y });
+	gui_set_color(building_inv, 0x464646FF);
 
 
 
