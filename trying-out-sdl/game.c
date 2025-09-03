@@ -21,6 +21,11 @@ SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
 MediaBin* game_media = NULL;
 
+
+// TODO
+
+// Game as a struct with render, media and states -> other code has access to it
+
 // Global variables
 
 int program_running = FALSE;
@@ -248,7 +253,7 @@ int game_update() {
 	update_craft_queue(delta_time);
 
 	// Update all gui
-	update_gui();
+	update_gui(renderer, game_media);
 
 
 	return 0;
@@ -279,6 +284,21 @@ int game_render() {
 		100		// Height
 	};
 	render_text(renderer, game_media->font_text, &t_rect, "Hello", COLOR_WHITE);
+
+
+
+	// Text rendering example with textbox
+	//SDL_FRect t_rect2 = {
+	//	200,	// x
+	//	100,	// y
+	//	300,	// Width
+	//	100		// Height
+	//};
+	//struct TextBox* tb = malloc(sizeof(struct TextBox));;
+	//update_text_box(renderer, tb, game_media->font_text, &t_rect2, "30", COLOR_BLACK);
+	//render_text_box(renderer, tb);
+
+
 
 	// Render scene
 	SDL_RenderPresent(renderer);

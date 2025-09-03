@@ -5,6 +5,7 @@
 #include "constants.h"
 #include "item.h"
 #include "inventory.h"
+#include "media.h"
 
 struct GUI_frame {
 	float position[2];
@@ -18,7 +19,8 @@ struct GUI_frame {
 	struct GUI_frame** children;
 	enum GUI_class class;
 	enum GUI_ID id;
-
+	struct TextBox* textBox;
+	int text_enabled;
 };
 
 
@@ -58,7 +60,7 @@ enum GUI_ID {
 extern struct GUI_frame* GUI_WINDOWS[MAX_GUI_WINDOWS];
 
 void init_gui();
-void update_gui();
+void update_gui(SDL_Renderer* renderer, struct MediaBin* mediaBin);
 static struct GUI_frame* gui_frame_init(struct GUI_frame* parent, const int max_children);
 void gui_frame_destroy(struct GUI_frame* frame);
 void gui_frame_render(SDL_Renderer* renderer, struct GUI_frame* frame);
@@ -76,8 +78,8 @@ int gui_is_inside_frame(struct GUI_frame* frame, int x, int y);
 struct GUI_frame* gui_get_frame_by_id(struct GUI_frame* parent, enum GUI_ID id);
 
 struct GUI_frame* gui_create_player_inventory();
-void gui_update_inventory(struct GUI_frame* gui_inv, struct Inventory* game_inv);
+void gui_update_inventory(struct GUI_frame* gui_inv, struct Inventory* game_inv, SDL_Renderer* renderer, struct MediaBin* mediaBin);
 void gui_create_item(struct GUI_frame* parent, struct Item* item);
-void gui_delete_item(struct GUI_frame* item);
+//void gui_delete_item(struct GUI_frame* item);
 
 #endif

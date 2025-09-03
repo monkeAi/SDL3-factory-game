@@ -67,3 +67,4 @@
 
 // Colors
 #define COLOR_WHITE (SDL_Color){255, 255, 255, 255}
+#define COLOR_BLACK (SDL_Color){0, 0, 0, 255}

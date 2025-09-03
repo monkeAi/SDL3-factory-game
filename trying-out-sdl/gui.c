@@ -3,6 +3,7 @@
 #include "tools.h"
 #include "inventory.h"
 #include "player.h"
+#include "media.h"
 
 // Main GUI frame
 
@@ -48,6 +49,9 @@ static struct GUI_frame* gui_frame_init(struct GUI_frame* parent, const int max_
 
 	frame->class = 0;
 	frame->id = 0;
+
+	frame->textBox = malloc(sizeof(struct TextBox));
+	frame->text_enabled = FALSE;
 
 	// Background color
 	frame->default_color = 0xFFFFFFFF;
@@ -275,7 +279,7 @@ void gui_frame_update(struct GUI_frame* frame) {
 }
 
 // Updates all gui
-void update_gui() {
+void update_gui(SDL_Renderer* renderer, struct MediaBin* mediaBin) {
 
 	// Loop through all visible gui and update it
 	for (int i = 0; i < MAX_GUI_WINDOWS; i++) {
@@ -286,7 +290,7 @@ void update_gui() {
 
 	// Update GUI Player Inventory
 	if (player->gui_inventory->visibility == SHOWN) {
-		gui_update_inventory(player->gui_inventory, player->inventory);
+		gui_update_inventory(player->gui_inventory, player->inventory, renderer, mediaBin);
 	}
 }
 
@@ -314,12 +318,19 @@ static void gui_frame_render(SDL_Renderer* renderer, struct GUI_frame* frame) {
 	// Add to render  
 	SDL_RenderFillRect(renderer, &frame_rect);
 
+	// Render textbox if text is enabled
+	if (frame->text_enabled) {
+		//printf("textbox frect:  x: %f; y: %f, w:%f, h:%f \n", frame->textBox->rect->x, frame->textBox->rect->y, frame->textBox->rect->w, frame->textBox->rect->h);
+		render_text_box(renderer, frame->textBox);
+	}
+
 	// Render children
 	for (int c = 0; c < frame->max_children; c++) {
 		// If child isnt NULL then render that child as well
 		if (frame->children[c] == NULL) continue;
 		gui_frame_render(renderer, frame->children[c]);
 	}
+
 
 	return;
 }
@@ -406,10 +417,6 @@ struct GUI_frame* gui_create_player_inventory() {
 	return main_frame;
 }
 
-
-// Every tile has an item 
-// On player side detect if its over gui then get pointer to that gui
-
 void gui_create_item(struct GUI_frame* parent, struct Item* item) {
 
 	struct GUI_frame* item_frame = gui_frame_init(parent, 0);
@@ -419,11 +426,13 @@ void gui_create_item(struct GUI_frame* parent, struct Item* item) {
 	printf("Item color: %x\n", item->color);
 	gui_set_color(item_frame, item->color);
 	item_frame->class = C_inventory_item;
+	// Enable text in the frame so it can be rendered
+	item_frame->text_enabled = TRUE;
 }
 
 // Ale was here
 // Updates gui and game inventory (inventory sync)
-void gui_update_inventory(struct GUI_frame* gui_inv, struct Inventory* game_inv) {
+void gui_update_inventory(struct GUI_frame* gui_inv, struct Inventory* game_inv, SDL_Renderer* renderer, struct MediaBin* mediaBin) {
 
 	struct GUI_frame* gui_slots = gui_get_frame_by_id(gui_inv, ID_inventory_frame);
 
@@ -435,6 +444,7 @@ void gui_update_inventory(struct GUI_frame* gui_inv, struct Inventory* game_inv)
 
 			// Delete item in slot
 			//printf("Slot: %d, delete item \n", slot);
+			gui_slots->children[slot]->children[0]->text_enabled = FALSE;
 			gui_frame_destroy(gui_slots->children[slot]->children[0]);
 		}
 
@@ -445,15 +455,57 @@ void gui_update_inventory(struct GUI_frame* gui_inv, struct Inventory* game_inv)
 			if (gui_slots->children[slot]->children[0] == NULL) {
 
 				// Create new gui item
+				
 				//printf("Slot: %d, create gui item \n", slot);
 				gui_create_item(gui_slots->children[slot], &player->inventory->slots[slot]);
+
+				if (!gui_slots->children[slot]->children[0]) {
+					printf("Null gui item pointer");
+					continue;
+				}
+				
+				// gui_slots->children[slot]->children[0] --- Item frame adress
+
+				// Converting integer to string for quantity
+				char quantity[12];
+				intToStr(game_inv->slots[slot].quantity, quantity);
+
+				
+				// Set text size and position to item
+				SDL_FRect* t_rect = malloc(sizeof(SDL_FRect));
+
+				t_rect->x = gui_slots->children[slot]->children[0]->position[0];	// x
+				t_rect->y = gui_slots->children[slot]->children[0]->position[1];	// y
+				t_rect->w = gui_slots->children[slot]->children[0]->width;			// Width
+				t_rect->h = gui_slots->children[slot]->children[0]->height;			// Height
+                
+				//printf("x: %f; y: %f, w:%f, h:%f \n", t_rect->x, t_rect->y, t_rect->w, t_rect->h);
+
+				// Update text box with correct quantity
+				update_text_box(renderer, gui_slots->children[slot]->children[0]->textBox, mediaBin->font_text, t_rect, quantity, COLOR_BLACK);
 			}
 
 			// Gui inv slot has the right item
 			else {
 
-				// Update gui quantity if needed
-				//printf("Slot: %d, Update gui item if needed\n", slot);
+
+				// Update text box with correct quantity
+				char quantity[12];
+				intToStr(game_inv->slots[slot].quantity, quantity);
+
+
+				// Set text size and position to item
+				SDL_FRect* t_rect = malloc(sizeof(SDL_FRect));
+
+				t_rect->x = gui_slots->children[slot]->children[0]->position[0];	// x
+				t_rect->y = gui_slots->children[slot]->children[0]->position[1];	// y
+				t_rect->w = gui_slots->children[slot]->children[0]->width;			// Width
+				t_rect->h = gui_slots->children[slot]->children[0]->height;			// Height
+
+				//printf("x: %f; y: %f, w:%f, h:%f \n", t_rect->x, t_rect->y, t_rect->w, t_rect->h);
+
+				// Update text box with correct quantity
+				update_text_box(renderer, gui_slots->children[slot]->children[0]->textBox, mediaBin->font_text, t_rect, quantity, COLOR_BLACK);
 			}
 		}
 
@@ -471,6 +523,15 @@ void gui_update_inventory(struct GUI_frame* gui_inv, struct Inventory* game_inv)
 
 }
 
+// When gui is open
+	// Get tile of selected inventory tile
+	// Check what item it is
+	// Store it into player 
+	// When player clicks on it it should stick to the mouse
+		// Item gets new draw position but is still in inventory until moved to another
+
+
+
 // Creates player crafting menu
 struct GUI_frame* gui_create_player_crafting() {
 
@@ -478,5 +539,6 @@ struct GUI_frame* gui_create_player_crafting() {
 
 }
 
+// OPTIONAL, NOT IMPORTANT RN
 // Automatic parent resize function
 // Starts from a child and resizes parent to fit child plus padding
