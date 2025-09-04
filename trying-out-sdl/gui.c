@@ -717,7 +717,7 @@ struct GUI_frame* gui_create_sm_buildings(struct GUI_frame* parent) {
 		gui_set_color(input_frame_border, COLOR_HEX_SEC);
 
 		// Input frame tile box
-		struct GUI_frame* input_tile_box = gui_create_tile_box(input_frame_border, CRAFTER_MAX_INV_SLOTS, 1, GUI_TILE_SIZE, GUI_TILE_SIZE, GUI_TILE_MARGIN, ID_sm_building_input, COLOR_HEX_THIRD);
+		struct GUI_frame* input_tile_box = gui_create_tile_box(input_frame_border, CRAFTER_MAX_INV_SLOTS, 1, GUI_TILE_SIZE, GUI_TILE_SIZE, GUI_TILE_MARGIN, ID_inventory_frame, COLOR_HEX_THIRD);
 
 
 		// Output frame border
@@ -727,7 +727,7 @@ struct GUI_frame* gui_create_sm_buildings(struct GUI_frame* parent) {
 		gui_set_color(output_frame_border, COLOR_HEX_SEC);
 
 		// Output frame tile
-		struct GUI_frame* output_tile_box = gui_create_tile_box(output_frame_border, CRAFTER_MAX_INV_SLOTS, 1, GUI_TILE_SIZE, GUI_TILE_SIZE, GUI_TILE_MARGIN, ID_sm_building_output, COLOR_HEX_THIRD);
+		struct GUI_frame* output_tile_box = gui_create_tile_box(output_frame_border, CRAFTER_MAX_INV_SLOTS, 1, GUI_TILE_SIZE, GUI_TILE_SIZE, GUI_TILE_MARGIN, ID_inventory_frame, COLOR_HEX_THIRD);
 
 		// Progress bar
 		struct GUI_frame* progress_bar_border = gui_frame_init(sm_container_bottom, 1);
@@ -746,7 +746,7 @@ void gui_update_sm_buildings(SDL_Renderer* renderer, struct MediaBin* mediaBin) 
 
 	struct Building* building = player->cursor->selected_building;
 
-	struct GUI_frame* recipe_text = player->gui_side_menu->children[0]->children[0]->children[1];
+	struct GUI_frame* recipe_text = player->gui_side_menu->children[0]->children[0]->children[1];			// side_menu/building/top_container/recipe_text
 
 	struct CraftingRecipe* selected_recipe = CraftingRecipes[building->recipe];
 
@@ -769,12 +769,18 @@ void gui_update_sm_buildings(SDL_Renderer* renderer, struct MediaBin* mediaBin) 
 
 		
 	// Update progress bar
-	// 
+	struct GUI_frame* bottom_container = player->gui_side_menu->children[0]->children[1];	// side_menu/building
+	struct GUI_frame* progress_bar = bottom_container->children[2];							// bottom_container/progress_bar
+
+	//gui_update_progress_bar(progress_bar, selected_recipe->crafting_time, 0.0);
+
 	//set correct recipe icon
 
 	// update input inventory
+	gui_update_inventory(bottom_container->children[0], building->input_inv, renderer, mediaBin);
 
 	// update output inventory
+	gui_update_inventory(bottom_container->children[1], building->output_inv, renderer, mediaBin);
 
 	// if there is no selected recipe, reset back
 

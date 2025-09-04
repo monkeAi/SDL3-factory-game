@@ -147,7 +147,8 @@ int render_text_box(SDL_Renderer* renderer, struct TextBox* textBox) {
 		// Render texture
 		SDL_RenderTexture(renderer, textBox->texture, NULL, textBox->rect);
 		//printf("Textbox rendered at: x: %f, y: %f, w: %f, h: %f\n", textBox->rect->x, textBox->rect->y, textBox->rect->w, textBox->rect->h);
-		//free(textBox->rect);
+		free(textBox->rect);
+		SDL_DestroyTexture(textBox->texture);
 	}
 }
 

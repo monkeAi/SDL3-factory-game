@@ -105,6 +105,8 @@ void game_init() {
 
 	player->cursor->selected_building = Buildings[0];
 
+	Buildings[0]->recipe = RECIPE_IRON_GEAR;
+
 	//printf("Recipe in init %d : %s\n", 2, CraftingRecipes[2]->title);
 
 }
@@ -202,15 +204,17 @@ int game_handle_input() {
 		}
 		if (event.key.key == SDLK_X) {
 	
-			int coords[2] = { 0, 0 };
+			/*int coords[2] = { 0, 0 };
 			if (Building_create(BUILDING_CRAFTER_1, coords, RIGHT)) {
 				printf("Could not create a new building.\n");
-			}
+			}*/
+
+			craft_item(Buildings[0]->input_inv, Buildings[0]->output_inv, RECIPE_IRON_GEAR);
 
 		}
 		if (event.key.key == SDLK_Z) {
 
-			Buildings[0]->recipe = RECIPE_IRON_GEAR;
+			Inventory_transfer_item(player->inventory, Buildings[0]->input_inv, 0, 30);
 		}
 		break;
 	}
