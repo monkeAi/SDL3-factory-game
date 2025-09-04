@@ -14,6 +14,7 @@
 #include "recipes.h"
 #include "crafting.h"
 #include "buildings.h"
+#include "OreManager.h"
  
 // Defines
 
@@ -83,6 +84,8 @@ void game_init() {
 	program_running = initialize_window();
 
 	game_media = init_media();
+
+	initOreManager();
 
 	init_tilemap();
 
@@ -159,6 +162,21 @@ int game_handle_input() {
 	case SDL_EVENT_QUIT:
 		program_running = FALSE;	// Stop game when QUIT EVENT is called
 		printf("Quiting game.");
+		break;
+
+	case SDL_EVENT_MOUSE_WHEEL:
+		if (event.wheel.y < 0) {
+			mainCamera->width += mainCamera->zoom;
+			mainCamera->height += mainCamera->zoom * mainCamera->zoom_aspect_ratio;
+			//mainCamera->x_offset -= mainCamera->zoom / 2;
+			//mainCamera->y_offset -= mainCamera->zoom * mainCamera->zoom_aspect_ratio / 2;
+		}
+		if (event.wheel.y > 0 && mainCamera->width > 200 && mainCamera->height > 200) {
+			mainCamera->width -= mainCamera->zoom;
+			mainCamera->height -= mainCamera->zoom * mainCamera->zoom_aspect_ratio;
+			//mainCamera->x_offset += mainCamera->zoom / 2;
+			//mainCamera->y_offset += mainCamera->zoom * mainCamera->zoom_aspect_ratio / 2;
+		}
 		break;
 
 	case SDL_EVENT_KEY_DOWN:
@@ -267,6 +285,7 @@ int game_render() {
 
 	// Render elements
 	render_tilemap(renderer);		// World tilemap
+	render_ores(renderer);       // Ores
 	render_buildings(renderer);
 	render_player_cursor(renderer);
 	render_player(renderer);		// Player

@@ -258,12 +258,16 @@ void render_buildings(SDL_Renderer* renderer) {
 
 		//printf("x: %d, y: %d\n", b->x_offset, b->y_offset);
 
+		float screenRatioW = WINDOW_WIDTH / mainCamera->width;
+		float screenRatioH = WINDOW_HEIGHT / mainCamera->height;
+
 		SDL_FRect building_rect = {
-			b->coords->x * TILE_SIZE + world_origin_x - mainCamera->x_offset,
-			b->coords->y * TILE_SIZE * -1 - b->tile_height * TILE_SIZE + world_origin_y - mainCamera->y_offset,
-			TILE_SIZE * b->tile_width,
-			TILE_SIZE * b->tile_height
+			(b->coords->x * TILE_SIZE - mainCamera->x_offset) * screenRatioW,
+			(b->coords->y * TILE_SIZE - b->tile_height * TILE_SIZE - mainCamera->y_offset) * screenRatioH,
+			TILE_SIZE * b->tile_width * screenRatioW + 1,
+			TILE_SIZE * b->tile_height * screenRatioH + 1
 		};
+
 		// Correct the offset and account for rotation
 		// Set render color
 		SDL_SetRenderDrawColor(renderer, 255, 189, 51, 255);

@@ -53,13 +53,15 @@ void render_player(SDL_Renderer* renderer) {
        return;  
    }  
 
-   // Create a rect for player  
-   SDL_FRect player_rect = {  
-       player->x_pos + world_origin_x - player->width / 2 - mainCamera->x_offset,  
-       player->y_pos + world_origin_y - player->height / 2 - mainCamera->y_offset,
-       player->width,  
-       player->height  
-   };  
+   float screenRatioW = WINDOW_WIDTH / mainCamera->width;
+   float screenRatioH = WINDOW_HEIGHT / mainCamera->height;
+
+   SDL_FRect player_rect = {
+       (player->x_pos - mainCamera->x_offset) * screenRatioW,
+       (player->y_pos - mainCamera->y_offset) * screenRatioH,
+       player->width * screenRatioW + 1,
+       player->height * screenRatioH + 1
+   };
 
    SDL_SetRenderDrawColor(renderer, 242, 147, 46, 255);  
 
@@ -114,20 +116,27 @@ static void handle_player_interaction(struct Player* p) {
         // Entity
     
     // Translate screen coordinates to world cordinates
-    int selected_cords[2] = { 0 };
+    float screenRatioW = WINDOW_WIDTH / mainCamera->width;
+    float screenRatioH = WINDOW_HEIGHT / mainCamera->height;
 
-    float world_x = (p->mouse_pos[0] * -1 + world_origin_x - mainCamera->x_offset) * -1;         // x
-    float world_y = (p->mouse_pos[1] * -1 + world_origin_y - mainCamera->y_offset);              // y
+    float world_x = p->mouse_pos[0] / screenRatioW + mainCamera->x_offset;
+    float world_y = p->mouse_pos[1] / screenRatioH + mainCamera->y_offset;
 
-    selected_cords[0] = (int)floorf(world_x / TILE_SIZE);
-    selected_cords[1] = (int)floorf(world_y / TILE_SIZE);
+    printf("Mouse screen cords: X:%f Y:%f\n", p->mouse_pos[0], p->mouse_pos[1]);
+    printf("Camera offset: X:%f Y:%f\n", mainCamera->x_offset, mainCamera->y_offset);
+    printf("Screen ratio: W:%f H:%f\n", screenRatioW, screenRatioH);
+    printf("Mouse world cords: X:%f Y:%f\n", world_x, world_y);
 
-    //printf("World cords X:%d Y:%d \n", selected_cords[0], selected_cords[1]);
+    int selected_tile_index[2] = {
+        (int)floorf(world_x / TILE_SIZE),
+        (int)floorf(world_y / TILE_SIZE)
+    };
 
-    // Translate world coordinates to tile coordinates
-    int selected_tile_index[2];
 
-    cordinate_to_index(selected_cords, selected_tile_index);
+    printf("World cords X:%d Y:%d \n", selected_tile_index[0], selected_tile_index[1]);
+
+    //nerabis tega vec
+    //cordinate_to_index(selected_cords, selected_tile_index);
 
     // Get what player is looking at:
 
@@ -190,7 +199,7 @@ static void handle_player_interaction(struct Player* p) {
             if (!world_is_inside(selected_tile_index[0], selected_tile_index[1])) continue;
 
             // Check if cursor is inside building
-            if (!Building_is_inside(Buildings[b], selected_cords[0], selected_cords[1])) continue;
+            if (!Building_is_inside(Buildings[b], selected_tile_index[0], selected_tile_index[1])) continue;
 
             p->cursor->watching_type = CURSOR_BUILDING;
             p->cursor->visibility = SHOWN;
@@ -218,8 +227,8 @@ static void handle_player_interaction(struct Player* p) {
 
                 p->cursor->visibility = SHOWN;
                 // Set cursor position
-                p->cursor->x_pos = selected_cords[0];
-                p->cursor->y_pos = selected_cords[1];
+                p->cursor->x_pos = selected_tile_index[0];
+                p->cursor->y_pos = selected_tile_index[1];
 
                 p->cursor->width = 1;
                 p->cursor->height = 1;
@@ -239,7 +248,7 @@ static void handle_player_interaction(struct Player* p) {
 
         //printf("Mouse click world cords: X:%d Y:%d \n", selected_cords[0], selected_cords[1]);
         if (p->cursor->watching_type != CURSOR_GUI) {
-            Building_create(BUILDING_CRAFTER_1, selected_cords, DOWN);
+            Building_create(BUILDING_CRAFTER_1, selected_tile_index, DOWN);
         }
     }
 
@@ -282,12 +291,14 @@ void render_player_cursor(SDL_Renderer* renderer) {
 
     if (player->cursor->visibility == HIDDEN) return;
 
-    // Create a rect for player  
+    float screenRatioW = WINDOW_WIDTH / mainCamera->width;
+    float screenRatioH = WINDOW_HEIGHT / mainCamera->height;
+
     SDL_FRect cursor_rect = {
-        (float)player->cursor->x_pos * TILE_SIZE + world_origin_x - mainCamera->x_offset,
-        (float)(player->cursor->y_pos + 1) * TILE_SIZE * -1 + world_origin_y - mainCamera->y_offset,
-        player->cursor->width * TILE_SIZE,
-        player->cursor->height * TILE_SIZE
+        (player->cursor->x_pos * TILE_SIZE - mainCamera->x_offset) * screenRatioW,
+        (player->cursor->y_pos * TILE_SIZE - mainCamera->y_offset) * screenRatioH * -1,
+        player->cursor->width * TILE_SIZE * screenRatioW + 1,
+        player->cursor->height * TILE_SIZE * screenRatioH + 1
     };
 
     // Set render color

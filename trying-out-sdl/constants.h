@@ -9,8 +9,8 @@
 #define FRAME_TARGET_TIME (1000 / FPS)
 
 #define TILE_SIZE 32
-#define MAP_WIDTH 40
-#define MAP_HEIGHT 40	 
+#define MAP_WIDTH 200
+#define MAP_HEIGHT 200	 
 
 
 // Terrain generation
@@ -25,6 +25,11 @@
 #define TERRAIN_FORREST_RANGE 80
 #define TERRAIN_ROCKY_RANGE 100
 
+// Ore generation
+
+#define IRON_ORE_RANGE 30
+#define COPPER_ORE_RANGE 30
+#define COAL_ORE_RANGE 30
 
 // Player
 

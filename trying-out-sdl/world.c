@@ -4,7 +4,7 @@
 #include "perlin_noise.h"
 #include "camera.h"
 #include "tools.h"
-
+#include "OreManager.h"
 
 
 // Create 2D map made of different tiles
@@ -60,6 +60,49 @@ void init_tilemap() {
 
 	//print_tilemap();
 
+	// create ore patches
+
+	struct OreManager* oreManager = getOreManager();
+
+	
+
+	for (int y = 0; y < MAP_HEIGHT; y++) {
+		for (int x = 0; x < MAP_WIDTH; x++) {
+
+			GAME_SEED = SEED + 1;
+			float perlinIron = perlin2d(x, y, NOISE_FREQ, NOISE_AMP) * 100.0;
+
+			GAME_SEED = SEED + 2;
+			float perlinCopper = perlin2d(x, y, NOISE_FREQ, NOISE_AMP) * 100.0;
+
+			GAME_SEED = SEED + 3;
+			float perlinCoal = perlin2d(x, y, NOISE_FREQ, NOISE_AMP) * 100.0;
+
+			enum OreType oreType;
+			int oreAmount = 0;
+			bool hasOre = false;
+
+			if (perlinIron < IRON_ORE_RANGE) {
+				oreType = IRON;
+				oreAmount = perlinIron * 1000;
+				hasOre = true;
+			}
+			if (perlinCopper < COPPER_ORE_RANGE) {
+				oreType = COPPER;
+				oreAmount = perlinCopper * 1000;
+				hasOre = true;
+			}
+			if (perlinCoal < COAL_ORE_RANGE) {
+				oreType = COAL;
+				oreAmount = perlinCoal * 1000;
+				hasOre = true;
+			}
+			if (hasOre && map[y][x].type != TILE_WATER) {
+				oreManager->addOre(oreManager, x, y, oreType, oreAmount);
+			}
+			
+		}
+	}
 }
 
 // Converts enums to characters
@@ -107,11 +150,16 @@ int render_tilemap(SDL_Renderer* renderer) {
 
 			// Create a rect for selected tile
 			// Positions are calculated based on origin and player
+
+
+			float screenRatioW = WINDOW_WIDTH / mainCamera->width;
+			float screenRatioH = WINDOW_HEIGHT / mainCamera->height;
+
 			SDL_FRect tile_rect = {
-				x * TILE_SIZE + world_start_offset_x - mainCamera->x_offset,
-				y * TILE_SIZE + world_start_offset_y - mainCamera->y_offset,
-				TILE_SIZE,
-				TILE_SIZE
+				(x * TILE_SIZE - mainCamera->x_offset) * screenRatioW,
+				(y * TILE_SIZE - mainCamera->y_offset) * screenRatioH,
+				TILE_SIZE * screenRatioW + 1,
+				TILE_SIZE * screenRatioH + 1
 			};
 
 			// Depending on tile type select corresponding tile color
@@ -142,6 +190,41 @@ int render_tilemap(SDL_Renderer* renderer) {
 	}
 
 	return 0;
+}
+
+int render_ores(SDL_Renderer* renderer) {
+	struct OreManager* oreManager = getOreManager();
+	struct OreList* curr = oreManager->oreList;
+
+	while (curr != NULL) {
+		struct Ore* ore = &curr->ore;
+		static Uint8 rgba[4] = { 255 };
+
+		float screenRatioW = WINDOW_WIDTH / mainCamera->width;
+		float screenRatioH = WINDOW_HEIGHT / mainCamera->height;
+
+		SDL_FRect tile_rect = {
+			(ore->x * TILE_SIZE - mainCamera->x_offset) * screenRatioW,
+			(ore->y * TILE_SIZE - mainCamera->y_offset) * screenRatioH,
+			TILE_SIZE * screenRatioW + 1,
+			TILE_SIZE * screenRatioH + 1
+		};
+
+		// In future select the right texture
+		switch (ore->type) {
+			case IRON: rgba[0] = 50; rgba[1] = 50; rgba[2] = 200; rgba[3] = 50; break;
+			case COPPER: rgba[0] = 200; rgba[1] = 100; rgba[2] = 100; rgba[3] = 50; break;
+			case COAL: rgba[0] = 50; rgba[1] = 50; rgba[2] = 50; rgba[3] = 50; break;
+			default: rgba[0] = 255; rgba[1] = 255; rgba[2] = 255; rgba[3] = 50; break;
+		}
+
+		SDL_SetRenderDrawColor(renderer, rgba[0], rgba[1], rgba[2], rgba[3]);
+
+		// Add to render 
+		SDL_RenderFillRect(renderer, &tile_rect);
+
+		curr = curr->next;
+	}
 }
 
 // Transform world cordinates to table index of tile
