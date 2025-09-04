@@ -67,11 +67,12 @@ extern struct GUI_frame* GUI_WINDOWS[MAX_GUI_WINDOWS];
 
 void init_gui();
 void update_gui(SDL_Renderer* renderer, struct MediaBin* mediaBin);
+void render_gui(SDL_Renderer* renderer);
+
 static struct GUI_frame* gui_frame_init(struct GUI_frame* parent, const int max_children);
 void gui_frame_destroy(struct GUI_frame* frame);
 void gui_frame_render(SDL_Renderer* renderer, struct GUI_frame* frame);
 static int gui_find_free_slot();
-void render_gui(SDL_Renderer* renderer);
 void gui_resize(struct GUI_frame* frame, int width, int height);
 void gui_move(struct GUI_frame* frame, int x, int y, int margin_x, int margin_y, enum GUI_flags* FLAGS);
 void gui_set_color(struct GUI_frame* frame, unsigned int new_color);
@@ -83,9 +84,15 @@ void gui_frame_update(struct GUI_frame* frame);
 int gui_is_inside_frame(struct GUI_frame* frame, int x, int y);
 struct GUI_frame* gui_get_frame_by_id(struct GUI_frame* parent, enum GUI_ID id);
 
+// Player inventory
 struct GUI_frame* gui_create_player_inventory();
 void gui_update_inventory(struct GUI_frame* gui_inv, struct Inventory* game_inv, SDL_Renderer* renderer, struct MediaBin* mediaBin);
 void gui_create_item(struct GUI_frame* parent, struct Item* item);
-//void gui_delete_item(struct GUI_frame* item);
+struct GUI_frame* gui_create_tile_box(struct GUI_frame* parent, int tiles_x, int tiles_y, int tile_w, int tile_h, int tile_margin, enum GUI_ID tiles_frame_id, unsigned int tile_color);
+
+// Side menu
+struct GUI_frame* gui_create_sm(struct GUI_frame* parent);
+struct GUI_frame* gui_create_sm_buildings(struct GUI_frame* parent);
+struct GUI_frame* gui_create_sm_crafting(struct GUI_frame* parent);
 
 #endif

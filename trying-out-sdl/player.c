@@ -28,7 +28,11 @@ void init_player() {
     player->vel.y = 0;
     player->available_inventory = PLAYER_START_INV_SIZE;
     player->inventory = Inventory_create(PLAYER_MAX_INV_SIZE, PLAYER_START_INV_SIZE);
+
+    // Player gui initialization
     player->gui_inventory = gui_create_player_inventory(player);
+    player->gui_side_menu = gui_create_sm(player->gui_inventory);
+
     player->cursor = player_cursor_create();
 
     if (player->cursor == NULL) printf("Null cursor!\n");
