@@ -29,6 +29,7 @@ struct PlayerCursor {
     unsigned int set_color;
     enum GUI_visibility visibility;
     enum CursorWatching watching_type;
+    struct Building* selected_building;
 };
 
 enum CursorWatching {

@@ -9,10 +9,11 @@
 
 // Init recipes from predefined set of variables
 // Add to array of all recipes
-struct CraftingRecipe CraftingRecipes[MAX_RECIPES];
+struct CraftingRecipe* CraftingRecipes[MAX_RECIPES] = { NULL };
 int recipe_count = 0;
 
 void init_recipes() {
+
     recipe_load_from_json("recipes.json");
 }
 
@@ -47,43 +48,57 @@ void recipe_load_from_json(const char* filename) {
    for (int i = 0; i < n && recipe_count < MAX_RECIPES; i++) {  
        cJSON* item = cJSON_GetArrayItem(root, i);  
 
-       CraftingRecipes[recipe_count].name = str_to_recipe_name(cJSON_GetObjectItem(item, "name")->valuestring);  
-       CraftingRecipes[recipe_count].state = str_to_recipe_state(cJSON_GetObjectItem(item, "state")->valuestring);  
-       CraftingRecipes[recipe_count].crafting_time = (float)cJSON_GetObjectItem(item, "crafting_time")->valuedouble;  
-       CraftingRecipes[recipe_count].required_energy = (float)cJSON_GetObjectItem(item, "required_energy")->valuedouble;  
+       // allocate memory for the recipe
+       CraftingRecipes[recipe_count] = malloc(sizeof(struct CraftingRecipe));
+       if (!CraftingRecipes[recipe_count]) {
+           perror("Failed to allocate memory for CraftingRecipe");
+           exit(1);
+       }
+
+       CraftingRecipes[recipe_count]->name = str_to_recipe_name(cJSON_GetObjectItem(item, "name")->valuestring);  
+       CraftingRecipes[recipe_count]->state = str_to_recipe_state(cJSON_GetObjectItem(item, "state")->valuestring);
+       CraftingRecipes[recipe_count]->crafting_time = (float)cJSON_GetObjectItem(item, "crafting_time")->valuedouble;
+       CraftingRecipes[recipe_count]->required_energy = (float)cJSON_GetObjectItem(item, "required_energy")->valuedouble;
+
+       // Copy title string into title
+       const char* title_str = cJSON_GetObjectItem(item, "title")->valuestring;
+       CraftingRecipes[recipe_count]->title = _strdup(title_str);
+
+       printf("Recipe %d : %s\n", i, CraftingRecipes[i]->title);
 
        // Crafting methods  
        cJSON* methods = cJSON_GetObjectItem(item, "craft_method");  
        for (int m = 0; m < CRAFT_METHODS; m++) {  
-           CraftingRecipes[recipe_count].craft_method[m] = RECIPE_HAND; // Default  
+           CraftingRecipes[recipe_count]->craft_method[m] = RECIPE_HAND; // Default  
        }  
 
        int method_count = cJSON_GetArraySize(methods);  
        for (int j = 0; j < method_count && j < CRAFT_METHODS; j++) {  
-           CraftingRecipes[recipe_count].craft_method[j] = str_to_craft_method(cJSON_GetArrayItem(methods, j)->valuestring);  
+           CraftingRecipes[recipe_count]->craft_method[j] = str_to_craft_method(cJSON_GetArrayItem(methods, j)->valuestring);
        }  
 
        // Input items  
        cJSON* inputs = cJSON_GetObjectItem(item, "input");  
        int input_count = cJSON_GetArraySize(inputs);  
-       CraftingRecipes[recipe_count].input_count = input_count;  
-       CraftingRecipes[recipe_count].input_items = malloc(sizeof(struct RecipeItem) * input_count);  
+       CraftingRecipes[recipe_count]->input_count = input_count;
+       CraftingRecipes[recipe_count]->input_items = malloc(sizeof(struct RecipeItem) * input_count);
        for (int j = 0; j < input_count; j++) {  
            cJSON* ri = cJSON_GetArrayItem(inputs, j);  
-           CraftingRecipes[recipe_count].input_items[j].type = str_to_item_type(cJSON_GetObjectItem(ri, "type")->valuestring);  
-           CraftingRecipes[recipe_count].input_items[j].quantity = cJSON_GetObjectItem(ri, "quantity")->valueint;  
+           CraftingRecipes[recipe_count]->input_items[j].type = str_to_item_type(cJSON_GetObjectItem(ri, "type")->valuestring);
+           CraftingRecipes[recipe_count]->input_items[j].quantity = cJSON_GetObjectItem(ri, "quantity")->valueint;
        }  
 
        // Output items  
        cJSON* outputs = cJSON_GetObjectItem(item, "output");  
        int output_count = cJSON_GetArraySize(outputs);  
-       CraftingRecipes[recipe_count].output_count = output_count;  
-       CraftingRecipes[recipe_count].output_items = malloc(sizeof(struct RecipeItem) * output_count);  
+       CraftingRecipes[recipe_count]->output_count = output_count;
+       CraftingRecipes[recipe_count]->output_items = malloc(sizeof(struct RecipeItem) * output_count);
        for (int j = 0; j < output_count; j++) {  
            cJSON* ri = cJSON_GetArrayItem(outputs, j);  
-           CraftingRecipes[recipe_count].output_items[j].type = str_to_item_type(cJSON_GetObjectItem(ri, "type")->valuestring);  
-           CraftingRecipes[recipe_count].output_items[j].quantity = cJSON_GetObjectItem(ri, "quantity")->valueint;  
+           CraftingRecipes[recipe_count]->output_items[j].type = str_to_item_type(cJSON_GetObjectItem(ri, "type")->valuestring);
+           CraftingRecipes[recipe_count]->output_items[j].quantity = cJSON_GetObjectItem(ri, "quantity")->valueint;
        }  
+
 
        recipe_count++;  
    }  

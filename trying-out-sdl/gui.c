@@ -4,6 +4,8 @@
 #include "inventory.h"
 #include "player.h"
 #include "media.h"
+#include "recipes.h"
+#include "buildings.h"
 
 // Main GUI frame
 
@@ -336,6 +338,32 @@ void update_gui(SDL_Renderer* renderer, struct MediaBin* mediaBin) {
 	// Update GUI Player Inventory
 	if (player->gui_inventory->visibility == SHOWN) {
 		gui_update_inventory(player->gui_inventory, player->inventory, renderer, mediaBin);
+
+		// Update side menu depending on what is open
+		switch (player->side_menu_state) {
+			case SM_BUILDING: {
+			
+				player->gui_side_menu->children[0]->visibility = SHOWN;		// Show buildings interface
+				player->gui_side_menu->children[1]->visibility = HIDDEN;
+				gui_update_sm_buildings(renderer, mediaBin);
+				break;
+			}
+		
+			case SM_CRAFTING: {
+				player->gui_side_menu->children[0]->visibility = HIDDEN;		// Show buildings interface
+				player->gui_side_menu->children[1]->visibility = SHOWN;
+				//gui_update_sm_buildings(renderer, mediaBin);				// Update crafting
+				break;
+			}
+			
+			default: {
+				player->gui_side_menu->children[0]->visibility = HIDDEN;		// Show buildings interface
+				player->gui_side_menu->children[1]->visibility = SHOWN;
+			}
+
+		}
+		
+		
 	}
 
 	// Update GUI Building Inventory
@@ -654,23 +682,25 @@ struct GUI_frame* gui_create_sm_buildings(struct GUI_frame* parent) {
 	struct GUI_frame* sm_container_top = gui_frame_init(sm_buildings, 3);
 	gui_resize(sm_container_top, sm_buildings->width - 2 * GUI_PADDING, sm_buildings->height * (1 - container_bottom_size));
 	gui_move(sm_container_top, 0, 0, 0, 0, (enum GUI_flags[]) { POS_CENTERED_X, POS_TOP });
-	gui_set_color(sm_container_top, COLOR_HEX_THIRD);
+	gui_set_color(sm_container_top, COLOR_HEX_SEC);
 
+		// Recipe icon
 		struct GUI_frame* selected_recipe_icon = gui_frame_init(sm_container_top, 0);
 		gui_resize(selected_recipe_icon, icon_size, icon_size);
 		gui_move(selected_recipe_icon, 0, 0, 0, 0, (enum GUI_flags[]) { POS_LEFT, POS_CENTERED_Y });
 		gui_set_color(selected_recipe_icon, COLOR_HEX_MAIN);
 
+		// Recipe text
 		struct GUI_frame* selected_recipe_text = gui_frame_init(sm_container_top, 0);
 		gui_resize(selected_recipe_text, text_width, icon_size);
-		gui_move(selected_recipe_text, 0, 0, icon_size + 20, 0, (enum GUI_flags[]) { POS_LEFT, POS_CENTERED_Y
-		});
-		gui_set_color(selected_recipe_text, COLOR_HEX_MAIN);
+		gui_move(selected_recipe_text, 0, 0, icon_size + GUI_PADDING, 0, (enum GUI_flags[]) { POS_LEFT, POS_CENTERED_Y });
+		gui_set_color(selected_recipe_text, COLOR_HEX_SEC);
+		selected_recipe_text->text_enabled = TRUE;
 
+		// Recipe change button
 		struct GUI_frame* change_recipe_button = gui_frame_init(sm_container_top, 0);
 		gui_resize(change_recipe_button, icon_size, icon_size);
-		gui_move(change_recipe_button, 0, 0, 0, 0, (enum GUI_flags[]) { POS_RIGHT, POS_CENTERED_Y
-		});
+		gui_move(change_recipe_button, 0, 0, 0, 0, (enum GUI_flags[]) { POS_RIGHT, POS_CENTERED_Y });
 		gui_set_color(change_recipe_button, COLOR_HEX_MAIN);
 
 
@@ -711,6 +741,45 @@ struct GUI_frame* gui_create_sm_buildings(struct GUI_frame* parent) {
 	return sm_buildings;
 }
 
+// Updates side menu buildings interface with data from active building
+void gui_update_sm_buildings(SDL_Renderer* renderer, struct MediaBin* mediaBin) {
+
+	struct Building* building = player->cursor->selected_building;
+
+	struct GUI_frame* recipe_text = player->gui_side_menu->children[0]->children[0]->children[1];
+
+	struct CraftingRecipe* selected_recipe = CraftingRecipes[building->recipe];
+
+
+	// Draw text for recipe item
+	SDL_FRect* t_rect = malloc(sizeof(SDL_FRect));
+
+	t_rect->x = recipe_text->position[0];	// x
+	t_rect->y = recipe_text->position[1];	// y
+	t_rect->w = recipe_text->width;			// Width
+	t_rect->h = recipe_text->height;			// Height
+
+	if (building->recipe == RECIPE_NONE) {
+		update_text_box(renderer, recipe_text->textBox, mediaBin->font_text, t_rect, "Select recipe", COLOR_WHITE);
+	}
+	else {
+		// Draw recipe name
+		update_text_box(renderer, recipe_text->textBox, mediaBin->font_text, t_rect, selected_recipe->title, COLOR_WHITE);
+	}
+
+		
+	// Update progress bar
+	// 
+	//set correct recipe icon
+
+	// update input inventory
+
+	// update output inventory
+
+	// if there is no selected recipe, reset back
+
+
+}
 
 // Creates a progress bar
 struct GUI_frame* gui_create_progress_bar(struct GUI_frame* parent, enum GUI_ID bar_id, unsigned int base_color, unsigned int progress_color) {
@@ -740,6 +809,7 @@ void gui_update_progress_bar(struct GUI_frame* bar, float total, float left) {
 	gui_resize(bar->children[0], (int)(bar->width * width_multiplier), bar->height);
 	
 }
+
 
 
 

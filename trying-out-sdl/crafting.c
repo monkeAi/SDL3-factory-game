@@ -13,11 +13,11 @@ void craft_item(struct Inventory* input_inv, struct Inventory* output_inv, enum 
 	
 	// If there is enough items in the input_inv for the recipe, move them to temporary inventory and start crafting timer
 	// Loop through each required item
-	for (int item = 0; item < CraftingRecipes[recipe].input_count; item++) {
+	for (int item = 0; item < CraftingRecipes[recipe]->input_count; item++) {
 
 		// Return if there is no such item or there isnt enought of it
-		int searched_item_slot = Inventory_search_item(input_inv, CraftingRecipes[recipe].input_items[item].type);
-		if (searched_item_slot == -1 || input_inv->slots[searched_item_slot].quantity < CraftingRecipes[recipe].input_items[item].quantity) { 
+		int searched_item_slot = Inventory_search_item(input_inv, CraftingRecipes[recipe]->input_items[item].type);
+		if (searched_item_slot == -1 || input_inv->slots[searched_item_slot].quantity < CraftingRecipes[recipe]->input_items[item].quantity) {
 			printf("Not enough items.\n");
 			return;
 		}
@@ -27,11 +27,11 @@ void craft_item(struct Inventory* input_inv, struct Inventory* output_inv, enum 
 
 	struct Inventory* tempInv = NULL;
 
-	tempInv = Inventory_create(CraftingRecipes[recipe].input_count, CraftingRecipes[recipe].input_count);
+	tempInv = Inventory_create(CraftingRecipes[recipe]->input_count, CraftingRecipes[recipe]->input_count);
 
-	for (int item = 0; item < CraftingRecipes[recipe].input_count; item++) {
+	for (int item = 0; item < CraftingRecipes[recipe]->input_count; item++) {
 
-		Inventory_transfer_item(input_inv, tempInv, Inventory_search_item(input_inv, CraftingRecipes[recipe].input_items[item].type), CraftingRecipes[recipe].input_items[item].quantity);
+		Inventory_transfer_item(input_inv, tempInv, Inventory_search_item(input_inv, CraftingRecipes[recipe]->input_items[item].type), CraftingRecipes[recipe]->input_items[item].quantity);
 	}
 	
 
@@ -58,11 +58,11 @@ void update_craft_queue(float delta_time) {
 		if (CraftingQueue[request].time_left <= 0) {
 
 			// Create output items and push them to the new inventory
-			for (unsigned int item = 0; item < CraftingRecipes[CraftingQueue[request].recipe].output_count; item++) {
+			for (unsigned int item = 0; item < CraftingRecipes[CraftingQueue[request].recipe]->output_count; item++) {
 
 				unsigned int max_quantity = 100;	// Change later to be dependant on item type
 
-				struct Item output_item = Item_create(CraftingRecipes[CraftingQueue[request].recipe].output_items[item].type, max_quantity, CraftingRecipes[CraftingQueue[request].recipe].output_items[item].quantity);
+				struct Item output_item = Item_create(CraftingRecipes[CraftingQueue[request].recipe]->output_items[item].type, max_quantity, CraftingRecipes[CraftingQueue[request].recipe]->output_items[item].quantity);
 				
 				Inventory_push_item(CraftingQueue[request].output_inv, &output_item);
 				// Handle full inventory case
@@ -86,7 +86,7 @@ static struct CraftRequest craft_request_create(struct Inventory* output_inv, en
 	struct CraftRequest request;
 	request.recipe = recipe;
 	request.output_inv = output_inv;
-	request.time_left = CraftingRecipes[recipe].crafting_time;
+	request.time_left = CraftingRecipes[recipe]->crafting_time;
 	return request;
 }
 

@@ -1,6 +1,7 @@
 [
     {
         "name": "RECIPE_NONE",
+        "title": "No recipe",
         "state": "RECIPE_LOCKED",
         "craft_method": [ "RECIPE_HAND" ],
         "input": [],
@@ -10,6 +11,7 @@
     },
     {
         "name": "RECIPE_IRON_PLATE",
+        "title": "Iron plates",
         "state": "RECIPE_AVAILABLE",
         "craft_method": [ "RECIPE_SMELTER" ],
         "input": [
@@ -38,6 +40,7 @@
 
     {
         "name": "RECIPE_IRON_GEAR",
+        "title": "Iron gears",
         "state": "RECIPE_LOCKED",
         "craft_method": [ "RECIPE_CRAFTER_1" ],
         "input": [
@@ -57,6 +60,7 @@
     },
     {
         "name": "RECIPE_COPPER_PLATE",
+        "title": "Copper plates",
         "state": "RECIPE_AVAILABLE",
         "craft_method": [ "RECIPE_SMELTER" ],
         "input": [

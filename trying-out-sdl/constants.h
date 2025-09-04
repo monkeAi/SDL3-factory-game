@@ -67,7 +67,7 @@
 
 
 // Fonts
-#define TEXT_SIZE 15
+#define TEXT_SIZE 18
 
 
 // Colors

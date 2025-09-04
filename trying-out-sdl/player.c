@@ -269,6 +269,7 @@ struct PlayerCursor* player_cursor_create() {
     cursor->set_color = 0xFFA500FF;
     cursor->watching_type = 0;
     cursor->visibility = SHOWN;
+    cursor->selected_building = NULL;
 
     return cursor;
 }

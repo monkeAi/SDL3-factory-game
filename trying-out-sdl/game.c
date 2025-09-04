@@ -103,6 +103,10 @@ void game_init() {
 	Building_create(BUILDING_CRAFTER_1, selected_cords2, RIGHT);
 	Building_create(BUILDING_CRAFTER_1, selected_cords3, LEFT);
 
+	player->cursor->selected_building = Buildings[0];
+
+	//printf("Recipe in init %d : %s\n", 2, CraftingRecipes[2]->title);
+
 }
 
 void game_loop() {
@@ -193,7 +197,7 @@ int game_handle_input() {
 		}
 		if(event.key.key == SDLK_B) {
 
-			Buildings_print();
+			player->side_menu_state = SM_BUILDING;
 
 		}
 		if (event.key.key == SDLK_X) {
@@ -206,8 +210,7 @@ int game_handle_input() {
 		}
 		if (event.key.key == SDLK_Z) {
 
-			Building_destroy(Buildings[0]);
-			printf("Building at slot 0 destroyed.\n");
+			Buildings[0]->recipe = RECIPE_IRON_GEAR;
 		}
 		break;
 	}
