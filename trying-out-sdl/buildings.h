@@ -19,8 +19,6 @@ struct Building {
 	int input_size, output_size;
 	enum RecipeName recipe;
 
-	struct GUI_frame* gui_input_inv;
-	struct GUI_frame* gui_output_inv;
 	enum GUI_visibility gui_visibility;
 };
 
