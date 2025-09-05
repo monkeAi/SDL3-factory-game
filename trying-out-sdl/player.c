@@ -119,26 +119,16 @@ static void handle_player_interaction(struct Player* p) {
     float screenRatioW = WINDOW_WIDTH / mainCamera->width;
     float screenRatioH = WINDOW_HEIGHT / mainCamera->height;
 
-    float world_x = p->mouse_pos[0] / screenRatioW + mainCamera->x_offset;
-    float world_y = p->mouse_pos[1] / screenRatioH + mainCamera->y_offset;
+    int world_x = p->mouse_pos[0] / screenRatioW + mainCamera->x_offset;
+    int world_y = p->mouse_pos[1] / screenRatioH + mainCamera->y_offset;
 
-    printf("Mouse screen cords: X:%f Y:%f\n", p->mouse_pos[0], p->mouse_pos[1]);
-    printf("Camera offset: X:%f Y:%f\n", mainCamera->x_offset, mainCamera->y_offset);
-    printf("Screen ratio: W:%f H:%f\n", screenRatioW, screenRatioH);
-    printf("Mouse world cords: X:%f Y:%f\n", world_x, world_y);
-
-    int selected_tile_index[2] = {
-        (int)floorf(world_x / TILE_SIZE),
-        (int)floorf(world_y / TILE_SIZE)
+    //se avtomatsko floora ki je int / int
+    int selected_tile[2] = {
+        world_x / TILE_SIZE,
+        world_y / TILE_SIZE
     };
 
-
-    printf("World cords X:%d Y:%d \n", selected_tile_index[0], selected_tile_index[1]);
-
-    //nerabis tega vec
-    //cordinate_to_index(selected_cords, selected_tile_index);
-
-    // Get what player is looking at:
+	//printf("selected tile: X:%d Y:%d \n", selected_tile[0], selected_tile[1]);
 
     p->cursor->watching_type = CURSOR_NONE;
 
@@ -196,17 +186,18 @@ static void handle_player_interaction(struct Player* p) {
             if (Buildings[b] == NULL) continue;
 
             // Check if reaching tile is inside tile world  // Possible problem 
-            if (!world_is_inside(selected_tile_index[0], selected_tile_index[1])) continue;
+            if (!world_is_inside(selected_tile[0], selected_tile[1])) continue;
 
             // Check if cursor is inside building
-            if (!Building_is_inside(Buildings[b], selected_tile_index[0], selected_tile_index[1])) continue;
+            if (!Building_is_inside(Buildings[b], selected_tile[0], selected_tile[1])) continue;
 
+			printf("Inside building");
             p->cursor->watching_type = CURSOR_BUILDING;
             p->cursor->visibility = SHOWN;
 
             // Set cursor position to building position
             p->cursor->x_pos = Buildings[b]->coords->x;
-            p->cursor->y_pos = Buildings[b]->coords->y + Buildings[b]->tile_height - 1;     // small offset for drawing
+            p->cursor->y_pos = Buildings[b]->coords->y;
 
             p->cursor->width = Buildings[b]->tile_width;
             p->cursor->height = Buildings[b]->tile_height;
@@ -219,16 +210,19 @@ static void handle_player_interaction(struct Player* p) {
     if (p->cursor->watching_type == CURSOR_NONE) {
 
         // Check if selected tile index is within table size
-        if (world_is_inside(selected_tile_index[0], selected_tile_index[1])) {
+        //print if its inside
+		printf("Is inside world: %d \n", world_is_inside(selected_tile[0], selected_tile[1]));
+        if (world_is_inside(selected_tile[0], selected_tile[1])) {
 
-            if (map[selected_tile_index[1]][selected_tile_index[0]].state != TILE_FULL && map[selected_tile_index[1]][selected_tile_index[0]].type != TILE_WATER) {
+            if (map[selected_tile[0]][selected_tile[1]].state != TILE_FULL && map[selected_tile[0]][selected_tile[1]].type != TILE_WATER) {
 
-                map[selected_tile_index[1]][selected_tile_index[0]].state = TILE_SELECTED;
+                map[selected_tile[0]][selected_tile[1]].state = TILE_SELECTED;
 
                 p->cursor->visibility = SHOWN;
                 // Set cursor position
-                p->cursor->x_pos = selected_tile_index[0];
-                p->cursor->y_pos = selected_tile_index[1];
+                p->cursor->x_pos = selected_tile[0];
+                p->cursor->y_pos = selected_tile[1];
+				printf("Cursor pos X:%d Y:%d \n", p->cursor->x_pos, p->cursor->y_pos);
 
                 p->cursor->width = 1;
                 p->cursor->height = 1;
@@ -248,7 +242,7 @@ static void handle_player_interaction(struct Player* p) {
 
         //printf("Mouse click world cords: X:%d Y:%d \n", selected_cords[0], selected_cords[1]);
         if (p->cursor->watching_type != CURSOR_GUI) {
-            Building_create(BUILDING_CRAFTER_1, selected_tile_index, DOWN);
+            Building_create(BUILDING_CRAFTER_1, selected_tile, DOWN);
         }
     }
 
@@ -296,7 +290,7 @@ void render_player_cursor(SDL_Renderer* renderer) {
 
     SDL_FRect cursor_rect = {
         (player->cursor->x_pos * TILE_SIZE - mainCamera->x_offset) * screenRatioW,
-        (player->cursor->y_pos * TILE_SIZE - mainCamera->y_offset) * screenRatioH * -1,
+        (player->cursor->y_pos * TILE_SIZE - mainCamera->y_offset) * screenRatioH,
         player->cursor->width * TILE_SIZE * screenRatioW + 1,
         player->cursor->height * TILE_SIZE * screenRatioH + 1
     };

@@ -60,39 +60,31 @@ static struct Building* Building_init(enum BuildingType type) {
 // Create and place a new building into the world
 int Building_create(enum BuildingType type, int* coordinates, enum BuildingRotation rotation) {
 
+	//printf("Trying to create building of type: %d at coordinates x: %d, y: %d with rotation: %d\n", type, coordinates[0], coordinates[1], rotation);
 	// Check if there is space for a building
 	int buildings_slot = Building_find_free_slot();
 	if (buildings_slot == -1) return 1;
 
+	//printf("Creating building at slot: %d\n", buildings_slot);
 	// Check if space is available at the cordinates for the selected building with rotation applied
 	if (!Building_placement_available(type, coordinates, rotation)) return 1;
 
 	// Init a new building
 	struct Building* b = Building_init(type);
 	b->rotation = rotation;
-
-	Building_rotate(b, rotation);
-	b->coords->x = coordinates[0] - b->x_offset;
-	b->coords->y = coordinates[1] - b->y_offset;		// FIX HERE
+	b->coords->x = coordinates[0];
+	b->coords->y = coordinates[1];		// FIX HERE
 
 	//printf("Building coordinates x: %d, y: %d\n", (int)b->coords->x, (int)b->coords->y);
 
 	// Asign new tile state to occupied tiles
-	int selected_tile_index[2];
-	int selected_cords[2] = { b->coords->x, b->coords->y };
-	cordinate_to_index(selected_cords, selected_tile_index);
+	int selected_tile_index[2] = { b->coords->x, b->coords->y };
 
 	// Asign tile_full state to all occupied tiles
 	for (int y = b->coords->y; y <= b->coords->y + b->tile_height - 1; y++) {
 		for (int x = b->coords->x; x <= (b->coords->x + b->tile_width - 1); x++) {
-
-			// Convert coordinates to tile index
-			int selected_tile_index[2];
-			int selected_cords[2] = { x, y };
-			cordinate_to_index(selected_cords, selected_tile_index);
-
-			// Set map tiles to full
-			map[selected_tile_index[1]][selected_tile_index[0]].state = TILE_FULL;
+			
+			map[y][x].state = TILE_FULL;
 
 		}
 	}
@@ -107,33 +99,22 @@ int Building_create(enum BuildingType type, int* coordinates, enum BuildingRotat
 	return 0;
 }
 
+
 // Rotates the building struct to specified rotation
-void Building_rotate(struct Building* b, enum BuildingRotation rotation) {
+//nerabis neke ful kode za rotiranje ker so vse zgradbe kvadrati trenutno
+//je samo vizualno kako se tekstura obrne in funkcionalnost rotacije lahko pol dobis vn is b->rotation
 
-	int building_width = b->tile_width;
-	int building_height = b->tile_height;
-
-	// Apply rotation
-	// Left and right
-	if (rotation % 2 == 1) {
-		int temp = building_width;
-		building_width = building_height;
-		building_height = temp;
+void Building_rotate_once(struct Building* b, bool direction) {
+	if (direction == 0) {
+		b->rotation = (b->rotation + 1) % 4;
+	} else if (direction == 1) {
+		b->rotation = (b->rotation - 1 + 4) % 4;
 	}
+	return;
+}
 
-	b->tile_width = building_width;
-	b->tile_height = building_height;
-
-	// Calculate new offsets
-
-	if (building_width % 2 == 1) b->x_offset = (building_width - 1) / 2;	// Odd numbers
-	else b->x_offset = (building_width / 2) - 1;							// Even numbers
-
-	if (building_height % 2 == 1) b->y_offset = (building_height - 1) / 2;	// Odd numbers
-	else b->y_offset = (building_height / 2) - 1;							// Even numbers
-
-	//printf("Building offset x: %d, y: %d\n", b->x_offset, b->y_offset);
-
+void Building_rotate(struct Building* b, enum BuildingRotation rotation) {
+	b->rotation = rotation;
 	return;
 }
 
@@ -145,13 +126,8 @@ void Building_destroy(struct Building* b) {
 	for (int y = b->coords->y; y <= b->coords->y + b->tile_height - 1; y++) {
 		for (int x = b->coords->x; x <= (b->coords->x + b->tile_width - 1); x++) {
 
-			// Convert coordinates to tile index
-			int selected_tile_index[2];
-			int selected_cords[2] = { x, y };
-			cordinate_to_index(selected_cords, selected_tile_index);
-
-			// Set map tiles to full
-			map[selected_tile_index[1]][selected_tile_index[0]].state = TILE_FREE;
+			int selected_tile[2] = { x, y };
+			map[selected_tile[0]][selected_tile[1]].state = TILE_FREE;
 
 		}
 	}
@@ -185,40 +161,17 @@ static int Building_placement_available(enum BuildingType type, int* coordinates
 		building_height = CRAFTER_HEIGHT;
 	}
 
-	// Apply rotation
-	// Left and right
-	if (rotation % 2 == 1) {
-		int temp = building_width;
-		building_width = building_height;
-		building_height = temp;
-	}
-
-	// Check with world tiles
-	int x_offset, y_offset;
-
-	if (building_width % 2 == 1) x_offset = (building_width - 1) / 2;	// Odd numbers
-	else x_offset = (building_width / 2) - 1;							// Even numbers
-
-	if (building_height % 2 == 1) y_offset = (building_height - 1) / 2;	// Odd numbers
-	else y_offset = (building_height / 2) - 1;							// Even numbers
-
 	// Loop through height and width
-	for (int y = coordinates[1] - y_offset; y <= coordinates[1] - y_offset + building_height - 1; y++) {
+	for (int x = coordinates[0]; x <= coordinates[0] + building_height - 1; x++) {
 
-		for (int x = coordinates[0] - x_offset; x <= (coordinates[0] - x_offset + building_width - 1); x++) {
+		for (int y = coordinates[1]; y <= (coordinates[1] + building_width - 1); y++) {
 
-			int selected_tile_index[2];
-			int selected_cords[2] = { x, y };
-
-			cordinate_to_index(selected_cords, selected_tile_index);
-
-			// Check if tile is out of bounds
-			if (!(selected_tile_index[0] >= 0 && selected_tile_index[0] < MAP_WIDTH && selected_tile_index[1] >= 0 && selected_tile_index[1] < MAP_HEIGHT)) {
+			if (!(x >= 0 && x < MAP_WIDTH && y >= 0 && y < MAP_HEIGHT)) {
 				return 0;
 			}
 
 			// Check if tile is free and not water
-			if (map[selected_tile_index[1]][selected_tile_index[0]].state == TILE_FULL || map[selected_tile_index[1]][selected_tile_index[0]].type == TILE_WATER) {
+			if (map[x][y].state == TILE_FULL || map[x][y].type == TILE_WATER) {
 				return 0;
 			}
 
@@ -233,7 +186,7 @@ static int Building_placement_available(enum BuildingType type, int* coordinates
 // Return first free slot in the buildings list, returns -1 if list is full
 static int Building_find_free_slot() {
 	int slot;
-	for (slot = 0; Buildings[slot] != NULL && slot < MAX_BUILDINGS; slot++);
+	for (slot = 0; Buildings[slot] != NULL && slot < MAX_BUILDINGS; slot++) {}
 	if (slot == MAX_BUILDINGS) return -1;
 	return slot;
 }
@@ -263,7 +216,7 @@ void render_buildings(SDL_Renderer* renderer) {
 
 		SDL_FRect building_rect = {
 			(b->coords->x * TILE_SIZE - mainCamera->x_offset) * screenRatioW,
-			(b->coords->y * TILE_SIZE - b->tile_height * TILE_SIZE - mainCamera->y_offset) * screenRatioH,
+			(b->coords->y * TILE_SIZE - mainCamera->y_offset) * screenRatioH,
 			TILE_SIZE * b->tile_width * screenRatioW + 1,
 			TILE_SIZE * b->tile_height * screenRatioH + 1
 		};
@@ -295,7 +248,7 @@ void Buildings_print() {
 // Return true if cursor coordinate is inside building
 int Building_is_inside(struct Building* b, int x_coord, int y_coord) {
 
-	if (x_coord >= b->coords->x && x_coord < b->coords->x + b->tile_width && y_coord >= b->coords->y && y_coord < b->coords->y + b->tile_height) return TRUE;
+	if (x_coord >= b->coords->x && x_coord <= b->coords->x + b->tile_width && y_coord >= b->coords->y && y_coord <= b->coords->y + b->tile_height) return TRUE;
 	else return FALSE;
 
 }

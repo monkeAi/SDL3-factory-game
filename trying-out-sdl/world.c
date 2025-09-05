@@ -228,10 +228,10 @@ int render_ores(SDL_Renderer* renderer) {
 }
 
 // Transform world cordinates to table index of tile
-void cordinate_to_index(int *cordinates, int *tileIndex) {
+void cordinate_to_tile(int *cordinates, int *tileIndex) {
 
-	tileIndex[0] = world_map_center_x + cordinates[0];	//	X cordinate 
-	tileIndex[1] = world_map_center_y - cordinates[1] - 1;	//	Y cordinate
+	tileIndex[0] = floor(cordinates[0] / TILE_SIZE);	//	X cordinate 
+	tileIndex[1] = floor(cordinates[1] / TILE_SIZE);	//	Y cordinate
 
 	//return 0;
 }
