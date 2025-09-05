@@ -745,6 +745,9 @@ struct GUI_frame* gui_create_sm_buildings(struct GUI_frame* parent) {
 void gui_update_sm_buildings(SDL_Renderer* renderer, struct MediaBin* mediaBin) {
 
 	struct Building* building = player->cursor->selected_building;
+	if (!building) {
+		return;
+	}
 
 	struct GUI_frame* recipe_text = player->gui_side_menu->children[0]->children[0]->children[1];			// side_menu/building/top_container/recipe_text
 

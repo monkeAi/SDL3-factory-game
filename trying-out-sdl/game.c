@@ -193,7 +193,8 @@ int game_handle_input() {
 			//Inventory_print(player->inventory);
 
 			// Toggle inventory visibility
-			player->gui_inventory->visibility = !player->gui_inventory->visibility;
+			player->toggle_inv(player);
+			player->side_menu_state = SM_CRAFTING;
 
 
 		}
@@ -215,6 +216,10 @@ int game_handle_input() {
 		if (event.key.key == SDLK_Z) {
 
 			Inventory_transfer_item(player->inventory, Buildings[0]->input_inv, 0, 30);
+		}
+		if (event.key.key == SDLK_L) {
+
+			player->cursor->selected_building = Buildings[1];
 		}
 		break;
 	}

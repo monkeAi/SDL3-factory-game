@@ -19,6 +19,8 @@ struct Player {
     struct GUI_frame* gui_side_menu;
     enum GUI_side_menu side_menu_state;
     struct PlayerCursor* cursor;
+
+    void (*toggle_inv)(struct Player* self);
 };
 
 struct PlayerCursor {
@@ -50,6 +52,7 @@ void get_mouse_update(struct Player* p);
 struct PlayerCursor* player_cursor_create();
 void player_cursor_update();
 void render_player_cursor(SDL_Renderer* renderer);
+static void toggle_inv(struct Player* self);
 
 
 #endif
