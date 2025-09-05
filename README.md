@@ -15,7 +15,8 @@ Project is still **work in progress**. Textures are not supported yet.
 ![image](https://github.com/user-attachments/assets/c23613b7-c2b8-4ce6-a2a3-ff1b781d601e)
 
 *Player inventory*
-![image](https://github.com/user-attachments/assets/d5af636c-3e33-4628-9a50-2ab0af76eb8a)
+<img width="1035" height="604" alt="image" src="https://github.com/user-attachments/assets/a88cd895-e83e-4ce3-b925-29f5e1d586d5" />
+
 
 
 
