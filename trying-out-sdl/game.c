@@ -92,6 +92,8 @@ void game_init() {
 
 	init_player();
 
+	init_item_data_list();
+
 	init_recipes();
 
 	init_gui();
@@ -99,16 +101,17 @@ void game_init() {
 	int selected_cords[2] = { 0 };
 	int selected_cords2[2] = { 10, 8 };
 	int selected_cords3[2] = { -4, - 15 };
-	Building_create(BUILDING_CRAFTER_1, selected_cords, DOWN);
-	Building_create(BUILDING_CRAFTER_1, selected_cords2, RIGHT);
-	Building_create(BUILDING_CRAFTER_1, selected_cords3, LEFT);
+	Building_create(BUILDING_CRAFTER_1, selected_cords, RIGHT);
+	//Building_create(BUILDING_CRAFTER_1, selected_cords2, RIGHT);
+	//Building_create(BUILDING_CRAFTER_1, selected_cords3, LEFT);
 
-	player->cursor->selected_building = Buildings[0];
+	//player->cursor->selected_building = Buildings[0];
 
 	Buildings[0]->recipe = RECIPE_IRON_GEAR;
 
 	//printf("Recipe in init %d : %s\n", 2, CraftingRecipes[2]->title);
 
+	print_item_data_list();
 }
 
 void game_loop() {
@@ -173,7 +176,7 @@ int game_handle_input() {
 		}
 		if (event.key.key == SDLK_F) {
 
-			struct Item iron_plate = Item_create(ITEM_IRON_PLATE, 100, 100); // 10 Iron Ore, max stack of 100
+			struct Item iron_plate = Item_create(ITEM_IRON_PLATE, 100); // 10 Iron Ore, max stack of 100
 			if (Inventory_push_item(player->inventory, &iron_plate) == 0) {
 				printf("%d Iron Plates added to inventory.\n", iron_plate.quantity);
 			}
@@ -216,6 +219,10 @@ int game_handle_input() {
 		if (event.key.key == SDLK_Z) {
 
 			Inventory_transfer_item(player->inventory, Buildings[0]->input_inv, 0, 30);
+			printf("Input Inventory: \n");
+			Inventory_print(Buildings[0]->input_inv);
+			printf("Output Inventory: \n");
+			Inventory_print(Buildings[0]->output_inv);
 		}
 		if (event.key.key == SDLK_L) {
 

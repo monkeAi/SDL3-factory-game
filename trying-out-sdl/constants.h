@@ -36,15 +36,18 @@
 // Recipes and Crafting
 
 #define MAX_RECIPES 128
+#define MAX_ITEMS 128
 #define CRAFT_METHODS 4
 #define MAX_CRAFT_QUEUE 100
+
 
 
 // Buildings
 
 #define MAX_BUILDINGS 200
 
-#define CRAFTER_MAX_INV_SLOTS 3
+#define CRAFTER_MAX_INPUT 3
+#define CRAFTER_MAX_OUTPUT 3
 #define CRAFTER_WIDTH 3
 #define CRAFTER_HEIGHT 3
 

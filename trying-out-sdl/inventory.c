@@ -3,6 +3,7 @@
 
 #include "inventory.h"
 #include "constants.h"
+#include "item.h"
 
 // Create and initialize new inventory
 struct Inventory* Inventory_create(unsigned int max_slots, unsigned int available_slots) {
@@ -52,7 +53,7 @@ int Inventory_push_item(struct Inventory* inv, struct Item* item) {
 		else {
 
 			// Amount of left space in a slot
-			int space_left = inv->slots[free_index].max_quantity - inv->slots[free_index].quantity;
+			int space_left = Item_data_list[inv->slots[free_index].type]->max_quantity - inv->slots[free_index].quantity;
 
 			// If there is more free space than required, add and return
 			if (space_left >= items_left) {
@@ -61,7 +62,7 @@ int Inventory_push_item(struct Inventory* inv, struct Item* item) {
 			}
 			// Else subtract the used amount and go again
 			else {
-				inv->slots[free_index].quantity = inv->slots[free_index].max_quantity;
+				inv->slots[free_index].quantity = Item_data_list[inv->slots[free_index].type]->max_quantity;
 				items_left -= space_left;
 			}
 
@@ -98,6 +99,35 @@ static int Inventory_find_free_slot(struct Inventory* inv, enum ItemType item_ty
 	// Return -1 if no free slot was found
 
 	return slot;
+}
+
+// Returns TRUE if there is enough space in inventory for that item
+int Inventory_enough_space(struct Inventory* inv, enum ItemType item_type, int required_amount) {
+
+	unsigned int total_free = 0;
+
+	//printf("Item type %d", item_type);
+
+	// Loop through the inventory slots
+	for (unsigned int i = 0; i < inv->available_slots; i++) {
+
+		//printf("slot %d \n", i);
+		// Find free slot or with the same type and isn't full
+		if (inv->slots[i].type == item_type && !Item_is_full(&inv->slots[i])) {
+
+			// Add free space to total
+			total_free += Item_data_list[item_type]->max_quantity - inv->slots[i].quantity;
+		}
+		else if (inv->slots[i].type == ITEM_NONE) {
+
+			// Add free space to total
+			total_free += Item_data_list[item_type]->max_quantity;
+		}
+	}
+
+	//printf("Total free space: %d \n", total_free);
+	if (total_free >= required_amount) return TRUE;
+	else return FALSE;
 }
 
 // Returns the slot index of last item type in inventory, returns -1 if item not found
@@ -146,7 +176,7 @@ int Inventory_transfer_item(struct Inventory* from_inv, struct Inventory* to_inv
 	//	If transfer amount is less than currently stored create new item with the desired quantity and send it
 	else if (from_inv->slots[from_slot].quantity > quantity) {
 
-		struct Item new_item = Item_create(from_inv->slots[from_slot].type, from_inv->slots[from_slot].max_quantity, quantity);
+		struct Item new_item = Item_create(from_inv->slots[from_slot].type, quantity);
 		
 		if (Inventory_push_item(to_inv, &new_item)) {
 

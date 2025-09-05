@@ -15,9 +15,10 @@ struct Building {
 
 	struct Inventory* input_inv;
 	struct Inventory* output_inv;
-
 	int input_size, output_size;
+
 	enum RecipeName recipe;
+	int craft_request_id;
 };
 
 enum BuildingType {

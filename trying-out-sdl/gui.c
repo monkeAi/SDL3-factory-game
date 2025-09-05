@@ -6,6 +6,7 @@
 #include "media.h"
 #include "recipes.h"
 #include "buildings.h"
+#include "crafting.h"
 
 // Main GUI frame
 
@@ -554,7 +555,7 @@ void gui_update_inventory(struct GUI_frame* gui_inv, struct Inventory* game_inv,
 				// Create new gui item
 				
 				//printf("Slot: %d, create gui item \n", slot);
-				gui_create_item(gui_slots->children[slot], &player->inventory->slots[slot]);
+				gui_create_item(gui_slots->children[slot], &game_inv->slots[slot]);
 
 				if (!gui_slots->children[slot]->children[0]) {
 					printf("Null gui item pointer");
@@ -675,7 +676,7 @@ struct GUI_frame* gui_create_sm_buildings(struct GUI_frame* parent) {
 
 	//sm_buildings->visibility = HIDDEN;
 	
-	int tiles_width = CRAFTER_MAX_INV_SLOTS * GUI_TILE_SIZE + (CRAFTER_MAX_INV_SLOTS - 1) * GUI_TILE_MARGIN;
+	int tiles_width = CRAFTER_MAX_INPUT * GUI_TILE_SIZE + (CRAFTER_MAX_INPUT - 1) * GUI_TILE_MARGIN;
 	int tiles_height = 1 * GUI_TILE_SIZE + (1 - 1) * GUI_TILE_MARGIN;
 
 	// Top Container for icon, button and text
@@ -717,7 +718,7 @@ struct GUI_frame* gui_create_sm_buildings(struct GUI_frame* parent) {
 		gui_set_color(input_frame_border, COLOR_HEX_SEC);
 
 		// Input frame tile box
-		struct GUI_frame* input_tile_box = gui_create_tile_box(input_frame_border, CRAFTER_MAX_INV_SLOTS, 1, GUI_TILE_SIZE, GUI_TILE_SIZE, GUI_TILE_MARGIN, ID_inventory_frame, COLOR_HEX_THIRD);
+		struct GUI_frame* input_tile_box = gui_create_tile_box(input_frame_border, CRAFTER_MAX_INPUT, 1, GUI_TILE_SIZE, GUI_TILE_SIZE, GUI_TILE_MARGIN, ID_inventory_frame, COLOR_HEX_THIRD);
 
 
 		// Output frame border
@@ -727,7 +728,7 @@ struct GUI_frame* gui_create_sm_buildings(struct GUI_frame* parent) {
 		gui_set_color(output_frame_border, COLOR_HEX_SEC);
 
 		// Output frame tile
-		struct GUI_frame* output_tile_box = gui_create_tile_box(output_frame_border, CRAFTER_MAX_INV_SLOTS, 1, GUI_TILE_SIZE, GUI_TILE_SIZE, GUI_TILE_MARGIN, ID_inventory_frame, COLOR_HEX_THIRD);
+		struct GUI_frame* output_tile_box = gui_create_tile_box(output_frame_border, CRAFTER_MAX_INPUT, 1, GUI_TILE_SIZE, GUI_TILE_SIZE, GUI_TILE_MARGIN, ID_inventory_frame, COLOR_HEX_THIRD);
 
 		// Progress bar
 		struct GUI_frame* progress_bar_border = gui_frame_init(sm_container_bottom, 1);
@@ -762,20 +763,26 @@ void gui_update_sm_buildings(SDL_Renderer* renderer, struct MediaBin* mediaBin) 
 	t_rect->w = recipe_text->width;			// Width
 	t_rect->h = recipe_text->height;			// Height
 
+	struct GUI_frame* bottom_container = player->gui_side_menu->children[0]->children[1];	// side_menu/building
+	struct GUI_frame* progress_bar = bottom_container->children[2]->children[0];							// bottom_container/progress_bar
+
 	if (building->recipe == RECIPE_NONE) {
 		update_text_box(renderer, recipe_text->textBox, mediaBin->font_text, t_rect, "Select recipe", COLOR_WHITE);
+
+		// Reset progress bar
+		gui_update_progress_bar(progress_bar, 1, 1);	// 0% progress
 	}
 	else {
 		// Draw recipe name
 		update_text_box(renderer, recipe_text->textBox, mediaBin->font_text, t_rect, selected_recipe->title, COLOR_WHITE);
+
+
+		// Update progress bar
+		gui_update_progress_bar(progress_bar, selected_recipe->crafting_time, CraftingQueue[building->craft_request_id].time_left);
 	}
 
 		
-	// Update progress bar
-	struct GUI_frame* bottom_container = player->gui_side_menu->children[0]->children[1];	// side_menu/building
-	struct GUI_frame* progress_bar = bottom_container->children[2];							// bottom_container/progress_bar
 
-	//gui_update_progress_bar(progress_bar, selected_recipe->crafting_time, 0.0);
 
 	//set correct recipe icon
 
@@ -812,8 +819,15 @@ void gui_update_progress_bar(struct GUI_frame* bar, float total, float left) {
 
 	if (!bar) return;
 
+	// In case time left is passed as a null
+	if (!left) left = total;
+
 	float progress = total - left;
-	float width_multiplier = progress / total;
+	float width_multiplier = 0;
+
+	if (total != 0) {
+		width_multiplier = progress / total;
+	}
 
 	gui_resize(bar->children[0], (int)(bar->width * width_multiplier), bar->height);
 	
