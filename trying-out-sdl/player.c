@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "player.h"  
 #include "tools.h"  
 #include "camera.h"  
@@ -9,6 +10,8 @@
 #include "gui.h"
 
 struct Player* player;  
+
+
 
 void init_player() {
 
@@ -28,10 +31,17 @@ void init_player() {
     player->vel.y = 0;
     player->available_inventory = PLAYER_START_INV_SIZE;
     player->inventory = Inventory_create(PLAYER_MAX_INV_SIZE, PLAYER_START_INV_SIZE);
+
+    // Player gui initialization
     player->gui_inventory = gui_create_player_inventory(player);
+    player->gui_side_menu = gui_create_sm(player->gui_inventory);
+
     player->cursor = player_cursor_create();
 
     if (player->cursor == NULL) printf("Null cursor!\n");
+
+    // Methods
+    player->toggle_inv = toggle_inv;
 
     
 }  
@@ -97,6 +107,12 @@ static void handle_player_movement(float delta_time) {
 static void get_mouse_update(struct Player *p) {
 
     p->mouse_state = SDL_GetMouseState(&p->mouse_pos[0], &p->mouse_pos[1]);
+
+    // Mouse states:
+    // 0 All the time
+    // 1 Left click
+    // 2 Middle click
+    // 4 Right click
 
     //printf("X:%f, Y:%f, Buttons: %u\n", p->mouse_pos[0], p->mouse_pos[1], p->mouse_state);
 }
@@ -194,6 +210,7 @@ static void handle_player_interaction(struct Player* p) {
 
             p->cursor->watching_type = CURSOR_BUILDING;
             p->cursor->visibility = SHOWN;
+            p->cursor->selected_building = Buildings[b];
 
             // Set cursor position to building position
             p->cursor->x_pos = Buildings[b]->coords->x;
@@ -201,6 +218,19 @@ static void handle_player_interaction(struct Player* p) {
 
             p->cursor->width = Buildings[b]->tile_width;
             p->cursor->height = Buildings[b]->tile_height;
+        }
+
+        // If right clicks on building open player inventory and side menu for buildings
+        if (p->mouse_state == 4) {
+
+            if (p->cursor->watching_type != CURSOR_GUI) {
+                
+                // Turn on player inventory
+                player->gui_inventory->visibility = TRUE;
+                // Set side menu for buildings
+                player->side_menu_state = SM_BUILDING;
+
+            }
         }
 
     }
@@ -265,6 +295,7 @@ struct PlayerCursor* player_cursor_create() {
     cursor->set_color = 0xFFA500FF;
     cursor->watching_type = 0;
     cursor->visibility = SHOWN;
+    cursor->selected_building = NULL;
 
     return cursor;
 }
@@ -299,3 +330,8 @@ void render_player_cursor(SDL_Renderer* renderer) {
     SDL_RenderFillRect(renderer, &cursor_rect);
 
 }
+
+static void toggle_inv(struct Player* self) {
+    self->gui_inventory->visibility = !self->gui_inventory->visibility;
+}
+

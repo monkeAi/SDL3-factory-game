@@ -1,6 +1,7 @@
 [
     {
         "name": "RECIPE_NONE",
+        "title": "No recipe",
         "state": "RECIPE_LOCKED",
         "craft_method": [ "RECIPE_HAND" ],
         "input": [],
@@ -10,17 +11,10 @@
     },
     {
         "name": "RECIPE_IRON_PLATE",
+        "title": "Iron plates",
         "state": "RECIPE_AVAILABLE",
         "craft_method": [ "RECIPE_SMELTER" ],
         "input": [
-            {
-                "type": "ITEM_IRON_ORE",
-                "quantity": 1
-            },
-            {
-                "type": "ITEM_IRON_ORE",
-                "quantity": 1
-            },
             {
                 "type": "ITEM_IRON_ORE",
                 "quantity": 1
@@ -29,7 +23,7 @@
         "output": [
             {
                 "type": "ITEM_IRON_PLATE",
-                "quantity": 5
+                "quantity": 1
             }
         ],
         "crafting_time": 2.5,
@@ -38,6 +32,7 @@
 
     {
         "name": "RECIPE_IRON_GEAR",
+        "title": "Iron gears",
         "state": "RECIPE_LOCKED",
         "craft_method": [ "RECIPE_CRAFTER_1" ],
         "input": [
@@ -52,11 +47,12 @@
                 "quantity": 1
             }
         ],
-        "crafting_time": 3.0,
+        "crafting_time": 1.0,
         "required_energy": 15.0
     },
     {
         "name": "RECIPE_COPPER_PLATE",
+        "title": "Copper plates",
         "state": "RECIPE_AVAILABLE",
         "craft_method": [ "RECIPE_SMELTER" ],
         "input": [

@@ -16,7 +16,11 @@ struct Player {
     int available_inventory;
     struct Inventory* inventory;
     struct GUI_frame* gui_inventory;
+    struct GUI_frame* gui_side_menu;
+    enum GUI_side_menu side_menu_state;
     struct PlayerCursor* cursor;
+
+    void (*toggle_inv)(struct Player* self);
 };
 
 struct PlayerCursor {
@@ -27,6 +31,7 @@ struct PlayerCursor {
     unsigned int set_color;
     enum GUI_visibility visibility;
     enum CursorWatching watching_type;
+    struct Building* selected_building;
 };
 
 enum CursorWatching {
@@ -47,6 +52,7 @@ void get_mouse_update(struct Player* p);
 struct PlayerCursor* player_cursor_create();
 void player_cursor_update();
 void render_player_cursor(SDL_Renderer* renderer);
+static void toggle_inv(struct Player* self);
 
 
 #endif

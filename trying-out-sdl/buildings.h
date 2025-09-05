@@ -15,13 +15,10 @@ struct Building {
 
 	struct Inventory* input_inv;
 	struct Inventory* output_inv;
-
 	int input_size, output_size;
-	enum RecipeName recipe;
 
-	struct GUI_frame* gui_input_inv;
-	struct GUI_frame* gui_output_inv;
-	enum GUI_visibility gui_visibility;
+	enum RecipeName recipe;
+	int craft_request_id;
 };
 
 enum BuildingType {
@@ -29,9 +26,7 @@ enum BuildingType {
 	BUILDING_BURNER_MINER,
 	BUILDING_ELECTRIC_MINER,
 	BUILDING_BURNER_SMELTER,
-	BUILDING_ELECTRIC_SMELTER,
 	BUILDING_CRAFTER_1,
-	BUILDING_CRAFTER_2,
 };
 
 enum BuildingState {

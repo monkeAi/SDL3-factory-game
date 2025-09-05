@@ -32,6 +32,7 @@ struct CraftingRecipe {
 	struct RecipeItem* output_items;
 	float crafting_time;
 	float required_energy;
+	char* title;
 };
 
 struct RecipeItem {
@@ -63,7 +64,7 @@ enum RecipeName {
 
 // Recipe is a list of parameters for the crafting system 
 
-extern struct CraftingRecipe CraftingRecipes[MAX_RECIPES];
+extern struct CraftingRecipe* CraftingRecipes[MAX_RECIPES];
 
 void init_recipes();
 void recipe_load_from_json(const char* filename);

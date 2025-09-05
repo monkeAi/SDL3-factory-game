@@ -4,6 +4,9 @@
 #include "inventory.h"
 #include "player.h"
 #include "media.h"
+#include "recipes.h"
+#include "buildings.h"
+#include "crafting.h"
 
 // Main GUI frame
 
@@ -113,7 +116,7 @@ void gui_resize(struct GUI_frame* frame, int width, int height) {
 }
 
 // Moves gui frame to a new position
-void gui_move(struct GUI_frame* frame, int x, int y, enum GUI_flags* FLAGS) {
+void gui_move(struct GUI_frame* frame, int x, int y, int margin_x, int margin_y, enum GUI_flags* FLAGS) {
 
 	int x_offset = x;
 	int	y_offset = y;
@@ -145,7 +148,52 @@ void gui_move(struct GUI_frame* frame, int x, int y, enum GUI_flags* FLAGS) {
 						y_offset = WINDOW_HEIGHT / 2 - frame->height / 2;
 					}
 					break;
+
 				// Add more cases for TOP, DOWN, LEFT, RIGHT
+
+				case POS_LEFT:
+					// If it has parent
+					if (frame->parent != NULL) {
+						x_offset = margin_x;
+					}
+					// If its based on window
+					else {
+						x_offset = margin_x;
+					}
+					break;
+
+				case POS_RIGHT:
+					// If it has parent
+					if (frame->parent != NULL) {
+						x_offset = frame->parent->width - frame->width - margin_x;
+					}
+					// If its based on window
+					else {
+						x_offset = WINDOW_WIDTH - frame->width - margin_x;
+					}
+					break;
+
+				case POS_TOP:
+					// If it has parent
+					if (frame->parent != NULL) {
+						y_offset = margin_y;
+					}
+					// If its based on window
+					else {
+						x_offset = margin_y;
+					}
+					break;
+
+				case POS_BOTTOM:
+					// If it has parent
+					if (frame->parent != NULL) {
+						y_offset = frame->parent->height - frame->height - margin_y;
+					}
+					// If its based on window
+					else {
+						x_offset = WINDOW_HEIGHT - frame->height - margin_y;;
+					}
+					break;
 			}
 		}
 	}
@@ -190,7 +238,7 @@ int gui_add_child(struct GUI_frame* parent, struct GUI_frame* child) {
 
 }
 
-// Returns a number of children with that class name, writes to a table of pointers to children with provided class name, it searches recursevly
+// Returns a number of children with that class name under the parent path, writes to a table of pointers fo children with provided class name, it searches recursevly
 int gui_find_children(struct GUI_frame* parent, enum GUI_class class_name, struct GUI_frame** matches) {
 
 	// Amount of found mathches
@@ -291,6 +339,32 @@ void update_gui(SDL_Renderer* renderer, struct MediaBin* mediaBin) {
 	// Update GUI Player Inventory
 	if (player->gui_inventory->visibility == SHOWN) {
 		gui_update_inventory(player->gui_inventory, player->inventory, renderer, mediaBin);
+
+		// Update side menu depending on what is open
+		switch (player->side_menu_state) {
+			case SM_BUILDING: {
+			
+				player->gui_side_menu->children[0]->visibility = SHOWN;		// Show buildings interface
+				player->gui_side_menu->children[1]->visibility = HIDDEN;
+				gui_update_sm_buildings(renderer, mediaBin);
+				break;
+			}
+		
+			case SM_CRAFTING: {
+				player->gui_side_menu->children[0]->visibility = HIDDEN;		// Show buildings interface
+				player->gui_side_menu->children[1]->visibility = SHOWN;
+				//gui_update_sm_buildings(renderer, mediaBin);				// Update crafting
+				break;
+			}
+			
+			default: {
+				player->gui_side_menu->children[0]->visibility = HIDDEN;		// Show buildings interface
+				player->gui_side_menu->children[1]->visibility = SHOWN;
+			}
+
+		}
+		
+		
 	}
 
 	// Update GUI Building Inventory
@@ -372,55 +446,69 @@ struct GUI_frame* gui_create_player_inventory() {
 	int tiles_width = GUI_INVENTORY_WIDTH * GUI_TILE_SIZE + (GUI_INVENTORY_WIDTH - 1) * GUI_TILE_MARGIN;
 	int tiles_height = GUI_INVENTORY_HEIGHT * GUI_TILE_SIZE + (GUI_INVENTORY_HEIGHT - 1) * GUI_TILE_MARGIN;
 
-	int padding = 15;
+	
 
 	// Create all components and add them together
-	struct GUI_frame* main_frame = gui_frame_init(NULL, 5);
-	gui_resize(main_frame, tiles_width + 4 * padding, tiles_height + 4 * padding);
-	gui_move(main_frame, 100, 100, (enum GUI_flags[]) { POS_CENTERED_X, POS_CENTERED_Y});
-	gui_set_color(main_frame, 0x505050FF);
+
+	// MAIN FRAME
+	struct GUI_frame* main_frame = gui_frame_init(NULL, 6);
+	gui_resize(main_frame, tiles_width + 4 * GUI_PADDING + GUI_SM_WIDTH, tiles_height + 4 * GUI_PADDING);
+	gui_move(main_frame, 100, 100, 0, 0, (enum GUI_flags[]) { POS_CENTERED_X, POS_CENTERED_Y});
+	gui_set_color(main_frame, COLOR_HEX_SEC);
 	main_frame->visibility = HIDDEN;
 	main_frame->class = C_inventory;
 
 	// Create all components and add them together
-	struct GUI_frame* inv_frame_border = gui_frame_init(main_frame, 5);
-	gui_resize(inv_frame_border, tiles_width + 2 * padding, tiles_height + 2 * padding);
-	gui_move(inv_frame_border, 100, 100, (enum GUI_flags[]) { POS_CENTERED_X, POS_CENTERED_Y });
-	gui_set_color(inv_frame_border, 0x646464FF);
-
-	// Create a child frame for inventory tiles
-	struct GUI_frame* inv_frame = gui_frame_init(inv_frame_border, GUI_INVENTORY_WIDTH * GUI_INVENTORY_HEIGHT);
-	// Set size to grid of tiles inside
-	gui_resize(inv_frame, tiles_width, tiles_height);
-	gui_move(inv_frame, 0, 0, (enum GUI_flags[]) { POS_CENTERED_X, POS_CENTERED_Y });
-	gui_set_color(inv_frame, inv_frame_border->default_color);
-	inv_frame->id = ID_inventory_frame;
 	
-	int slot = 0;
+	// INVENTORY FRAME BORDER
+	struct GUI_frame* inv_frame_border = gui_frame_init(main_frame, 5);
+	gui_resize(inv_frame_border, tiles_width + 2 * GUI_PADDING, tiles_height + 2 * GUI_PADDING);
+	gui_move(inv_frame_border, 100, 100, GUI_PADDING, 0, (enum GUI_flags[]) { POS_LEFT, POS_CENTERED_Y });
+	gui_set_color(inv_frame_border, COLOR_HEX_MAIN);
 
-	// Create tiles for inventroy frame
-	for (int y = 0; y < GUI_INVENTORY_HEIGHT; y++) {
-		for (int x = 0; x < GUI_INVENTORY_WIDTH; x++) {
-
-			// Create a tile
-			struct GUI_frame* inv_tile = gui_frame_init(inv_frame, 1);
-
-			// Set size 
-			gui_resize(inv_tile, GUI_TILE_SIZE, GUI_TILE_SIZE);
-			gui_move(inv_tile, x * GUI_TILE_SIZE + x * GUI_TILE_MARGIN, y * GUI_TILE_SIZE + y * GUI_TILE_MARGIN, NULL);
-			gui_set_color(inv_tile, 0x464646FF);
-			inv_tile->class = C_inventory_tile;
-
-			slot++;
-		}
-	}
-
-
+	// INVENTORY FRAME
+	struct GUI_frame* inv_frame = gui_create_tile_box(inv_frame_border, GUI_INVENTORY_WIDTH, GUI_INVENTORY_HEIGHT, GUI_TILE_SIZE, GUI_TILE_SIZE, GUI_TILE_MARGIN, ID_inventory_frame, COLOR_HEX_SEC);
 
 	// Add final frame composition to list of all gui frames
 	GUI_WINDOWS[gui_find_free_slot()] = main_frame;
 
 	return main_frame;
+}
+
+// Creates a tile box full of frames
+struct GUI_frame* gui_create_tile_box(struct GUI_frame* parent, int tiles_x, int tiles_y, int tile_w, int tile_h, int tile_margin, enum GUI_ID tiles_frame_id, unsigned int tile_color) {
+
+	// Total size of the container
+	int tiles_width = tiles_x * tile_w + (tiles_x - 1) * tile_margin;
+	int tiles_height = tiles_y * tile_h + (tiles_y - 1) * tile_margin;
+
+
+	// Tile box frame
+	struct GUI_frame* tiles_frame = gui_frame_init(parent, tiles_x * tiles_y);
+	// Set size to grid of tiles inside
+	gui_resize(tiles_frame, tiles_width, tiles_height);
+	gui_move(tiles_frame, 0, 0, 0, 0, (enum GUI_flags[]) { POS_CENTERED_X, POS_CENTERED_Y });
+	gui_set_color(tiles_frame, parent->default_color);
+	tiles_frame->id = tiles_frame_id;
+
+	int slot = 0;
+
+	// Create tiles for box frame
+	for (int y = 0; y < tiles_y; y++) {
+		for (int x = 0; x < tiles_x; x++) {
+
+			// Create a tile
+			struct GUI_frame* tile = gui_frame_init(tiles_frame, 1);
+
+			// Set size 
+			gui_resize(tile, tile_w, tile_h);
+			gui_move(tile, x * tile_w + x * tile_margin, y * tile_h + y * tile_margin, 0, 0, NULL);
+			gui_set_color(tile, tile_color);
+			tile->class = C_inventory_tile;
+
+			slot++;
+		}
+	}
 }
 
 void gui_create_item(struct GUI_frame* parent, struct Item* item) {
@@ -436,10 +524,15 @@ void gui_create_item(struct GUI_frame* parent, struct Item* item) {
 }
 
 // Ale was here
+ 
 // Updates gui and game inventory (inventory sync)
 void gui_update_inventory(struct GUI_frame* gui_inv, struct Inventory* game_inv, SDL_Renderer* renderer, struct MediaBin* mediaBin) {
 
 	struct GUI_frame* gui_slots = gui_get_frame_by_id(gui_inv, ID_inventory_frame);
+
+	if (!gui_slots) {
+		printf("Null pointer ID");
+	}
 
 	// Loop through game inventory and compare it to gui inventory tiles
 	for (int slot = 0; slot < game_inv->max_slots; slot++) {
@@ -462,7 +555,7 @@ void gui_update_inventory(struct GUI_frame* gui_inv, struct Inventory* game_inv,
 				// Create new gui item
 				
 				//printf("Slot: %d, create gui item \n", slot);
-				gui_create_item(gui_slots->children[slot], &player->inventory->slots[slot]);
+				gui_create_item(gui_slots->children[slot], &game_inv->slots[slot]);
 
 				if (!gui_slots->children[slot]->children[0]) {
 					printf("Null gui item pointer");
@@ -536,14 +629,224 @@ void gui_update_inventory(struct GUI_frame* gui_inv, struct Inventory* game_inv,
 		// Item gets new draw position but is still in inventory until moved to another
 
 
+// Creates player's side menu gui
+struct GUI_frame* gui_create_sm(struct GUI_frame* parent) {
+	
+	// Create side menu frame
+	struct GUI_frame* side_menu = gui_frame_init(parent, 2);
+	gui_resize(side_menu, GUI_SM_WIDTH - GUI_PADDING, parent->height - 2 * GUI_PADDING);
+	gui_move(side_menu, 100, 100, GUI_PADDING, 0, (enum GUI_flags[]) { POS_RIGHT, POS_CENTERED_Y });
+	gui_set_color(side_menu, COLOR_HEX_MAIN);
 
-// Creates player crafting menu
-struct GUI_frame* gui_create_player_crafting() {
+	// Create buildings interface
+	struct GUI_frame* sm_buildings = gui_create_sm_buildings(side_menu);
 
+	// Create crafting interface
+	struct GUI_frame* sm_crafting = gui_create_sm_crafting(side_menu);
+
+
+	return side_menu;
+}
+
+// Creates crafting side menu
+struct GUI_frame* gui_create_sm_crafting(struct GUI_frame* parent) {
+
+	struct GUI_frame* sm_crafting = gui_frame_init(parent, 1);
+	gui_resize(sm_crafting, parent->width - 2 * GUI_PADDING, parent->height - 2 * GUI_PADDING);
+	gui_move(sm_crafting, 100, 100, 0, 0, (enum GUI_flags[]) { POS_CENTERED_X, POS_CENTERED_Y });
+	gui_set_color(sm_crafting, COLOR_HEX_SEC);
+	sm_crafting->visibility = HIDDEN;
+
+	return sm_crafting;
+}
+
+// Creates building interaction side menu
+struct GUI_frame* gui_create_sm_buildings(struct GUI_frame* parent) {
+
+	// Main frame for side menu - buildings interface
+	struct GUI_frame* sm_buildings = gui_frame_init(parent, 2);
+	gui_resize(sm_buildings, parent->width - 2 * GUI_PADDING, parent->height - 2 * GUI_PADDING);
+	gui_move(sm_buildings, 0, 0, 0, 0, (enum GUI_flags[]) { POS_CENTERED_X, POS_CENTERED_Y });
+	gui_set_color(sm_buildings, COLOR_HEX_SEC);
+
+	float container_bottom_size = 0.75;		// Size percentage of bottom container
+	int inventory_margin = 60;				// Top and bottom margin for inventory tile box
+	int icon_size = 40;
+	int text_width = 200;
+
+	//sm_buildings->visibility = HIDDEN;
+	
+	int tiles_width = CRAFTER_MAX_INPUT * GUI_TILE_SIZE + (CRAFTER_MAX_INPUT - 1) * GUI_TILE_MARGIN;
+	int tiles_height = 1 * GUI_TILE_SIZE + (1 - 1) * GUI_TILE_MARGIN;
+
+	// Top Container for icon, button and text
+	struct GUI_frame* sm_container_top = gui_frame_init(sm_buildings, 3);
+	gui_resize(sm_container_top, sm_buildings->width - 2 * GUI_PADDING, sm_buildings->height * (1 - container_bottom_size));
+	gui_move(sm_container_top, 0, 0, 0, 0, (enum GUI_flags[]) { POS_CENTERED_X, POS_TOP });
+	gui_set_color(sm_container_top, COLOR_HEX_SEC);
+
+		// Recipe icon
+		struct GUI_frame* selected_recipe_icon = gui_frame_init(sm_container_top, 0);
+		gui_resize(selected_recipe_icon, icon_size, icon_size);
+		gui_move(selected_recipe_icon, 0, 0, 0, 0, (enum GUI_flags[]) { POS_LEFT, POS_CENTERED_Y });
+		gui_set_color(selected_recipe_icon, COLOR_HEX_MAIN);
+
+		// Recipe text
+		struct GUI_frame* selected_recipe_text = gui_frame_init(sm_container_top, 0);
+		gui_resize(selected_recipe_text, text_width, icon_size);
+		gui_move(selected_recipe_text, 0, 0, icon_size + GUI_PADDING, 0, (enum GUI_flags[]) { POS_LEFT, POS_CENTERED_Y });
+		gui_set_color(selected_recipe_text, COLOR_HEX_SEC);
+		selected_recipe_text->text_enabled = TRUE;
+
+		// Recipe change button
+		struct GUI_frame* change_recipe_button = gui_frame_init(sm_container_top, 0);
+		gui_resize(change_recipe_button, icon_size, icon_size);
+		gui_move(change_recipe_button, 0, 0, 0, 0, (enum GUI_flags[]) { POS_RIGHT, POS_CENTERED_Y });
+		gui_set_color(change_recipe_button, COLOR_HEX_MAIN);
+
+
+	// Container for input, output and progress bar
+	struct GUI_frame* sm_container_bottom = gui_frame_init(sm_buildings, 3);
+	gui_resize(sm_container_bottom, sm_buildings->width, sm_buildings->height * container_bottom_size);
+	gui_move(sm_container_bottom, 0, 0, 0, 0, (enum GUI_flags[]) { POS_CENTERED_X, POS_BOTTOM });
+	gui_set_color(sm_container_bottom, COLOR_HEX_SEC);
+
+		// Input frame border
+		struct GUI_frame* input_frame_border = gui_frame_init(sm_container_bottom, 1);
+		gui_resize(input_frame_border, tiles_width, tiles_height);
+		gui_move(input_frame_border, 0, 0, 0, inventory_margin, (enum GUI_flags[]) { POS_CENTERED_X, POS_TOP });
+		gui_set_color(input_frame_border, COLOR_HEX_SEC);
+
+		// Input frame tile box
+		struct GUI_frame* input_tile_box = gui_create_tile_box(input_frame_border, CRAFTER_MAX_INPUT, 1, GUI_TILE_SIZE, GUI_TILE_SIZE, GUI_TILE_MARGIN, ID_inventory_frame, COLOR_HEX_THIRD);
+
+
+		// Output frame border
+		struct GUI_frame* output_frame_border = gui_frame_init(sm_container_bottom, 1);
+		gui_resize(output_frame_border, tiles_width, tiles_height);
+		gui_move(output_frame_border, 0, 0, 0, inventory_margin, (enum GUI_flags[]) { POS_CENTERED_X, POS_BOTTOM });
+		gui_set_color(output_frame_border, COLOR_HEX_SEC);
+
+		// Output frame tile
+		struct GUI_frame* output_tile_box = gui_create_tile_box(output_frame_border, CRAFTER_MAX_INPUT, 1, GUI_TILE_SIZE, GUI_TILE_SIZE, GUI_TILE_MARGIN, ID_inventory_frame, COLOR_HEX_THIRD);
+
+		// Progress bar
+		struct GUI_frame* progress_bar_border = gui_frame_init(sm_container_bottom, 1);
+		gui_resize(progress_bar_border, 220, 30);
+		gui_move(progress_bar_border, 0, 0, 0, 80, (enum GUI_flags[]) { POS_CENTERED_X, POS_CENTERED_Y });
+		gui_set_color(progress_bar_border, COLOR_HEX_SEC);
+		struct GUI_frame* progress_bar = gui_create_progress_bar(progress_bar_border, ID_sm_building_progress_bar, COLOR_HEX_THIRD, COLOR_HEX_MAIN);
+	
+		gui_update_progress_bar(progress_bar, 300, 180);
+
+	return sm_buildings;
+}
+
+// Updates side menu buildings interface with data from active building
+void gui_update_sm_buildings(SDL_Renderer* renderer, struct MediaBin* mediaBin) {
+
+	struct Building* building = player->cursor->selected_building;
+	if (!building) {
+		return;
+	}
+
+	struct GUI_frame* recipe_text = player->gui_side_menu->children[0]->children[0]->children[1];			// side_menu/building/top_container/recipe_text
+
+	struct CraftingRecipe* selected_recipe = CraftingRecipes[building->recipe];
+
+
+	// Draw text for recipe item
+	SDL_FRect* t_rect = malloc(sizeof(SDL_FRect));
+
+	t_rect->x = recipe_text->position[0];	// x
+	t_rect->y = recipe_text->position[1];	// y
+	t_rect->w = recipe_text->width;			// Width
+	t_rect->h = recipe_text->height;			// Height
+
+	struct GUI_frame* bottom_container = player->gui_side_menu->children[0]->children[1];	// side_menu/building
+	struct GUI_frame* progress_bar = bottom_container->children[2]->children[0];							// bottom_container/progress_bar
+
+	if (building->recipe == RECIPE_NONE) {
+		update_text_box(renderer, recipe_text->textBox, mediaBin->font_text, t_rect, "Select recipe", COLOR_WHITE);
+
+		// Reset progress bar
+		gui_update_progress_bar(progress_bar, 1, 1);	// 0% progress
+	}
+	else {
+		// Draw recipe name
+		update_text_box(renderer, recipe_text->textBox, mediaBin->font_text, t_rect, selected_recipe->title, COLOR_WHITE);
+
+
+		// Update progress bar
+		gui_update_progress_bar(progress_bar, selected_recipe->crafting_time, CraftingQueue[building->craft_request_id].time_left);
+	}
+
+		
+
+
+	//set correct recipe icon
+
+	// update input inventory
+	gui_update_inventory(bottom_container->children[0], building->input_inv, renderer, mediaBin);
+
+	// update output inventory
+	gui_update_inventory(bottom_container->children[1], building->output_inv, renderer, mediaBin);
+
+	// if there is no selected recipe, reset back
 
 
 }
 
+// Creates a progress bar
+struct GUI_frame* gui_create_progress_bar(struct GUI_frame* parent, enum GUI_ID bar_id, unsigned int base_color, unsigned int progress_color) {
+
+	struct GUI_frame* base_frame = gui_frame_init(parent, 1);
+	gui_resize(base_frame, parent->width, parent->height);
+	gui_move(base_frame, 0, 0, 0, 0, (enum GUI_flags[]) { POS_CENTERED_X, POS_CENTERED_Y });
+	gui_set_color(base_frame, base_color);
+	base_frame->id = bar_id;
+
+	struct GUI_frame* progress_frame = gui_frame_init(base_frame, 0);
+	gui_resize(progress_frame, parent->width, parent->height);
+	gui_move(progress_frame, 0, 0, 0, 0, NULL);
+	gui_set_color(progress_frame, progress_color);
+
+	return base_frame;
+}
+
+// Updates progress bar with time left
+void gui_update_progress_bar(struct GUI_frame* bar, float total, float left) {
+
+	if (!bar) return;
+
+	// In case time left is passed as a null
+	if (!left) left = total;
+
+	float progress = total - left;
+	float width_multiplier = 0;
+
+	if (total != 0) {
+		width_multiplier = progress / total;
+	}
+
+	gui_resize(bar->children[0], (int)(bar->width * width_multiplier), bar->height);
+	
+}
+
+
+
+
+
+
+
+
+
+
+
+
 // OPTIONAL, NOT IMPORTANT RN
 // Automatic parent resize function
 // Starts from a child and resizes parent to fit child plus padding
+
+
+

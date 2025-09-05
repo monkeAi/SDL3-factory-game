@@ -8,6 +8,8 @@
 #include "world.h"
 #include "inventory.h"
 #include "camera.h"
+#include "crafting.h"
+#include "recipes.h"
 
 // List for all building's pointers
 struct Building* Buildings[MAX_BUILDINGS] = { NULL };
@@ -24,10 +26,11 @@ static struct Building* Building_init(enum BuildingType type) {
 
 	building->type = type;
 	building->recipe = RECIPE_NONE;
-	building->state = BUILDING_NONE;
+	building->state = BUILDING_STATE_IDLE;
 	building->input_size = 0;
 	building->output_size = 0;
 	building->coords = malloc(sizeof(struct Vector2D));
+	building->craft_request_id = NULL;
 
 	// Depending on the building type set the parameters
 	switch (type) {
@@ -39,8 +42,8 @@ static struct Building* Building_init(enum BuildingType type) {
 		break;
 
 	case BUILDING_CRAFTER_1:
-	    building->input_inv = Inventory_create(CRAFTER_MAX_INV_SLOTS, 0);
-		building->output_inv = Inventory_create(CRAFTER_MAX_INV_SLOTS, 0);
+	    building->input_inv = Inventory_create(CRAFTER_MAX_INPUT, CRAFTER_MAX_INPUT);
+		building->output_inv = Inventory_create(CRAFTER_MAX_OUTPUT, CRAFTER_MAX_OUTPUT);
 		building->tile_width = CRAFTER_WIDTH;
 		building->tile_height = CRAFTER_HEIGHT;
 		break;
@@ -48,8 +51,8 @@ static struct Building* Building_init(enum BuildingType type) {
 	default:
 		building->input_inv = NULL;
 		building->output_inv = NULL;
-		building->tile_width = 0;
-		building->tile_height = 0;
+		building->tile_width = 3;
+		building->tile_height = 1;
 		break;
 	}
 
@@ -241,6 +244,79 @@ static int Building_find_free_slot() {
 
 // Loops through all the buildings and updates them
 void update_buildings() {
+
+	for (int b = 0; b < MAX_BUILDINGS; b++) {
+
+		if (Buildings[b] == NULL) continue;
+
+		// Sort by building type
+		switch (Buildings[b]->type) {
+
+			// Crafters
+		case BUILDING_CRAFTER_1: {
+
+			// If it has active recipe
+			if (Buildings[b]->recipe != RECIPE_NONE) {
+
+				// if it has enough power - feature to be added
+
+				// Check state
+					// If idle -> start crafting request and switch state to running
+					// If active -> wait for request to end
+
+				switch (Buildings[b]->state) {
+					case BUILDING_STATE_IDLE: {
+
+						// If output inventory has enough space start craft request
+						int allow_craft_request = TRUE;
+						
+						// Loop through every output recipe item and chek if it has enough space
+						for (int item = 0; item < CraftingRecipes[Buildings[b]->recipe]->output_count; item++) {
+
+							if (!Inventory_enough_space(Buildings[b]->output_inv, CraftingRecipes[Buildings[b]->recipe]->output_items[item].type, CraftingRecipes[Buildings[b]->recipe]->output_items[item].quantity)) {
+								allow_craft_request = FALSE;
+							}
+
+						}
+
+						// If it has continue with crafting
+						if (allow_craft_request) {
+
+							// Start craft request and save id so it can track time left
+							int craft_request_id = craft_item(Buildings[b]->input_inv, Buildings[b]->output_inv, Buildings[b]->recipe);
+							if (craft_request_id != -1) {
+								Buildings[b]->craft_request_id = craft_request_id;
+								Buildings[b]->state = BUILDING_STATE_RUNNING;
+							}
+
+						}
+						break;
+					}
+					case BUILDING_STATE_RUNNING: {
+						if (CraftingQueue[Buildings[b]->craft_request_id].time_left <= 0) {
+							Buildings[b]->state = BUILDING_STATE_IDLE;
+							Buildings[b]->craft_request_id = NULL;
+						}
+						break;
+					}
+					case BUILDING_STATE_PAUSED: {
+						// Pause if output inventory is full
+						
+					}
+				}
+
+			}
+			// No selected recipe -> reset building
+			else {
+
+			}
+
+				break;
+			}
+		}
+
+
+	}
 
 
 }
