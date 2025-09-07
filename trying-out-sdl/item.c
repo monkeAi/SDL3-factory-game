@@ -2,11 +2,12 @@
 #include <stdlib.h>
 #include "SDL3/SDL.h"
 #include "item.h"
+#include "constants.h"
 
 struct Item_data* Item_data_list[MAX_ITEMS] = { NULL };
 
 // Create a item_data struct meant for storing stats of every different item type
-struct Item_data* create_item_data(enum ItemType type, char* name_string, unsigned int max_quantity, unsigned int color) {
+struct Item_data* create_item_data(enum ItemType type, char* name_string, unsigned int max_quantity, unsigned int color, int is_buildable) {
 
     // Allocate enough memory to the item_data pointer
     struct Item_data* item_data = (struct Item_data*)malloc(sizeof(struct Item_data));
@@ -19,6 +20,7 @@ struct Item_data* create_item_data(enum ItemType type, char* name_string, unsign
     item_data->name_string = name_string;
     item_data->max_quantity = max_quantity;
     item_data->color = color;
+    item_data->is_buildable = is_buildable;
 
     return item_data;
 }
@@ -26,17 +28,22 @@ struct Item_data* create_item_data(enum ItemType type, char* name_string, unsign
 // Item data list is a dictionary of all item types
 void init_item_data_list(void) {
 
-    // Loop through all items and add them to the list
+    // Loop through all items, initialize their parameters and add them to the list
     for (int item = 0; item < MAX_ITEMS; item++) {
 
         switch (item) {
-            case ITEM_NONE: { Item_data_list[item] = create_item_data(item, "Item none", 0, 0x000000FF); break; }
-            case ITEM_IRON_ORE: { Item_data_list[item] = create_item_data(item, "Iron ore", 100, 0x0b4b80FF); break; }
-            case ITEM_IRON_PLATE: { Item_data_list[item] = create_item_data(item, "Iron plate", 100, 0xa3cdf0FF); break; }
-            case ITEM_IRON_GEAR: { Item_data_list[item] = create_item_data(item, "Iron gear", 50, 0xabbcc9FF); break; }
-            case ITEM_COPPER_ORE: { Item_data_list[item] = create_item_data(item, "Copper ore", 100, 0x964520FF); break; }
-            case ITEM_COPPER_PLATE: { Item_data_list[item] = create_item_data(item, "Copper plate", 100, 0xed8b5fFF); break; }
-            case ITEM_COPPER_WIRE: { Item_data_list[item] = create_item_data(item, "Copper wire", 100, 0x964520FF); break; }
+            case ITEM_NONE: { Item_data_list[item] = create_item_data(item, "Item none", 0, 0x000000FF, FALSE); break; }
+
+            case ITEM_IRON_ORE: { Item_data_list[item] = create_item_data(item, "Iron ore", 100, 0x0b4b80FF, FALSE); break; }
+            case ITEM_IRON_PLATE: { Item_data_list[item] = create_item_data(item, "Iron plate", 100, 0xa3cdf0FF, FALSE); break; }
+            case ITEM_IRON_GEAR: { Item_data_list[item] = create_item_data(item, "Iron gear", 50, 0xabbcc9FF, FALSE); break; }
+
+            case ITEM_COPPER_ORE: { Item_data_list[item] = create_item_data(item, "Copper ore", 100, 0x964520FF, FALSE); break; }
+            case ITEM_COPPER_PLATE: { Item_data_list[item] = create_item_data(item, "Copper plate", 100, 0xed8b5fFF, FALSE); break; }
+            case ITEM_COPPER_WIRE: { Item_data_list[item] = create_item_data(item, "Copper wire", 100, 0x964520FF, FALSE); break; }
+
+            case ITEM_CRAFTER_1: { Item_data_list[item] = create_item_data(item, "Crafter mk.1", 50, 0xFFAC1CFF, TRUE); break; }
+
             default: { Item_data_list[item] = NULL; break; }
         }
 

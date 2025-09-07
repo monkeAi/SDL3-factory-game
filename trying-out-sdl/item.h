@@ -10,12 +10,16 @@ struct Item {
 
 enum ItemType {
     ITEM_NONE,
+
     ITEM_IRON_ORE,
     ITEM_IRON_PLATE,
     ITEM_IRON_GEAR,
+
     ITEM_COPPER_ORE,
     ITEM_COPPER_PLATE,
-    ITEM_COPPER_WIRE
+    ITEM_COPPER_WIRE,
+
+    ITEM_CRAFTER_1
 };
 
 struct Item_data {
@@ -23,11 +27,12 @@ struct Item_data {
     char* name_string;
     unsigned int max_quantity;
     unsigned int color;
+    int is_buildable;
 };
 
 extern struct Item_data* Item_data_list[MAX_ITEMS];
 
-struct Item_data* create_item_data(enum ItemType type, char* name_string, unsigned int max_quantity, unsigned int color);
+struct Item_data* create_item_data(enum ItemType type, char* name_string, unsigned int max_quantity, unsigned int color, int is_buildable);
 void init_item_data_list(void);
 void print_item_data_list(void);
 

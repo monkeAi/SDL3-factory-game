@@ -99,16 +99,11 @@ int update_text_box(SDL_Renderer* renderer, struct TextBox* textBox, TTF_Font* f
 		fprintf(stderr, "Error loading Font: %s\n", SDL_GetError());
 		return FALSE;
 	}
-	if (!&text_rect) {
-		fprintf(stderr, "Error loading rect: %s\n", SDL_GetError());
-		return FALSE;
-	}
 	if (!text) {
 		fprintf(stderr, "Error loading text: %s\n", SDL_GetError());
 		return FALSE;
 	}
 
-	textBox->rect = text_rect;
 
 	// Create surface for text
 	SDL_Surface* surf = TTF_RenderText_Blended(font, text, 0, color);
@@ -119,8 +114,10 @@ int update_text_box(SDL_Renderer* renderer, struct TextBox* textBox, TTF_Font* f
 	}
 
 	// Set width and height of surface to rect
-	text_rect->w = (float)surf->w;
-	text_rect->h = (float)surf->h;
+	textBox->rect.x = text_rect->x;
+	textBox->rect.y = text_rect->y;
+	textBox->rect.w = (float)surf->w;
+	textBox->rect.h = (float)surf->h;
 
 	// Create texture from surface
 	SDL_Texture* text_image = SDL_CreateTextureFromSurface(renderer, surf);
@@ -143,13 +140,27 @@ int render_text_box(SDL_Renderer* renderer, struct TextBox* textBox) {
 	// Render if not NULL
 
 
-	if (textBox != NULL && textBox->rect != NULL) {
+
+	if (textBox != NULL) {
+		// Crete FRect
+		SDL_FRect* t_rect = malloc(sizeof(SDL_FRect));
+
+		t_rect->x = textBox->rect.x;
+		t_rect->y = textBox->rect.y;
+		t_rect->w = textBox->rect.w;		
+		t_rect->h = textBox->rect.h;
+
 		// Render texture
-		SDL_RenderTexture(renderer, textBox->texture, NULL, textBox->rect);
-		//printf("Textbox rendered at: x: %f, y: %f, w: %f, h: %f\n", textBox->rect->x, textBox->rect->y, textBox->rect->w, textBox->rect->h);
-		free(textBox->rect);
-		SDL_DestroyTexture(textBox->texture);
+		SDL_RenderTexture(renderer, textBox->texture, NULL, t_rect);
+
+		//printf("Textbox rendered at: x: %f, y: %f, w: %f, h: %f\n", t_rect->x, t_rect->y, t_rect->w, t_rect->h);
+		
+		// Clean up
+		free(t_rect);
+		//SDL_DestroyTexture(textBox->texture);
 	}
+
+
 }
 
 // Free media
@@ -168,10 +179,6 @@ void free_text_box(struct TextBox* box) {
 	if (box->texture != NULL) {
 		SDL_DestroyTexture(box->texture);
 		box->texture = NULL;
-	}
-	if (box->rect != NULL) {
-		free(box->rect);
-		box->rect = NULL;
 	}
 	if (box != NULL) {
 		free(box);

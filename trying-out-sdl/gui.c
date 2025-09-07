@@ -244,6 +244,8 @@ int gui_find_children(struct GUI_frame* parent, enum GUI_class class_name, struc
 	// Amount of found mathches
 	int matches_count = 0;
 
+	if (!parent) return -1;
+
 	// Loop through every child
 	for (int i = 0; i < parent->max_children; i++) {
 
@@ -336,8 +338,17 @@ void update_gui(SDL_Renderer* renderer, struct MediaBin* mediaBin) {
 	}
 
 
+	// Update player holding item position
+	if (player->cursor->is_holding) {
+
+		player->cursor->held_item->position[0] = player->mouse_pos[0];
+		player->cursor->held_item->position[1] = player->mouse_pos[1];
+
+	}
+
+
 	// Update GUI Player Inventory
-	if (player->gui_inventory->visibility == SHOWN) {
+	if (player->gui_inventory->visibility == SHOWN || player->cursor->is_holding) {
 		gui_update_inventory(player->gui_inventory, player->inventory, renderer, mediaBin);
 
 		// Update side menu depending on what is open
@@ -367,9 +378,6 @@ void update_gui(SDL_Renderer* renderer, struct MediaBin* mediaBin) {
 		
 	}
 
-	// Update GUI Building Inventory
-
-		// Buildings have 2 inventorys to update
 
 
 }
@@ -417,9 +425,16 @@ static void gui_frame_render(SDL_Renderer* renderer, struct GUI_frame* frame) {
 
 // Render gui windows and frames
 void render_gui(SDL_Renderer* renderer) {
+
 	for (int i = 0; i < MAX_GUI_WINDOWS; i++) {
 		if (GUI_WINDOWS[i] == NULL) continue;
 		gui_frame_render(renderer, GUI_WINDOWS[i]);
+	}
+
+	// Additionaly render held item on top again
+	if (player->cursor->is_holding) {
+
+		gui_frame_render(renderer, player->cursor->held_item);
 	}
 }
 
@@ -467,7 +482,7 @@ struct GUI_frame* gui_create_player_inventory() {
 	gui_set_color(inv_frame_border, COLOR_HEX_MAIN);
 
 	// INVENTORY FRAME
-	struct GUI_frame* inv_frame = gui_create_tile_box(inv_frame_border, GUI_INVENTORY_WIDTH, GUI_INVENTORY_HEIGHT, GUI_TILE_SIZE, GUI_TILE_SIZE, GUI_TILE_MARGIN, ID_inventory_frame, COLOR_HEX_SEC);
+	struct GUI_frame* inv_frame = gui_create_tile_box(inv_frame_border, GUI_INVENTORY_WIDTH, GUI_INVENTORY_HEIGHT, GUI_TILE_SIZE, GUI_TILE_SIZE, GUI_TILE_MARGIN, ID_inventory_frame, ID_player_inventory, COLOR_HEX_SEC);
 
 	// Add final frame composition to list of all gui frames
 	GUI_WINDOWS[gui_find_free_slot()] = main_frame;
@@ -476,7 +491,7 @@ struct GUI_frame* gui_create_player_inventory() {
 }
 
 // Creates a tile box full of frames
-struct GUI_frame* gui_create_tile_box(struct GUI_frame* parent, int tiles_x, int tiles_y, int tile_w, int tile_h, int tile_margin, enum GUI_ID tiles_frame_id, unsigned int tile_color) {
+struct GUI_frame* gui_create_tile_box(struct GUI_frame* parent, int tiles_x, int tiles_y, int tile_w, int tile_h, int tile_margin, enum GUI_ID tiles_frame_id, enum GUI_ID inventory_id, unsigned int tile_color) {
 
 	// Total size of the container
 	int tiles_width = tiles_x * tile_w + (tiles_x - 1) * tile_margin;
@@ -505,6 +520,7 @@ struct GUI_frame* gui_create_tile_box(struct GUI_frame* parent, int tiles_x, int
 			gui_move(tile, x * tile_w + x * tile_margin, y * tile_h + y * tile_margin, 0, 0, NULL);
 			gui_set_color(tile, tile_color);
 			tile->class = C_inventory_tile;
+			tile->id = inventory_id;
 
 			slot++;
 		}
@@ -530,6 +546,7 @@ void gui_update_inventory(struct GUI_frame* gui_inv, struct Inventory* game_inv,
 
 	struct GUI_frame* gui_slots = gui_get_frame_by_id(gui_inv, ID_inventory_frame);
 
+
 	if (!gui_slots) {
 		printf("Null pointer ID");
 	}
@@ -548,6 +565,7 @@ void gui_update_inventory(struct GUI_frame* gui_inv, struct Inventory* game_inv,
 
 		// Game inv slot has an item
 		else if (game_inv->slots[slot].type != ITEM_NONE) {
+
 
 			// Gui inv slot is empty
 			if (gui_slots->children[slot]->children[0] == NULL) {
@@ -570,17 +588,17 @@ void gui_update_inventory(struct GUI_frame* gui_inv, struct Inventory* game_inv,
 
 				
 				// Set text size and position to item
-				SDL_FRect* t_rect = malloc(sizeof(SDL_FRect));
-
-				t_rect->x = gui_slots->children[slot]->children[0]->position[0];	// x
-				t_rect->y = gui_slots->children[slot]->children[0]->position[1];	// y
-				t_rect->w = gui_slots->children[slot]->children[0]->width;			// Width
-				t_rect->h = gui_slots->children[slot]->children[0]->height;			// Height
+				SDL_FRect t_rect = {
+					gui_slots->children[slot]->children[0]->position[0],
+					gui_slots->children[slot]->children[0]->position[1],
+					gui_slots->children[slot]->children[0]->width,
+					gui_slots->children[slot]->children[0]->height
+				};
                 
 				//printf("x: %f; y: %f, w:%f, h:%f \n", t_rect->x, t_rect->y, t_rect->w, t_rect->h);
 
 				// Update text box with correct quantity
-				update_text_box(renderer, gui_slots->children[slot]->children[0]->textBox, mediaBin->font_text, t_rect, quantity, COLOR_BLACK);
+				update_text_box(renderer, gui_slots->children[slot]->children[0]->textBox, mediaBin->font_text, &t_rect, quantity, COLOR_BLACK);
 			}
 
 			// Gui inv slot has the right item
@@ -593,17 +611,17 @@ void gui_update_inventory(struct GUI_frame* gui_inv, struct Inventory* game_inv,
 
 
 				// Set text size and position to item
-				SDL_FRect* t_rect = malloc(sizeof(SDL_FRect));
-
-				t_rect->x = gui_slots->children[slot]->children[0]->position[0];	// x
-				t_rect->y = gui_slots->children[slot]->children[0]->position[1];	// y
-				t_rect->w = gui_slots->children[slot]->children[0]->width;			// Width
-				t_rect->h = gui_slots->children[slot]->children[0]->height;			// Height
+				SDL_FRect t_rect = {
+					gui_slots->children[slot]->children[0]->position[0],
+					gui_slots->children[slot]->children[0]->position[1],
+					gui_slots->children[slot]->children[0]->width,
+					gui_slots->children[slot]->children[0]->height
+				};
 
 				//printf("x: %f; y: %f, w:%f, h:%f \n", t_rect->x, t_rect->y, t_rect->w, t_rect->h);
 
 				// Update text box with correct quantity
-				update_text_box(renderer, gui_slots->children[slot]->children[0]->textBox, mediaBin->font_text, t_rect, quantity, COLOR_BLACK);
+				update_text_box(renderer, gui_slots->children[slot]->children[0]->textBox, mediaBin->font_text, &t_rect, quantity, COLOR_BLACK);
 			}
 		}
 
@@ -620,6 +638,7 @@ void gui_update_inventory(struct GUI_frame* gui_inv, struct Inventory* game_inv,
 	// Else skip
 
 }
+
 
 // When gui is open
 	// Get tile of selected inventory tile
@@ -716,19 +735,20 @@ struct GUI_frame* gui_create_sm_buildings(struct GUI_frame* parent) {
 		gui_resize(input_frame_border, tiles_width, tiles_height);
 		gui_move(input_frame_border, 0, 0, 0, inventory_margin, (enum GUI_flags[]) { POS_CENTERED_X, POS_TOP });
 		gui_set_color(input_frame_border, COLOR_HEX_SEC);
+		input_frame_border->id = ID_sm_building_input;
 
 		// Input frame tile box
-		struct GUI_frame* input_tile_box = gui_create_tile_box(input_frame_border, CRAFTER_MAX_INPUT, 1, GUI_TILE_SIZE, GUI_TILE_SIZE, GUI_TILE_MARGIN, ID_inventory_frame, COLOR_HEX_THIRD);
-
+		struct GUI_frame* input_tile_box = gui_create_tile_box(input_frame_border, CRAFTER_MAX_INPUT, 1, GUI_TILE_SIZE, GUI_TILE_SIZE, GUI_TILE_MARGIN, ID_inventory_frame, ID_sm_input_inv, COLOR_HEX_THIRD);
 
 		// Output frame border
 		struct GUI_frame* output_frame_border = gui_frame_init(sm_container_bottom, 1);
 		gui_resize(output_frame_border, tiles_width, tiles_height);
 		gui_move(output_frame_border, 0, 0, 0, inventory_margin, (enum GUI_flags[]) { POS_CENTERED_X, POS_BOTTOM });
 		gui_set_color(output_frame_border, COLOR_HEX_SEC);
+		output_frame_border->id = ID_sm_building_output;
 
 		// Output frame tile
-		struct GUI_frame* output_tile_box = gui_create_tile_box(output_frame_border, CRAFTER_MAX_INPUT, 1, GUI_TILE_SIZE, GUI_TILE_SIZE, GUI_TILE_MARGIN, ID_inventory_frame, COLOR_HEX_THIRD);
+		struct GUI_frame* output_tile_box = gui_create_tile_box(output_frame_border, CRAFTER_MAX_INPUT, 1, GUI_TILE_SIZE, GUI_TILE_SIZE, GUI_TILE_MARGIN, ID_inventory_frame, ID_sm_output_inv, COLOR_HEX_THIRD);
 
 		// Progress bar
 		struct GUI_frame* progress_bar_border = gui_frame_init(sm_container_bottom, 1);
@@ -756,25 +776,25 @@ void gui_update_sm_buildings(SDL_Renderer* renderer, struct MediaBin* mediaBin) 
 
 
 	// Draw text for recipe item
-	SDL_FRect* t_rect = malloc(sizeof(SDL_FRect));
-
-	t_rect->x = recipe_text->position[0];	// x
-	t_rect->y = recipe_text->position[1];	// y
-	t_rect->w = recipe_text->width;			// Width
-	t_rect->h = recipe_text->height;			// Height
+	SDL_FRect t_rect = {
+		recipe_text->position[0],
+		recipe_text->position[1],
+		recipe_text->width,
+		recipe_text->height
+	};
 
 	struct GUI_frame* bottom_container = player->gui_side_menu->children[0]->children[1];	// side_menu/building
 	struct GUI_frame* progress_bar = bottom_container->children[2]->children[0];							// bottom_container/progress_bar
 
 	if (building->recipe == RECIPE_NONE) {
-		update_text_box(renderer, recipe_text->textBox, mediaBin->font_text, t_rect, "Select recipe", COLOR_WHITE);
+		update_text_box(renderer, recipe_text->textBox, mediaBin->font_text, &t_rect, "Select recipe", COLOR_WHITE);
 
 		// Reset progress bar
 		gui_update_progress_bar(progress_bar, 1, 1);	// 0% progress
 	}
 	else {
 		// Draw recipe name
-		update_text_box(renderer, recipe_text->textBox, mediaBin->font_text, t_rect, selected_recipe->title, COLOR_WHITE);
+		update_text_box(renderer, recipe_text->textBox, mediaBin->font_text, &t_rect, selected_recipe->title, COLOR_WHITE);
 
 
 		// Update progress bar
@@ -793,7 +813,6 @@ void gui_update_sm_buildings(SDL_Renderer* renderer, struct MediaBin* mediaBin) 
 	gui_update_inventory(bottom_container->children[1], building->output_inv, renderer, mediaBin);
 
 	// if there is no selected recipe, reset back
-
 
 }
 
