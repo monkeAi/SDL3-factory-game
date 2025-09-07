@@ -14,6 +14,7 @@
 #include "recipes.h"
 #include "crafting.h"
 #include "buildings.h"
+#include "ore_manager.h"
  
 // Defines
 
@@ -83,6 +84,8 @@ void game_init() {
 	program_running = initialize_window();
 
 	game_media = init_media();
+
+	init_Ore_Manager();
 
 	init_tilemap();
 
@@ -267,6 +270,7 @@ int game_render() {
 
 	// Render elements
 	render_tilemap(renderer);		// World tilemap
+	render_ores(renderer);
 	render_buildings(renderer);
 	render_player_cursor(renderer);
 	render_player(renderer);		// Player

@@ -4,6 +4,7 @@
 #include "perlin_noise.h"
 #include "camera.h"
 #include "tools.h"
+#include "ore_manager.h"
 
 
 
@@ -55,6 +56,50 @@ void init_tilemap() {
 			}
 
 			map[y][x].type = selectedType;
+		}
+	}
+
+	// create ore patches
+
+	struct Ore_Manager* ore_Manager = get_Ore_Manager();
+
+
+
+	for (int y = 0; y < MAP_HEIGHT; y++) {
+		for (int x = 0; x < MAP_WIDTH; x++) {
+
+			GAME_SEED = SEED + 1;
+			float perlin_Iron = perlin2d(x, y, NOISE_FREQ, NOISE_AMP) * 100.0;
+
+			GAME_SEED = SEED + 2;
+			float perlin_Copper = perlin2d(x, y, NOISE_FREQ, NOISE_AMP) * 100.0;
+
+			GAME_SEED = SEED + 3;
+			float perlin_Coal = perlin2d(x, y, NOISE_FREQ, NOISE_AMP) * 100.0;
+
+			enum Ore_Type ore_Type;
+			int ore_Amount = 0;
+			bool has_Ore = false;
+
+			if (perlin_Iron < IRON_ORE_RANGE) {
+				ore_Type = IRON;
+				ore_Amount = perlin_Iron * 1000;
+				has_Ore = true;
+			}
+			if (perlin_Copper < COPPER_ORE_RANGE) {
+				ore_Type = COPPER;
+				ore_Amount = perlin_Copper * 1000;
+				has_Ore = true;
+			}
+			if (perlin_Coal < COAL_ORE_RANGE) {
+				ore_Type = COAL;
+				ore_Amount = perlin_Coal * 1000;
+				has_Ore = true;
+			}
+			if (has_Ore && map[y][x].type != TILE_WATER) {
+				ore_Manager->add_Ore(ore_Manager, x, y, ore_Type, ore_Amount);
+			}
+
 		}
 	}
 
@@ -142,6 +187,40 @@ int render_tilemap(SDL_Renderer* renderer) {
 	}
 
 	return 0;
+}
+
+int render_ores(SDL_Renderer* renderer) {
+	struct Ore_Manager* ore_Manager = get_Ore_Manager();
+	struct Ore_List* curr = ore_Manager->ore_List;
+
+	while (curr != NULL) {
+		struct Ore* ore = &curr->ore;
+
+		SDL_FRect tile_rect = {
+				ore->x * TILE_SIZE + world_start_offset_x - mainCamera->x_offset,
+				ore->y * TILE_SIZE + world_start_offset_y - mainCamera->y_offset,
+				TILE_SIZE,
+				TILE_SIZE
+		};
+
+		// Depending on tile type select corresponding tile color
+		static Uint8 rgba[4] = { 255 };
+
+		// In future select the right texture
+		switch (ore->type) {
+			case IRON: rgba[0] = 50; rgba[1] = 50; rgba[2] = 200; rgba[3] = 50; break;
+			case COPPER: rgba[0] = 200; rgba[1] = 100; rgba[2] = 100; rgba[3] = 50; break;
+			case COAL: rgba[0] = 50; rgba[1] = 50; rgba[2] = 50; rgba[3] = 50; break;
+			default: rgba[0] = 255; rgba[1] = 255; rgba[2] = 255; rgba[3] = 50; break;
+		}
+
+		SDL_SetRenderDrawColor(renderer, rgba[0], rgba[1], rgba[2], rgba[3]);
+
+		// Add to render 
+		SDL_RenderFillRect(renderer, &tile_rect);
+
+		curr = curr->next;
+	}
 }
 
 // Transform world cordinates to table index of tile
