@@ -32,6 +32,7 @@ struct PlayerCursor {
     enum GUI_visibility visibility;
     enum CursorWatching watching_type;
     struct Building* selected_building;
+    enum CursorHolding is_holding;
 };
 
 enum CursorWatching {
@@ -39,6 +40,11 @@ enum CursorWatching {
     CURSOR_GUI,
     CURSOR_BUILDING,
     CURSOR_TILE
+};
+
+enum CursorHolding {
+    HOLDING_NONE,
+    HOLDING_ITEM
 };
 
 extern struct Player* player;

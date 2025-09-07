@@ -184,6 +184,18 @@ static void handle_player_interaction(struct Player* p) {
 
                 inv_tiles[tile]->state = GUI_HOVERING;  // This is the selected tile!
 
+                // If hovered tile is clicked and it has an item inside append item position to mouse position
+                    // If its over:
+                        // GUI inventory:
+                            // clicked on -> transfer whole item if posible
+                            // right clicked -> transfer only one item
+                        // Ground:
+                            // Item type is buildable -> open building mode -> when clicked->build and consume 1 item
+                            // else if pressed z drop 1 item on ground at the tile if empty
+                        // Building:
+                            // not needed feature at the moment
+                                
+
             }
 
             break;

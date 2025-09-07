@@ -219,10 +219,6 @@ int game_handle_input() {
 		if (event.key.key == SDLK_Z) {
 
 			Inventory_transfer_item(player->inventory, Buildings[0]->input_inv, 0, 30);
-			printf("Input Inventory: \n");
-			Inventory_print(Buildings[0]->input_inv);
-			printf("Output Inventory: \n");
-			Inventory_print(Buildings[0]->output_inv);
 		}
 		if (event.key.key == SDLK_L) {
 
