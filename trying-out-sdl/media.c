@@ -24,7 +24,7 @@ struct MediaBin* init_media(void) {
 		exit(1);
 	}
 
-	printf("Media bin initialization complete. \n");
+	//printf("Media bin initialization complete. \n");
 	// Return pointer
 	return mediaBin;
 

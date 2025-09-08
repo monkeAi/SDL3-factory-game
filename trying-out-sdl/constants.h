@@ -12,7 +12,7 @@
 #define MAP_WIDTH 40
 #define MAP_HEIGHT 40	 
 
-#define CLICK_COOLDOWN 0.1
+#define CLICK_COOLDOWN 1
 
 
 // Terrain generation
