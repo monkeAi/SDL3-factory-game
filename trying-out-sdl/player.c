@@ -60,13 +60,15 @@ void update_player(struct Player *p, float delta_time) {
    if (p->cursor->click_cooldown >= 0) p->cursor->click_cooldown -= delta_time;
 
    // Update deconstruction time left
-   if (p->cursor->watching_building == p->cursor->decontruct_building) {
+   if (p->cursor->watching_building == p->cursor->decontruct_building && p->cursor->decontruct_building != NULL) {
        p->cursor->deconstruct_time_left -= delta_time;
    }
    else {
        p->cursor->deconstruct_time_left = PLAYER_DECONSTRUCT_SPEED;
        p->cursor->decontruct_building = NULL;
    }
+
+   p->mouse_state_before = p->mouse_state;
 }  
 
 void render_player(SDL_Renderer* renderer) {  
@@ -316,7 +318,7 @@ static void handle_player_interaction(struct Player* p) {
         // If left clicks on building open player inventory and side menu for buildings
         if (p->mouse_state == 1) {
 
-            if (p->cursor->watching_type == CURSOR_BUILDING) {
+            if (p->cursor->watching_type == CURSOR_BUILDING && p->mouse_state != p->mouse_state_before) {
 
                 // Set selected building to currently watched
                 player->cursor->selected_building = player->cursor->watching_building;
@@ -325,6 +327,9 @@ static void handle_player_interaction(struct Player* p) {
                 player->gui_inventory->visibility = TRUE;
                 // Set side menu for buildings
                 player->side_menu_state = SM_BUILDING;
+
+                // Reset mouse state before
+                p->mouse_state_before = p->mouse_state;
 
             }
         }
@@ -336,9 +341,12 @@ static void handle_player_interaction(struct Player* p) {
 
             // When timer runs out and selected building is still being deconstructed -> destroy building
             if (p->cursor->deconstruct_time_left <= 0 && player->cursor->decontruct_building != NULL) {
+                
+                // Close side menu if active building is deconstructed
+                if (p->cursor->selected_building == p->cursor->decontruct_building) {
 
-                // Close side menu
-                player->toggle_inv(player);
+                    player->side_menu_state = HIDDEN;
+                }
 
                 // Add building item to player inventory
                 if (player->cursor->decontruct_building->building_item_type) {
@@ -353,7 +361,7 @@ static void handle_player_interaction(struct Player* p) {
                 player->cursor->decontruct_building = NULL;
                 player->cursor->deconstruct_time_left = PLAYER_DECONSTRUCT_SPEED;
 
-                printf("Deconstructed building \n");
+                //printf("Deconstructed building \n");
 
             }
 
@@ -372,7 +380,7 @@ static void handle_player_interaction(struct Player* p) {
 
                 map[selected_tile_index[1]][selected_tile_index[0]].state = TILE_SELECTED;
 
-                p->cursor->visibility = SHOWN;
+                p->cursor->visibility = HIDDEN;
                 // Set cursor position
                 p->cursor->x_pos = selected_cords[0];
                 p->cursor->y_pos = selected_cords[1];
@@ -393,9 +401,35 @@ static void handle_player_interaction(struct Player* p) {
     // Place building if left click is pressed and its not inside inv
     if (p->mouse_state == 1) {
 
-        //printf("Mouse click world cords: X:%d Y:%d \n", selected_cords[0], selected_cords[1]);
-        if (p->cursor->watching_type != CURSOR_GUI) {
-            //Building_create(BUILDING_CRAFTER_1, selected_cords, DOWN);
+
+        if (p->cursor->held_item != NULL) {
+
+            struct Item* held_item = &p->cursor->held_item_inventory->slots[p->cursor->held_item_index];
+
+            // Place if held item is buildable
+            if (p->cursor->watching_type != CURSOR_GUI && Item_data_list[held_item->type]->is_buildable == TRUE) {
+
+                // Create building
+                if (!Building_create(Item_data_list[held_item->type]->building_type, selected_cords, DOWN)) {
+
+                    // Remove one item from held item
+                    held_item->quantity -= 1;
+
+                    // When item is empty remove it from inventory
+                    if (held_item->quantity <= 0) {
+
+                        Inventory_remove_item(p->cursor->held_item_inventory, p->cursor->held_item_index, 1);
+
+                        // Reset cursor 
+                        player_cursor_holding_reset();
+                    }
+
+
+                };
+
+
+            }
+
         }
     }
 

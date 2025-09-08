@@ -19,5 +19,6 @@ int Inventory_search_item(struct Inventory* inv, enum ItemType item_type);
 int Inventory_transfer_item(struct Inventory* from_inv, struct Inventory* to_inv, int from_slot, unsigned int quantity);
 void Inventory_free(struct Inventory* inv);
 int Inventory_enough_space(struct Inventory* inv, enum ItemType item_type, int required_amount);
+void Inventory_remove_item(struct Inventory* from_inv, int from_slot, unsigned int quantity);
 
 #endif

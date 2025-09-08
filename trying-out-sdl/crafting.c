@@ -33,6 +33,10 @@ int craft_item(struct Inventory* input_inv, struct Inventory* output_inv, enum R
 
 		Inventory_transfer_item(input_inv, tempInv, Inventory_search_item(input_inv, CraftingRecipes[recipe]->input_items[item].type), CraftingRecipes[recipe]->input_items[item].quantity);
 	}
+
+	// For now free temp inventory, in future save temp inventory in case building gets deconstructed
+
+	Inventory_free(tempInv);
 	
 
 	// Create a new crafting request and add it to the queue
@@ -56,6 +60,8 @@ void update_craft_queue(float delta_time) {
 		// Skip if request is empty
 		if (CraftingQueue[request].recipe == RECIPE_NONE) continue;
 
+		if (!CraftingQueue[request].output_inv) continue;
+
 		CraftingQueue[request].time_left -= delta_time;
 
 		// When crafting time is over 
@@ -66,6 +72,8 @@ void update_craft_queue(float delta_time) {
 
 				struct Item output_item = Item_create(CraftingRecipes[CraftingQueue[request].recipe]->output_items[item].type, CraftingRecipes[CraftingQueue[request].recipe]->output_items[item].quantity);
 				
+
+
 				Inventory_push_item(CraftingQueue[request].output_inv, &output_item);
 				// Handle full inventory case
 

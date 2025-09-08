@@ -87,7 +87,6 @@ static int Inventory_find_free_slot(struct Inventory* inv, enum ItemType item_ty
 	// Loop through the inventory slots
 	for (unsigned int i = 0; i < inv->max_slots; i++) {
 
-
 		// Find free slot or with the same type and isn't full
 		if (inv->slots[i].type == item_type && !Item_is_full(&inv->slots[i])) {
 
@@ -173,7 +172,6 @@ int Inventory_transfer_item(struct Inventory* from_inv, struct Inventory* to_inv
 			return 2;  // to_inventory is full
 		}
 
-		printf("Transfer successful: full amount. \n");
 		// Delete item from original inventory
 		Item_delete(&from_inv->slots[from_slot]);
 
@@ -201,6 +199,26 @@ int Inventory_transfer_item(struct Inventory* from_inv, struct Inventory* to_inv
 // 
 
 
+// Free memory of inventory struct
 void Inventory_free(struct Inventory* inv) {
-	// Free memory of inventory struct
+
+	free(inv->slots);
+
+	free(inv);
+
+	inv = NULL;
+}
+
+// Removes specified amount of items from inventory slot
+void Inventory_remove_item(struct Inventory* from_inv, int from_slot, unsigned int quantity) {
+
+	// Create new trash inventory
+	struct Inventory* trash_inv = Inventory_create(1, 1);
+
+	// Move items to there
+	Inventory_transfer_item(from_inv, trash_inv, from_slot, quantity);
+
+	// Delete trash inventory
+	Inventory_free(trash_inv);
+
 }

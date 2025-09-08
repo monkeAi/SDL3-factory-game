@@ -112,7 +112,7 @@ void game_init() {
 
 	Buildings[0]->recipe = RECIPE_IRON_GEAR;
 
-	struct Item crafter = Item_create(ITEM_CRAFTER_1, 20);
+	struct Item crafter = Item_create(ITEM_CRAFTER_1, 3);
 	Inventory_push_item(player->inventory, &crafter);
 }
 

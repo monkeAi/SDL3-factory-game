@@ -28,11 +28,12 @@ struct Item_data {
     unsigned int max_quantity;
     unsigned int color;
     int is_buildable;
+    enum BuildingType building_type;
 };
 
 extern struct Item_data* Item_data_list[MAX_ITEMS];
 
-struct Item_data* create_item_data(enum ItemType type, char* name_string, unsigned int max_quantity, unsigned int color, int is_buildable);
+struct Item_data* create_item_data(enum ItemType type, char* name_string, unsigned int max_quantity, unsigned int color, int is_buildable, enum BuildingType building_type);
 void init_item_data_list(void);
 void print_item_data_list(void);
 
