@@ -58,6 +58,15 @@ void update_player(struct Player *p, float delta_time) {
 
    // Player click debounce function
    if (p->cursor->click_cooldown >= 0) p->cursor->click_cooldown -= delta_time;
+
+   // Update deconstruction time left
+   if (p->cursor->watching_building == p->cursor->decontruct_building) {
+       p->cursor->deconstruct_time_left -= delta_time;
+   }
+   else {
+       p->cursor->deconstruct_time_left = PLAYER_DECONSTRUCT_SPEED;
+       p->cursor->decontruct_building = NULL;
+   }
 }  
 
 void render_player(SDL_Renderer* renderer) {  
@@ -151,6 +160,7 @@ static void handle_player_interaction(struct Player* p) {
     // Get what player is looking at:
 
     p->cursor->watching_type = CURSOR_NONE;
+    p->cursor->watching_building = NULL;
 
     // 1) Check if mouse is over visible gui
     for (int window = 0; window < MAX_GUI_WINDOWS; window++) {
@@ -293,7 +303,7 @@ static void handle_player_interaction(struct Player* p) {
 
             p->cursor->watching_type = CURSOR_BUILDING;
             p->cursor->visibility = SHOWN;
-            p->cursor->selected_building = Buildings[b];
+            p->cursor->watching_building = Buildings[b];
 
             // Set cursor position to building position
             p->cursor->x_pos = Buildings[b]->coords->x;
@@ -303,10 +313,13 @@ static void handle_player_interaction(struct Player* p) {
             p->cursor->height = Buildings[b]->tile_height;
         }
 
-        // If right clicks on building open player inventory and side menu for buildings
-        if (p->mouse_state == 4) {
+        // If left clicks on building open player inventory and side menu for buildings
+        if (p->mouse_state == 1) {
 
             if (p->cursor->watching_type == CURSOR_BUILDING) {
+
+                // Set selected building to currently watched
+                player->cursor->selected_building = player->cursor->watching_building;
 
                 // Turn on player inventory
                 player->gui_inventory->visibility = TRUE;
@@ -314,6 +327,36 @@ static void handle_player_interaction(struct Player* p) {
                 player->side_menu_state = SM_BUILDING;
 
             }
+        }
+
+        // If holding right click on building deconstruct it
+        if (p->mouse_state == 4) {
+
+            player->cursor->decontruct_building = player->cursor->watching_building;
+
+            // When timer runs out and selected building is still being deconstructed -> destroy building
+            if (p->cursor->deconstruct_time_left <= 0 && player->cursor->decontruct_building != NULL) {
+
+                // Close side menu
+                player->toggle_inv(player);
+
+                // Add building item to player inventory
+                if (player->cursor->decontruct_building->building_item_type) {
+                    struct Item building = Item_create(player->cursor->decontruct_building->building_item_type, 1);
+                    Inventory_push_item(player->inventory, &building);
+                }
+
+                // Destroy building
+                Building_destroy(player->cursor->decontruct_building);
+
+                // Reset deconstruction timer and deconstruct_building
+                player->cursor->decontruct_building = NULL;
+                player->cursor->deconstruct_time_left = PLAYER_DECONSTRUCT_SPEED;
+
+                printf("Deconstructed building \n");
+
+            }
+
         }
 
     }
@@ -352,7 +395,7 @@ static void handle_player_interaction(struct Player* p) {
 
         //printf("Mouse click world cords: X:%d Y:%d \n", selected_cords[0], selected_cords[1]);
         if (p->cursor->watching_type != CURSOR_GUI) {
-            Building_create(BUILDING_CRAFTER_1, selected_cords, DOWN);
+            //Building_create(BUILDING_CRAFTER_1, selected_cords, DOWN);
         }
     }
 
@@ -378,7 +421,10 @@ struct PlayerCursor* player_cursor_create() {
     cursor->set_color = 0xFFA500FF;
     cursor->watching_type = 0;
     cursor->visibility = SHOWN;
+
+    cursor->watching_building = NULL;
     cursor->selected_building = NULL;
+
     cursor->held_item = NULL;
     cursor->held_item_index = 0;
     cursor->is_holding = HOLDING_NONE;
@@ -387,6 +433,8 @@ struct PlayerCursor* player_cursor_create() {
     cursor->watching_inventory = NULL;
 
     cursor->click_cooldown = CLICK_COOLDOWN;
+    cursor->deconstruct_time_left = PLAYER_DECONSTRUCT_SPEED;
+    cursor->decontruct_building = NULL;
 
     return cursor;
 }

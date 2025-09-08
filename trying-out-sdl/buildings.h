@@ -12,6 +12,7 @@ struct Building {
 	int x_offset, y_offset;
 	enum BuildingState state;
 	int tile_width, tile_height;
+	enum ItemType building_item_type;
 
 	struct Inventory* input_inv;
 	struct Inventory* output_inv;

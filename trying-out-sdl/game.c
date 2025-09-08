@@ -105,7 +105,7 @@ void game_init() {
 	int selected_cords2[2] = { 10, 8 };
 	int selected_cords3[2] = { -4, - 15 };
 	Building_create(BUILDING_CRAFTER_1, selected_cords, RIGHT);
-	//Building_create(BUILDING_CRAFTER_1, selected_cords2, RIGHT);
+	Building_create(BUILDING_CRAFTER_1, selected_cords2, RIGHT);
 	//Building_create(BUILDING_CRAFTER_1, selected_cords3, LEFT);
 
 	//player->cursor->selected_building = Buildings[0];

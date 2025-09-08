@@ -39,6 +39,7 @@ static struct Building* Building_init(enum BuildingType type) {
 		building->output_inv = NULL;
 		building->tile_width = 0;
 		building->tile_height = 0;
+		building->building_item_type = ITEM_NONE;
 		break;
 
 	case BUILDING_CRAFTER_1:
@@ -46,6 +47,7 @@ static struct Building* Building_init(enum BuildingType type) {
 		building->output_inv = Inventory_create(CRAFTER_MAX_OUTPUT, CRAFTER_MAX_OUTPUT);
 		building->tile_width = CRAFTER_WIDTH;
 		building->tile_height = CRAFTER_HEIGHT;
+		building->building_item_type = ITEM_CRAFTER_1;
 		break;
 
 	default:
@@ -53,6 +55,7 @@ static struct Building* Building_init(enum BuildingType type) {
 		building->output_inv = NULL;
 		building->tile_width = 3;
 		building->tile_height = 1;
+		building->building_item_type = ITEM_NONE;
 		break;
 	}
 

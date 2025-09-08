@@ -12,7 +12,7 @@
 #define MAP_WIDTH 50	
 #define MAP_HEIGHT 50	 
 
-#define CLICK_COOLDOWN 1
+#define CLICK_COOLDOWN 1.0
 
 
 // Terrain generation
@@ -39,6 +39,8 @@
 #define PLAYER_MAX_SPEED 400
 #define PLAYER_MAX_INV_SIZE 100
 #define PLAYER_START_INV_SIZE 10
+
+#define PLAYER_DECONSTRUCT_SPEED 0.5
 
 
 // Recipes and Crafting

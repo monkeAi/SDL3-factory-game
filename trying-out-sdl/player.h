@@ -29,15 +29,23 @@ struct PlayerCursor {
     int width;
     int height;
     unsigned int set_color;
+
     enum GUI_visibility visibility;
+
     enum CursorWatching watching_type;
+    struct Building* watching_building;
     struct Building* selected_building;
+
     enum CursorHolding is_holding;
     struct GUI_frame* held_item;
     struct Inventory* held_item_inventory;
     int held_item_index;
     struct Inventory* watching_inventory;
+
     float click_cooldown;
+
+    float deconstruct_time_left;
+    struct Building* decontruct_building;
 };
 
 enum CursorWatching {
