@@ -146,6 +146,7 @@
     <ClCompile Include="item.c" />
     <ClCompile Include="media.c" />
     <ClCompile Include="main.c" />
+    <ClCompile Include="OreManager.c" />
     <ClCompile Include="perlin_noise.c" />
     <ClCompile Include="player.c" />
     <ClCompile Include="recipes.c" />
@@ -165,6 +166,7 @@
     <ClInclude Include="inventory.h" />
     <ClInclude Include="item.h" />
     <ClInclude Include="media.h" />
+    <ClInclude Include="OreManager.h" />
     <ClInclude Include="perlin_noise.h" />
     <ClInclude Include="player.h" />
     <ClInclude Include="recipes.h" />

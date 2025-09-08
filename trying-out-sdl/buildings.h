@@ -51,6 +51,9 @@ void Buildings_print();
 void Building_free(struct Building* building);
 int Building_is_inside(struct Building* b, int x_coord, int y_coord);
 
+void update_buildings();
+void render_buildings(SDL_Renderer* renderer);
+
 // Global buildings list
 
 extern struct Building* Buildings[MAX_BUILDINGS];
