@@ -13,7 +13,7 @@ struct MediaBin {
 // Combination of text texture and text rect ready for render
 struct TextBox {
 	SDL_Texture* texture;
-	SDL_FRect* rect;
+	SDL_FRect rect;
 };
 
 typedef struct MediaBin MediaBin;

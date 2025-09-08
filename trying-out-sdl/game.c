@@ -109,9 +109,8 @@ void game_init() {
 
 	Buildings[0]->recipe = RECIPE_IRON_GEAR;
 
-	//printf("Recipe in init %d : %s\n", 2, CraftingRecipes[2]->title);
-
-	print_item_data_list();
+	struct Item crafter = Item_create(ITEM_CRAFTER_1, 20);
+	Inventory_push_item(player->inventory, &crafter);
 }
 
 void game_loop() {
@@ -176,7 +175,7 @@ int game_handle_input() {
 		}
 		if (event.key.key == SDLK_F) {
 
-			struct Item iron_plate = Item_create(ITEM_IRON_PLATE, 100); // 10 Iron Ore, max stack of 100
+			struct Item iron_plate = Item_create(ITEM_IRON_PLATE, 100);
 			if (Inventory_push_item(player->inventory, &iron_plate) == 0) {
 				printf("%d Iron Plates added to inventory.\n", iron_plate.quantity);
 			}

@@ -31,6 +31,7 @@ int Inventory_push_item(struct Inventory* inv, struct Item* item) {
 
 		// Find first available item slot
 		int free_index = Inventory_find_free_slot(inv, item->type);
+		//printf("free index: %d \n", free_index);
 
 		// Check if inventory is full
 		if (free_index == -1) {
@@ -160,7 +161,10 @@ int Inventory_print(struct Inventory* inv) {
 int Inventory_transfer_item(struct Inventory* from_inv, struct Inventory* to_inv, int from_slot, unsigned int quantity) {
 
 	// Check if from_inv slot is empty
-	if (from_inv->slots[from_slot].type == ITEM_NONE) return 1;
+	if (from_inv->slots[from_slot].type == ITEM_NONE) {
+		printf("Transfer failed: from slot is empty. \n");
+		return 1;
+	}
 
 	//	If desired transfer quantity is -1 or larger than currently stored quantity -> transfer all of it
 	if (quantity == -1 || from_inv->slots[from_slot].quantity <= quantity) {
@@ -169,6 +173,7 @@ int Inventory_transfer_item(struct Inventory* from_inv, struct Inventory* to_inv
 			return 2;  // to_inventory is full
 		}
 
+		printf("Transfer successful: full amount. \n");
 		// Delete item from original inventory
 		Item_delete(&from_inv->slots[from_slot]);
 
@@ -185,6 +190,7 @@ int Inventory_transfer_item(struct Inventory* from_inv, struct Inventory* to_inv
 		}
 
 		from_inv->slots[from_slot].quantity -= quantity;
+
 	}
 
 	return 0;

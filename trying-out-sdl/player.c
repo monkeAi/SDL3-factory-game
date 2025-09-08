@@ -55,6 +55,9 @@ void update_player(struct Player *p, float delta_time) {
    handle_player_movement(delta_time);
    player_cursor_update();
    handle_player_interaction(p);
+
+   // Player click debounce function
+   if (p->cursor->click_cooldown >= 0) p->cursor->click_cooldown -= delta_time;
 }  
 
 void render_player(SDL_Renderer* renderer) {  
@@ -168,23 +171,88 @@ static void handle_player_interaction(struct Player* p) {
         // In case of it beeing inventory then check witch inventory tile is hovered
         case C_inventory: {
 
-            struct GUI_frame* inv_tiles[MAX_GUI_CLASS_MATHCHES] = { 0 };
+            // List of all inventory tile box frames to go through
+            struct GUI_frame* tile_box_frames[3] = { 
+                player->gui_inventory->children[0],
+                player->gui_side_menu->children[0]->children[1]->children[0],
+                player->gui_side_menu->children[0]->children[1]->children[1]
+            };
 
-            // Break if it finds no children
-            if (!gui_find_children(GUI_WINDOWS[window], C_inventory_tile, inv_tiles)) break;
+            //printf("%x %x %x \n", tile_box_frames[0], tile_box_frames[1], tile_box_frames[2]);
 
-            // Determine over witch tile it is hovering
-            for (int tile = 0; tile < MAX_GUI_CLASS_MATHCHES; tile++) {
+            // For each inventory check every tile
+            for (int tile_box_frame = 0; tile_box_frame < 3; tile_box_frame++) {
+                
+                struct GUI_frame* inv_tiles[MAX_GUI_CLASS_MATHCHES] = { 0 };
 
-                // Skip if null or hidden
-                if (inv_tiles[tile] == NULL) continue;
-                if (!inv_tiles[tile]->visibility) continue;
-                // Skip if mouse pos is outside of acctual tile
-                if (!gui_is_inside_frame(inv_tiles[tile], p->mouse_pos[0], p->mouse_pos[1])) continue;
+                // Break if it finds no children
+                if (!gui_find_children(tile_box_frames[tile_box_frame], C_inventory_tile, inv_tiles)) break;
 
-                inv_tiles[tile]->state = GUI_HOVERING;  // This is the selected tile!
+                // Determine over witch tile it is hovering
+                for (int tile = 0; tile < MAX_GUI_CLASS_MATHCHES; tile++) {
 
-                // If hovered tile is clicked and it has an item inside append item position to mouse position
+                    // Skip if null or hidden
+                    if (inv_tiles[tile] == NULL) continue;
+                    if (!inv_tiles[tile]->visibility) continue;
+                    // Skip if mouse pos is outside of acctual tile
+                    if (!gui_is_inside_frame(inv_tiles[tile], p->mouse_pos[0], p->mouse_pos[1])) continue;
+
+                    inv_tiles[tile]->state = GUI_HOVERING;  // This is the selected tile!
+
+                    // Determine what game inventory the tile belongs to
+                    switch (inv_tiles[tile]->id) {
+                    case ID_sm_input_inv: { player->cursor->watching_inventory = player->cursor->selected_building->input_inv; break; }
+                    case ID_sm_output_inv: { player->cursor->watching_inventory = player->cursor->selected_building->output_inv; break; }
+                    case ID_player_inventory: { player->cursor->watching_inventory = player->inventory; break; }
+                    default: { player->cursor->watching_inventory = NULL; break; }
+
+                    }
+
+
+                    // If hovered tile is clicked and it has an item inside append item position to mouse position
+                    if (player->mouse_state == 1) {
+
+                        // It has item inside and player isn't holding anything
+                        if (inv_tiles[tile]->children[0] != NULL && player->cursor->is_holding == HOLDING_NONE && player->cursor->click_cooldown <= 0) {
+
+                            // Apend item to the mouse position
+                            player->cursor->is_holding = HOLDING_ITEM;
+                            player->cursor->held_item = inv_tiles[tile]->children[0];
+
+                            // Aquire game inventory of held item
+                            player->cursor->held_item_inventory = player->cursor->watching_inventory;
+
+                            // Save held item inventory slot index
+                            player->cursor->held_item_index = tile;
+
+                            // Reset click cooldown
+                            player->cursor->click_cooldown = CLICK_COOLDOWN;
+
+                        }
+
+                        // Place held item to hovered slot if it isnt full
+                        if (inv_tiles[tile]->children[0] == NULL && player->cursor->is_holding != HOLDING_NONE) {
+
+                            // If transfering back to itself -> let go
+                            if (player->cursor->watching_inventory == player->cursor->held_item_inventory) {
+                                player_cursor_holding_reset();
+                                continue;
+                            }
+
+                            // Make the item transfer
+                            int output = Inventory_transfer_item(
+                                player->cursor->held_item_inventory,
+                                player->cursor->watching_inventory,
+                                player->cursor->held_item_index,
+                                -1
+                            );
+
+                            // Reset cursor 
+                            player_cursor_holding_reset();
+                        }
+                    }
+
+
                     // If its over:
                         // GUI inventory:
                             // clicked on -> transfer whole item if posible
@@ -194,9 +262,12 @@ static void handle_player_interaction(struct Player* p) {
                             // else if pressed z drop 1 item on ground at the tile if empty
                         // Building:
                             // not needed feature at the moment
-                                
 
+
+                }
             }
+
+            
 
             break;
         }
@@ -235,8 +306,8 @@ static void handle_player_interaction(struct Player* p) {
         // If right clicks on building open player inventory and side menu for buildings
         if (p->mouse_state == 4) {
 
-            if (p->cursor->watching_type != CURSOR_GUI) {
-                
+            if (p->cursor->watching_type == CURSOR_BUILDING) {
+
                 // Turn on player inventory
                 player->gui_inventory->visibility = TRUE;
                 // Set side menu for buildings
@@ -308,12 +379,37 @@ struct PlayerCursor* player_cursor_create() {
     cursor->watching_type = 0;
     cursor->visibility = SHOWN;
     cursor->selected_building = NULL;
+    cursor->held_item = NULL;
+    cursor->held_item_index = 0;
+    cursor->is_holding = HOLDING_NONE;
+
+    cursor->held_item_inventory = NULL;
+    cursor->watching_inventory = NULL;
+
+    cursor->click_cooldown = CLICK_COOLDOWN;
 
     return cursor;
 }
 
 void player_cursor_update() {
     player->cursor->visibility = HIDDEN;
+    
+}
+
+// Release item from cursor
+void player_cursor_holding_reset() {
+
+    // Reset item gui position
+    player->cursor->held_item->position[0] = player->cursor->held_item->parent->position[0];
+    player->cursor->held_item->position[1] = player->cursor->held_item->parent->position[1];
+
+    // Release item from cursor
+    player->cursor->is_holding = HOLDING_NONE;
+    player->cursor->held_item = NULL;
+
+    player->cursor->held_item_inventory = NULL;
+
+    player->cursor->held_item_index = 0;
 }
 
 void render_player_cursor(SDL_Renderer* renderer) {

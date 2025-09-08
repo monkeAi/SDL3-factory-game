@@ -58,7 +58,10 @@ enum GUI_ID {
 	ID_sm_building_input,
 	ID_sm_building_output,
 	ID_sm_building_progress_bar,
-	ID_sm_selected_recipe
+	ID_sm_selected_recipe,
+	ID_player_inventory,
+	ID_sm_input_inv,
+	ID_sm_output_inv
 };
 
 enum GUI_side_menu {
@@ -92,7 +95,7 @@ struct GUI_frame* gui_get_frame_by_id(struct GUI_frame* parent, enum GUI_ID id);
 struct GUI_frame* gui_create_player_inventory();
 void gui_update_inventory(struct GUI_frame* gui_inv, struct Inventory* game_inv, SDL_Renderer* renderer, struct MediaBin* mediaBin);
 void gui_create_item(struct GUI_frame* parent, struct Item* item);
-struct GUI_frame* gui_create_tile_box(struct GUI_frame* parent, int tiles_x, int tiles_y, int tile_w, int tile_h, int tile_margin, enum GUI_ID tiles_frame_id, unsigned int tile_color);
+struct GUI_frame* gui_create_tile_box(struct GUI_frame* parent, int tiles_x, int tiles_y, int tile_w, int tile_h, int tile_margin, enum GUI_ID tiles_frame_id, enum GUI_ID inventory_id, unsigned int tile_color);
 
 // Side menu
 struct GUI_frame* gui_create_sm(struct GUI_frame* parent);
