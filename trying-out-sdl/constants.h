@@ -27,11 +27,6 @@
 #define TERRAIN_FORREST_RANGE 80
 #define TERRAIN_ROCKY_RANGE 100
 
-// Ore generation
-
-#define IRON_ORE_RANGE 50
-#define COPPER_ORE_RANGE 50
-#define COAL_ORE_RANGE 50
 
 // Player
 
