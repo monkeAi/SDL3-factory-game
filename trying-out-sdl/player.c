@@ -80,7 +80,7 @@ void render_player(SDL_Renderer* renderer) {
    SDL_RenderFillRect(renderer, &player_rect);  
 }
 
-// Handle player movement
+// Hanlde player movement
 static void handle_player_movement(float delta_time) {
 
     const Uint8* state = SDL_GetKeyboardState(NULL);
