@@ -17,6 +17,21 @@ void init_recipes() {
     recipe_load_from_json("recipes.json");
 }
 
+// Returns TRUE if provided method is available for the recipe, else FALSE
+int recipe_match_method(struct CraftingRecipe* recipe, enum RecipeCraftMethod craft_method) {
+    
+    // Loop through all possible crafting methods
+    for (int m = 0; m < CRAFT_METHODS; m++) {
+
+        if (!recipe) continue;
+        if (recipe->craft_method[m] == craft_method) return TRUE;
+    }
+
+    // If no match is found return false
+    return FALSE;
+
+}
+
 void recipe_load_from_json(const char* filename) {  
    FILE* f = fopen(filename, "rb");  
    if (!f) { perror("Failed to open JSON file"); exit(1); }  

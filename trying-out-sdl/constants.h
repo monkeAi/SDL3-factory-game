@@ -61,6 +61,9 @@
 #define CRAFTER_WIDTH 3
 #define CRAFTER_HEIGHT 3
 
+#define MINER_WIDTH 2
+#define MINER_HEIGHT 2
+
 
 // GUI
 #define MAX_GUI_WINDOWS 5
@@ -72,6 +75,8 @@
 #define GUI_INVENTORY_WIDTH 10
 #define GUI_INVENTORY_HEIGHT 10
 #define GUI_TILE_MARGIN 2
+#define GUI_RECIPE_WIDTH 7
+#define GUI_RECIPE_HEIGHT 6
 
 #define GUI_PADDING 16
 

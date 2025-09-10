@@ -50,6 +50,7 @@ enum GUI_class {
 	C_inventory,
 	C_inventory_tile,
 	C_inventory_item,
+	C_recipe_item
 };
 
 enum GUI_ID {
@@ -61,7 +62,9 @@ enum GUI_ID {
 	ID_sm_selected_recipe,
 	ID_player_inventory,
 	ID_sm_input_inv,
-	ID_sm_output_inv
+	ID_sm_output_inv,
+	ID_recipe_list,
+	ID_recipe_frame
 };
 
 enum GUI_side_menu {
@@ -101,7 +104,11 @@ struct GUI_frame* gui_create_tile_box(struct GUI_frame* parent, int tiles_x, int
 struct GUI_frame* gui_create_sm(struct GUI_frame* parent);
 struct GUI_frame* gui_create_sm_buildings(struct GUI_frame* parent);
 struct GUI_frame* gui_create_sm_crafting(struct GUI_frame* parent);
+void gui_update_sm_crafting(SDL_Renderer* renderer, struct MediaBin* mediaBin);
 void gui_update_sm_buildings(SDL_Renderer* renderer, struct MediaBin* mediaBin);
+struct GUI_frame* gui_create_sm_recipe_list(struct GUI_frame* parent, enum GUI_ID recipe_list_id);
+void gui_create_recipe_item(struct GUI_frame* parent, struct CraftingRecipe* recipe);
+void gui_update_recipe_list(struct GUI_frame* recipe_list, enum RecipeCraftMethod crafting_method);
 
 // Other elements
 struct GUI_frame* gui_create_progress_bar(struct GUI_frame* parent, enum GUI_ID bar_id, unsigned int base_color, unsigned int progress_color);

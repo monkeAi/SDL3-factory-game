@@ -284,6 +284,9 @@ struct GUI_frame* gui_get_frame_by_id(struct GUI_frame* parent, enum GUI_ID id) 
 		// Run function on the children as well
 		return gui_get_frame_by_id(parent->children[i], id);
 	}
+
+	// No match
+	return NULL;
 }
 
 // Find first free space in matches
@@ -364,7 +367,7 @@ void update_gui(SDL_Renderer* renderer, struct MediaBin* mediaBin) {
 			case SM_CRAFTING: {
 				player->gui_side_menu->children[0]->visibility = HIDDEN;		// Show buildings interface
 				player->gui_side_menu->children[1]->visibility = SHOWN;
-				//gui_update_sm_buildings(renderer, mediaBin);				// Update crafting
+				gui_update_sm_crafting(renderer, mediaBin);									// Update crafting
 				break;
 			}
 			
@@ -648,6 +651,75 @@ void gui_update_inventory(struct GUI_frame* gui_inv, struct Inventory* game_inv,
 		// Item gets new draw position but is still in inventory until moved to another
 
 
+// Update recipe list with right items
+void gui_update_recipe_list(struct GUI_frame* recipe_list, enum RecipeCraftMethod crafting_method) {
+
+	// Get all recipe tiles
+	struct GUI_frame* recipe_tiles = gui_get_frame_by_id(recipe_list, ID_recipe_frame);
+
+	if (!recipe_tiles) {
+		printf("null pointer\n");
+		return;
+	}
+
+	int recipe = 1;
+
+	// Loop through all available recipies based on what is open (player inventory, crafter .. )
+	for (int tile = 0; tile < GUI_RECIPE_WIDTH * GUI_RECIPE_HEIGHT; tile++) {
+
+		/*while (CraftingRecipes[recipe] == NULL || CraftingRecipes[recipe]->state == RECIPE_LOCKED || !recipe_match_method(CraftingRecipes[recipe], crafting_method)) {
+			recipe++;
+		}*/
+
+		// TO DO:
+		// Resi problem da skipa unavailable recipije
+		// Ko kliknes na recipe tile ti starta craft queue
+
+		// Crafting recipe is empty/locked/incorrect crafting method and recipe tile has a recipe item -> delete the item
+		if ((CraftingRecipes[recipe] == NULL || CraftingRecipes[recipe]->state == RECIPE_LOCKED || !recipe_match_method(CraftingRecipes[recipe], crafting_method)) && recipe_tiles->children[tile]->children[0] != NULL) {
+
+			// Delete item in tile
+			gui_frame_destroy(recipe_tiles->children[tile]->children[0]);
+		}
+
+		// Crafting recipe has a recipe and is available and correct crafting method is used
+		else if (CraftingRecipes[recipe] != NULL && CraftingRecipes[recipe]->state == RECIPE_AVAILABLE && recipe_match_method(CraftingRecipes[recipe], crafting_method)) {
+
+			// Gui slot is empty
+			if (recipe_tiles->children[tile]->children[0] == NULL) {
+
+				// Create new gui item
+				
+				//printf("Slot: %d, create gui item \n", slot);
+				gui_create_recipe_item(recipe_tiles->children[tile], CraftingRecipes[recipe]);
+
+			}
+
+			// Gui slot has the right recipe
+			else {
+				// maybe update
+			}
+		}
+
+		recipe++;
+	}
+}
+
+// Creates a recipe item with info menu
+void gui_create_recipe_item(struct GUI_frame* parent, struct CraftingRecipe* recipe) {
+
+	struct GUI_frame* item_frame = gui_frame_init(parent, 1);
+
+	// Set params
+	gui_resize(item_frame, parent->width, parent->height);
+	item_frame->default_color = Item_data_list[CraftingRecipes[recipe->name]->output_items[0].type]->color;
+	gui_set_color(item_frame, Item_data_list[CraftingRecipes[recipe->name]->output_items[0].type]->color);
+	item_frame->class = C_recipe_item;
+
+	// Add menu
+}
+
+
 // Creates player's side menu gui
 struct GUI_frame* gui_create_sm(struct GUI_frame* parent) {
 	
@@ -663,20 +735,63 @@ struct GUI_frame* gui_create_sm(struct GUI_frame* parent) {
 	// Create crafting interface
 	struct GUI_frame* sm_crafting = gui_create_sm_crafting(side_menu);
 
-
 	return side_menu;
 }
 
 // Creates crafting side menu
 struct GUI_frame* gui_create_sm_crafting(struct GUI_frame* parent) {
 
-	struct GUI_frame* sm_crafting = gui_frame_init(parent, 1);
+	struct GUI_frame* sm_crafting = gui_frame_init(parent, 2);
 	gui_resize(sm_crafting, parent->width - 2 * GUI_PADDING, parent->height - 2 * GUI_PADDING);
 	gui_move(sm_crafting, 100, 100, 0, 0, (enum GUI_flags[]) { POS_CENTERED_X, POS_CENTERED_Y });
 	gui_set_color(sm_crafting, COLOR_HEX_SEC);
-	sm_crafting->visibility = HIDDEN;
+
+	struct GUI_frame* recipe_list = gui_create_sm_recipe_list(sm_crafting, ID_recipe_list);
+
+	int text_width = 200;
+
+	// Recipe text
+	struct GUI_frame* sm_title = gui_frame_init(sm_crafting, 0);
+	gui_resize(sm_title, text_width, 40);
+	gui_move(sm_title, 0, 0, GUI_PADDING, GUI_PADDING, (enum GUI_flags[]) { POS_LEFT, POS_TOP });
+	gui_set_color(sm_title, COLOR_HEX_SEC);
+	sm_title->text_enabled = TRUE;
 
 	return sm_crafting;
+}
+
+// Creates recipe list block 
+struct GUI_frame* gui_create_sm_recipe_list(struct GUI_frame* parent, enum GUI_ID recipe_list_id) {
+
+	struct GUI_frame* main_frame = gui_frame_init(parent, 1);
+	gui_resize(main_frame, parent->width - 2 * GUI_PADDING, parent->height - 2 * GUI_PADDING);
+	gui_move(main_frame, 0, 0, 0, 0, (enum GUI_flags[]) { POS_CENTERED_X, POS_CENTERED_Y});
+	gui_set_color(main_frame, COLOR_HEX_SEC);
+
+	// Recipe item grid
+	struct GUI_frame* recipes_frame = gui_create_tile_box(main_frame, GUI_RECIPE_WIDTH, GUI_RECIPE_HEIGHT, GUI_TILE_SIZE, GUI_TILE_SIZE, GUI_TILE_MARGIN, ID_recipe_frame, recipe_list_id, COLOR_HEX_SEC);
+
+}
+
+// Updates side menu crafting recipe list
+void gui_update_sm_crafting(SDL_Renderer* renderer, struct MediaBin* mediaBin) {
+
+	struct GUI_frame* recipes_list = player->gui_side_menu->children[1];
+	struct GUI_frame* recipe_title = player->gui_side_menu->children[1]->children[1];
+
+	gui_update_recipe_list(recipes_list, RECIPE_HAND);
+
+
+
+	// Draw text for recipe item
+	SDL_FRect t_rect = {
+		recipe_title->position[0],
+		recipe_title->position[1],
+		recipe_title->width,
+		recipe_title->height
+	};
+
+	update_text_box(renderer, recipe_title->textBox, mediaBin->font_text, &t_rect, "Crafting recipes", COLOR_WHITE);
 }
 
 // Creates building interaction side menu
@@ -692,8 +807,6 @@ struct GUI_frame* gui_create_sm_buildings(struct GUI_frame* parent) {
 	int inventory_margin = 60;				// Top and bottom margin for inventory tile box
 	int icon_size = 40;
 	int text_width = 200;
-
-	//sm_buildings->visibility = HIDDEN;
 	
 	int tiles_width = CRAFTER_MAX_INPUT * GUI_TILE_SIZE + (CRAFTER_MAX_INPUT - 1) * GUI_TILE_MARGIN;
 	int tiles_height = 1 * GUI_TILE_SIZE + (1 - 1) * GUI_TILE_MARGIN;
@@ -800,8 +913,6 @@ void gui_update_sm_buildings(SDL_Renderer* renderer, struct MediaBin* mediaBin) 
 		// Update progress bar
 		gui_update_progress_bar(progress_bar, selected_recipe->crafting_time, CraftingQueue[building->craft_request_id].time_left);
 	}
-
-		
 
 
 	//set correct recipe icon

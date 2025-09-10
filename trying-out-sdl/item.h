@@ -19,7 +19,8 @@ enum ItemType {
     ITEM_COPPER_PLATE,
     ITEM_COPPER_WIRE,
 
-    ITEM_CRAFTER_1
+    ITEM_CRAFTER_1,
+    ITEM_BURNER_MINER
 };
 
 struct Item_data {

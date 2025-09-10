@@ -68,6 +68,7 @@ extern struct CraftingRecipe* CraftingRecipes[MAX_RECIPES];
 
 void init_recipes();
 void recipe_load_from_json(const char* filename);
+int recipe_match_method(struct CraftingRecipe* recipe, enum RecipeCraftMethod craft_method);
 
 static enum RecipeName str_to_recipe_name(const char* str);
 static enum RecipeState str_to_recipe_state(const char* str);

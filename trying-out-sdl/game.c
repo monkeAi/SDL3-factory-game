@@ -114,6 +114,9 @@ void game_init() {
 
 	struct Item crafter = Item_create(ITEM_CRAFTER_1, 3);
 	Inventory_push_item(player->inventory, &crafter);
+
+	struct Item miner = Item_create(ITEM_BURNER_MINER, 3);
+	Inventory_push_item(player->inventory, &miner);
 }
 
 void game_loop() {

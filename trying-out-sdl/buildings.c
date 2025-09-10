@@ -50,10 +50,17 @@ static struct Building* Building_init(enum BuildingType type) {
 		building->building_item_type = ITEM_CRAFTER_1;
 		break;
 
+	case BUILDING_BURNER_MINER:
+		building->input_inv = Inventory_create(1, 1);
+		building->output_inv = Inventory_create(1, 1);
+		building->tile_width = MINER_WIDTH;
+		building->tile_height = MINER_HEIGHT;
+		building->building_item_type = ITEM_BURNER_MINER;
+		break;
 	default:
 		building->input_inv = NULL;
 		building->output_inv = NULL;
-		building->tile_width = 3;
+		building->tile_width = 1;
 		building->tile_height = 1;
 		building->building_item_type = ITEM_NONE;
 		break;
@@ -189,6 +196,12 @@ static int Building_placement_available(enum BuildingType type, int* coordinates
 	case BUILDING_CRAFTER_1:
 		building_width = CRAFTER_WIDTH;
 		building_height = CRAFTER_HEIGHT;
+		break;
+
+	case BUILDING_BURNER_MINER:
+		building_width = MINER_WIDTH;
+		building_height = MINER_HEIGHT;
+		break;
 	}
 
 	// Apply rotation
@@ -344,7 +357,8 @@ void render_buildings(SDL_Renderer* renderer) {
 			TILE_SIZE * b->tile_height
 		};
 		// Correct the offset and account for rotation
-		// Set render color
+		// 
+		// Set render color depending on building
 		SDL_SetRenderDrawColor(renderer, 255, 189, 51, 255);
 
 		// Add to render  
