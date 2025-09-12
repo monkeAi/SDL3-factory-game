@@ -24,10 +24,15 @@ int recipe_match_method(struct CraftingRecipe* recipe, enum RecipeCraftMethod cr
     for (int m = 0; m < CRAFT_METHODS; m++) {
 
         if (!recipe) continue;
-        if (recipe->craft_method[m] == craft_method) return TRUE;
+        if (recipe->craft_method[m] == craft_method) {
+            
+            //printf("method match! %d  %d\n", recipe->craft_method[m], craft_method);
+            return TRUE;
+        }
     }
 
     // If no match is found return false
+    //printf("NO method match!\n");
     return FALSE;
 
 }
@@ -79,14 +84,9 @@ void recipe_load_from_json(const char* filename) {
        const char* title_str = cJSON_GetObjectItem(item, "title")->valuestring;
        CraftingRecipes[recipe_count]->title = _strdup(title_str);
 
-       printf("Recipe %d : %s\n", i, CraftingRecipes[i]->title);
-
        // Crafting methods  
        cJSON* methods = cJSON_GetObjectItem(item, "craft_method");  
-       for (int m = 0; m < CRAFT_METHODS; m++) {  
-           CraftingRecipes[recipe_count]->craft_method[m] = RECIPE_HAND; // Default  
-       }  
-
+       
        int method_count = cJSON_GetArraySize(methods);  
        for (int j = 0; j < method_count && j < CRAFT_METHODS; j++) {  
            CraftingRecipes[recipe_count]->craft_method[j] = str_to_craft_method(cJSON_GetArrayItem(methods, j)->valuestring);
@@ -142,10 +142,9 @@ static const RecipeStateMap recipe_state_map[] = {
 };
 
 static const RecipeCraftMethodMap craft_method_map[] = {
-    { "RECIPE_HAND", RECIPE_HAND },
-    { "RECIPE_CRAFTER_1", RECIPE_CRAFTER_1 },
-    { "RECIPE_CRAFTER_2", RECIPE_CRAFTER_2 },
-    { "RECIPE_SMELTER", RECIPE_SMELTER }
+    { "RECIPE_HAND", RECIPE_M_HAND },
+    { "RECIPE_CRAFTER", RECIPE_M_CRAFTER },
+    { "RECIPE_SMELTER", RECIPE_M_SMELTER }
 };
 
 static const ItemTypeMap item_type_map[] = {
@@ -176,7 +175,7 @@ static enum RecipeCraftMethod str_to_craft_method(const char* str) {
     for (size_t i = 0; i < sizeof(craft_method_map) / sizeof(craft_method_map[0]); i++) {
         if (strcmp(str, craft_method_map[i].name) == 0) return craft_method_map[i].value;
     }
-    return RECIPE_HAND;
+    return RECIPE_M_HAND;
 }
 
 static enum ItemType str_to_item_type(const char* str) {

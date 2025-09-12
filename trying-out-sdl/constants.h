@@ -43,13 +43,6 @@
 #define PLAYER_DECONSTRUCT_SPEED 0.5
 
 
-// Recipes and Crafting
-
-#define MAX_RECIPES 128
-#define MAX_ITEMS 128
-#define CRAFT_METHODS 4
-#define MAX_CRAFT_QUEUE 100
-
 
 
 // Buildings
@@ -70,6 +63,7 @@
 #define MAX_GUI_FLAGS 5
 #define MAX_GUI_CLASS 16
 #define MAX_GUI_CLASS_MATHCHES 256
+#define MAX_GUI_BUTTONS 128
 
 #define GUI_TILE_SIZE 40
 #define GUI_INVENTORY_WIDTH 10
@@ -84,6 +78,15 @@
 #define GUI_SM_HEIGHT 200
 
 
+// Recipes and Crafting
+
+#define MAX_RECIPES 128
+#define MAX_ITEMS 128
+#define CRAFT_METHODS 4
+#define MAX_CRAFT_QUEUE 100
+
+
+
 // Fonts
 #define TEXT_SIZE 18
 
@@ -94,4 +97,6 @@
 
 #define COLOR_HEX_MAIN 0XFA9549FF 
 #define COLOR_HEX_SEC 0X5F668CFF
+#define COLOR_HEX_SEC_2 0X555b7eFF
 #define COLOR_HEX_THIRD 0X393D54FF
+#define COLOR_HEX_GREEN 0X668c5fFF

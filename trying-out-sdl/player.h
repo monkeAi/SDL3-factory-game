@@ -22,6 +22,7 @@ struct Player {
     struct GUI_frame* gui_side_menu;
     enum GUI_side_menu side_menu_state;
     struct PlayerCursor* cursor;
+    int selecting_recipe;
 
     void (*toggle_inv)(struct Player* self);
 };

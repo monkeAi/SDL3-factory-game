@@ -42,10 +42,9 @@ struct RecipeItem {
 
 // Available recipe crafting methods
 enum RecipeCraftMethod {
-	RECIPE_HAND,
-	RECIPE_CRAFTER_1,
-	RECIPE_CRAFTER_2,
-	RECIPE_SMELTER,
+	RECIPE_M_HAND,
+	RECIPE_M_CRAFTER,
+	RECIPE_M_SMELTER,
 };
 
 enum RecipeState {

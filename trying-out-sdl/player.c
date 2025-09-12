@@ -42,6 +42,7 @@ void init_player() {
 
     // Methods
     player->toggle_inv = toggle_inv;
+    player->selecting_recipe = FALSE;
 
     
 }  
@@ -201,7 +202,7 @@ static void handle_player_interaction(struct Player* p) {
                     if (tile_box_frame == 1 || tile_box_frame == 2) continue;
                 }
                 else if (player->side_menu_state == SM_BUILDING && tile_box_frame == 3) continue;
-                
+
                 struct GUI_frame* inv_tiles[MAX_GUI_CLASS_MATHCHES] = { 0 };
 
                 // Break if it finds no children
@@ -232,7 +233,7 @@ static void handle_player_interaction(struct Player* p) {
                     }
 
                     // When left clicked on a tile
-                    if (player->mouse_state == 1)  {
+                    if (player->mouse_state == 1) {
 
                         // If hovered tile is clicked and it has an item inside append item position to mouse  and the tile is not recipe list
                         if (inv_tiles[tile]->id != ID_recipe_list) {
@@ -275,8 +276,8 @@ static void handle_player_interaction(struct Player* p) {
                                 // Reset cursor 
                                 player_cursor_holding_reset();
                             }
-                        
-                        
+
+
                         }
 
 
@@ -297,6 +298,51 @@ static void handle_player_interaction(struct Player* p) {
 
 
                 }
+            }
+
+            // Button functionality
+
+            // Get all visible buttons
+            // for each if clicked depending on id run their function
+
+            struct GUI_frame* buttons[MAX_GUI_BUTTONS] = { NULL };
+            gui_find_children(GUI_WINDOWS[window], C_button, buttons);
+
+
+            for (int btn = 0; btn < MAX_GUI_BUTTONS; btn++) {
+
+                if (buttons[btn] == NULL) continue;
+                if (buttons[btn]->visibility == HIDDEN) continue;
+
+                // If outside a button continue
+                if (!gui_is_inside_frame(buttons[btn], p->mouse_pos[0], p->mouse_pos[1])) continue;
+
+                // If cursor clicks on a button do stuff
+                if (player->mouse_state == 1 && p->mouse_state != p->mouse_state_before) {
+
+                    switch (buttons[btn]->id) {
+
+                        // Crafter recipe select
+                        case ID_sm_recipe_btn: {
+                            
+                            // Open side menu for crafting
+                            player->side_menu_state = SM_CRAFTING;
+                            // Set recipe select to true
+                            player->selecting_recipe = TRUE;
+
+
+                            //printf("Change recipe button pressed!\n");S
+
+                            break;
+                        }
+                    }
+
+
+                    // Reset mouse state before
+                    p->mouse_state_before = p->mouse_state;
+
+                }
+
             }
 
             
@@ -345,7 +391,9 @@ static void handle_player_interaction(struct Player* p) {
 
                 // Turn on player inventory
                 player->gui_inventory->visibility = TRUE;
+
                 // Set side menu for buildings
+                // If the building has a recipe then open buildings side menu, else open select recipe
                 player->side_menu_state = SM_BUILDING;
 
                 // Reset mouse state before
@@ -550,5 +598,6 @@ void render_player_cursor(SDL_Renderer* renderer) {
 
 static void toggle_inv(struct Player* self) {
     self->gui_inventory->visibility = !self->gui_inventory->visibility;
+    self->selecting_recipe = FALSE;
 }
 

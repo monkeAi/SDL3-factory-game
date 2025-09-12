@@ -13,7 +13,7 @@
         "name": "RECIPE_IRON_PLATE",
         "title": "Iron plates",
         "state": "RECIPE_AVAILABLE",
-        "craft_method": [ "RECIPE_SMELTER" ],
+        "craft_method": [ "RECIPE_HAND", "RECIPE_SMELTER" ],
         "input": [
             {
                 "type": "ITEM_IRON_ORE",
@@ -33,8 +33,8 @@
     {
         "name": "RECIPE_IRON_GEAR",
         "title": "Iron gears",
-        "state": "RECIPE_LOCKED",
-        "craft_method": [ "RECIPE_CRAFTER_1" ],
+        "state": "RECIPE_AVAILABLE",
+        "craft_method": [ "RECIPE_HAND", "RECIPE_CRAFTER" ],
         "input": [
             {
                 "type": "ITEM_IRON_PLATE",
@@ -54,7 +54,7 @@
         "name": "RECIPE_COPPER_PLATE",
         "title": "Copper plates",
         "state": "RECIPE_AVAILABLE",
-        "craft_method": [ "RECIPE_SMELTER" ],
+        "craft_method": [ "RECIPE_HAND", "RECIPE_CRAFTER" ],
         "input": [
             {
                 "type": "ITEM_COPPER_ORE",

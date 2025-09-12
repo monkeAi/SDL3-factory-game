@@ -62,6 +62,9 @@ static struct GUI_frame* gui_frame_init(struct GUI_frame* parent, const int max_
 
 	frame->visibility = SHOWN;
 
+	frame->is_button = FALSE;
+	frame->set_recipe = RECIPE_NONE;
+
 	// If parent isnt NULL then addapt some parameters from it
 	if (parent != NULL) {
 
@@ -651,6 +654,9 @@ void gui_update_inventory(struct GUI_frame* gui_inv, struct Inventory* game_inv,
 		// Item gets new draw position but is still in inventory until moved to another
 
 
+// TO DO:
+// Ko kliknes na recipe tile ti starta craft queue
+		
 // Update recipe list with right items
 void gui_update_recipe_list(struct GUI_frame* recipe_list, enum RecipeCraftMethod crafting_method) {
 
@@ -662,42 +668,45 @@ void gui_update_recipe_list(struct GUI_frame* recipe_list, enum RecipeCraftMetho
 		return;
 	}
 
-	int recipe = 1;
+	int recipe = 0;
 
 	// Loop through all available recipies based on what is open (player inventory, crafter .. )
 	for (int tile = 0; tile < GUI_RECIPE_WIDTH * GUI_RECIPE_HEIGHT; tile++) {
 
-		/*while (CraftingRecipes[recipe] == NULL || CraftingRecipes[recipe]->state == RECIPE_LOCKED || !recipe_match_method(CraftingRecipes[recipe], crafting_method)) {
-			recipe++;
-		}*/
-
-		// TO DO:
-		// Resi problem da skipa unavailable recipije
-		// Ko kliknes na recipe tile ti starta craft queue
-
 		// Crafting recipe is empty/locked/incorrect crafting method and recipe tile has a recipe item -> delete the item
-		if ((CraftingRecipes[recipe] == NULL || CraftingRecipes[recipe]->state == RECIPE_LOCKED || !recipe_match_method(CraftingRecipes[recipe], crafting_method)) && recipe_tiles->children[tile]->children[0] != NULL) {
+		while (recipe < MAX_RECIPES && (CraftingRecipes[recipe] == NULL || CraftingRecipes[recipe]->state == RECIPE_LOCKED || !recipe_match_method(CraftingRecipes[recipe], crafting_method))) {
 
-			// Delete item in tile
-			gui_frame_destroy(recipe_tiles->children[tile]->children[0]);
+			recipe++;
 		}
 
-		// Crafting recipe has a recipe and is available and correct crafting method is used
-		else if (CraftingRecipes[recipe] != NULL && CraftingRecipes[recipe]->state == RECIPE_AVAILABLE && recipe_match_method(CraftingRecipes[recipe], crafting_method)) {
+		struct GUI_frame* slot = recipe_tiles->children[tile];
+		struct GUI_frame* item = slot->children[0];
 
-			// Gui slot is empty
-			if (recipe_tiles->children[tile]->children[0] == NULL) {
-
-				// Create new gui item
-				
-				//printf("Slot: %d, create gui item \n", slot);
-				gui_create_recipe_item(recipe_tiles->children[tile], CraftingRecipes[recipe]);
-
+		// invalid or out of recipes -> delete item
+		if (recipe >= MAX_RECIPES || CraftingRecipes[recipe] == NULL) {
+			if (item != NULL) {
+				gui_frame_destroy(item);
 			}
+		}
+		else {
+		// valid recipe
+		// 
+			//printf("tile: %d; recipe: %d\n", tile, recipe);
 
-			// Gui slot has the right recipe
+			// if no item -> create it
+			if (item == NULL) {
+				gui_create_recipe_item(slot, CraftingRecipes[recipe]);
+			}
 			else {
-				// maybe update
+				// If recipes dont match delete and create a new one
+				if (item->set_recipe != CraftingRecipes[recipe]->name) {
+					gui_frame_destroy(item);
+					gui_create_recipe_item(slot, CraftingRecipes[recipe]);
+				}
+				// Update item
+				else {
+					gui_update_recipe_item(item, CraftingRecipes[recipe]);
+				}
 			}
 		}
 
@@ -714,9 +723,17 @@ void gui_create_recipe_item(struct GUI_frame* parent, struct CraftingRecipe* rec
 	gui_resize(item_frame, parent->width, parent->height);
 	item_frame->default_color = Item_data_list[CraftingRecipes[recipe->name]->output_items[0].type]->color;
 	gui_set_color(item_frame, Item_data_list[CraftingRecipes[recipe->name]->output_items[0].type]->color);
+	item_frame->set_recipe = recipe->name;
 	item_frame->class = C_recipe_item;
 
 	// Add menu
+}
+
+// Update recipe item
+void gui_update_recipe_item(struct GUI_frame* item_frame, struct CraftingRecipe* recipe) {
+
+	item_frame->default_color = Item_data_list[CraftingRecipes[recipe->name]->output_items[0].type]->color;
+	gui_set_color(item_frame, Item_data_list[CraftingRecipes[recipe->name]->output_items[0].type]->color);
 }
 
 
@@ -769,7 +786,7 @@ struct GUI_frame* gui_create_sm_recipe_list(struct GUI_frame* parent, enum GUI_I
 	gui_set_color(main_frame, COLOR_HEX_SEC);
 
 	// Recipe item grid
-	struct GUI_frame* recipes_frame = gui_create_tile_box(main_frame, GUI_RECIPE_WIDTH, GUI_RECIPE_HEIGHT, GUI_TILE_SIZE, GUI_TILE_SIZE, GUI_TILE_MARGIN, ID_recipe_frame, recipe_list_id, COLOR_HEX_SEC);
+	struct GUI_frame* recipes_frame = gui_create_tile_box(main_frame, GUI_RECIPE_WIDTH, GUI_RECIPE_HEIGHT, GUI_TILE_SIZE, GUI_TILE_SIZE, GUI_TILE_MARGIN, ID_recipe_frame, recipe_list_id, COLOR_HEX_SEC_2);
 
 }
 
@@ -778,11 +795,7 @@ void gui_update_sm_crafting(SDL_Renderer* renderer, struct MediaBin* mediaBin) {
 
 	struct GUI_frame* recipes_list = player->gui_side_menu->children[1];
 	struct GUI_frame* recipe_title = player->gui_side_menu->children[1]->children[1];
-
-	gui_update_recipe_list(recipes_list, RECIPE_HAND);
-
-
-
+	
 	// Draw text for recipe item
 	SDL_FRect t_rect = {
 		recipe_title->position[0],
@@ -791,7 +804,17 @@ void gui_update_sm_crafting(SDL_Renderer* renderer, struct MediaBin* mediaBin) {
 		recipe_title->height
 	};
 
-	update_text_box(renderer, recipe_title->textBox, mediaBin->font_text, &t_rect, "Crafting recipes", COLOR_WHITE);
+
+	// Load recipes depending on if player is selecting a recipe for a building or is in player crafting mode
+	if (player->selecting_recipe == TRUE) {
+		gui_update_recipe_list(recipes_list, RECIPE_M_CRAFTER);
+		update_text_box(renderer, recipe_title->textBox, mediaBin->font_text, &t_rect, "Select recipe", COLOR_WHITE);
+	}
+	else {
+		gui_update_recipe_list(recipes_list, RECIPE_M_HAND);
+		update_text_box(renderer, recipe_title->textBox, mediaBin->font_text, &t_rect, "Crafting recipes", COLOR_WHITE);
+	}
+
 }
 
 // Creates building interaction side menu
@@ -834,7 +857,9 @@ struct GUI_frame* gui_create_sm_buildings(struct GUI_frame* parent) {
 		struct GUI_frame* change_recipe_button = gui_frame_init(sm_container_top, 0);
 		gui_resize(change_recipe_button, icon_size, icon_size);
 		gui_move(change_recipe_button, 0, 0, 0, 0, (enum GUI_flags[]) { POS_RIGHT, POS_CENTERED_Y });
-		gui_set_color(change_recipe_button, COLOR_HEX_MAIN);
+		gui_set_color(change_recipe_button, COLOR_HEX_GREEN);
+		change_recipe_button->id = ID_sm_recipe_btn;
+		change_recipe_button->class = C_button;
 
 
 	// Container for input, output and progress bar

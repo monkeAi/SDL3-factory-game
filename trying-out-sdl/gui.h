@@ -21,6 +21,8 @@ struct GUI_frame {
 	enum GUI_ID id;
 	struct TextBox* textBox;
 	int text_enabled;
+	int is_button;
+	enum RecipeName set_recipe;
 };
 
 
@@ -50,7 +52,8 @@ enum GUI_class {
 	C_inventory,
 	C_inventory_tile,
 	C_inventory_item,
-	C_recipe_item
+	C_recipe_item,
+	C_button
 };
 
 enum GUI_ID {
@@ -64,7 +67,8 @@ enum GUI_ID {
 	ID_sm_input_inv,
 	ID_sm_output_inv,
 	ID_recipe_list,
-	ID_recipe_frame
+	ID_recipe_frame,
+	ID_sm_recipe_btn
 };
 
 enum GUI_side_menu {
@@ -108,6 +112,7 @@ void gui_update_sm_crafting(SDL_Renderer* renderer, struct MediaBin* mediaBin);
 void gui_update_sm_buildings(SDL_Renderer* renderer, struct MediaBin* mediaBin);
 struct GUI_frame* gui_create_sm_recipe_list(struct GUI_frame* parent, enum GUI_ID recipe_list_id);
 void gui_create_recipe_item(struct GUI_frame* parent, struct CraftingRecipe* recipe);
+void gui_update_recipe_item(struct GUI_frame* item_frame, struct CraftingRecipe* recipe);
 void gui_update_recipe_list(struct GUI_frame* recipe_list, enum RecipeCraftMethod crafting_method);
 
 // Other elements

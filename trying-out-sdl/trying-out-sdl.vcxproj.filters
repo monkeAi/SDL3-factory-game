@@ -93,6 +93,9 @@
     <ClCompile Include="media.c">
       <Filter>Source Files\Game</Filter>
     </ClCompile>
+    <ClCompile Include="OreManager.c">
+      <Filter>Source Files\World_generation</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="player.h">
@@ -139,6 +142,9 @@
     </ClInclude>
     <ClInclude Include="media.h">
       <Filter>Source Files\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="OreManager.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
