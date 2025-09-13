@@ -13,7 +13,7 @@
         "name": "RECIPE_IRON_PLATE",
         "title": "Iron plates",
         "state": "RECIPE_AVAILABLE",
-        "craft_method": [ "RECIPE_HAND", "RECIPE_SMELTER" ],
+        "craft_method": [ "RECIPE_SMELTER" ],
         "input": [
             {
                 "type": "ITEM_IRON_ORE",
@@ -26,7 +26,7 @@
                 "quantity": 1
             }
         ],
-        "crafting_time": 2.5,
+        "crafting_time": 2.0,
         "required_energy": 10.0
     },
 
@@ -54,7 +54,7 @@
         "name": "RECIPE_COPPER_PLATE",
         "title": "Copper plates",
         "state": "RECIPE_AVAILABLE",
-        "craft_method": [ "RECIPE_HAND", "RECIPE_CRAFTER" ],
+        "craft_method": [ "RECIPE_SMELTER" ],
         "input": [
             {
                 "type": "ITEM_COPPER_ORE",
@@ -67,7 +67,7 @@
                 "quantity": 1
             }
         ],
-        "crafting_time": 2.5,
+        "crafting_time": 2.0,
         "required_energy": 10.0
     }
 ]

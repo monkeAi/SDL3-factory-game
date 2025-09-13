@@ -156,7 +156,10 @@ int render_text_box(SDL_Renderer* renderer, struct TextBox* textBox) {
 		//printf("Textbox rendered at: x: %f, y: %f, w: %f, h: %f\n", t_rect->x, t_rect->y, t_rect->w, t_rect->h);
 		
 		// Clean up
-		free(t_rect);
+		if (t_rect != NULL) {
+
+			free(t_rect);
+		}
 		//SDL_DestroyTexture(textBox->texture);
 	}
 

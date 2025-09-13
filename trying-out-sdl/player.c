@@ -8,6 +8,7 @@
 #include "inventory.h"
 #include "buildings.h"
 #include "gui.h"
+#include "crafting.h"
 
 struct Player* player;  
 
@@ -39,6 +40,8 @@ void init_player() {
     player->cursor = player_cursor_create();
 
     if (player->cursor == NULL) printf("Null cursor!\n");
+
+    player->craft_request = NULL;
 
     // Methods
     player->toggle_inv = toggle_inv;
@@ -357,8 +360,8 @@ static void handle_player_interaction(struct Player* p) {
                             // Else add clicked recipe to crafting queue
                             else {
 
-                                printf("Addign %s to queue \n", recipe->title);
-                                craft_item(player->inventory, player->inventory, recipe->name);
+                                printf("%s added to queue \n", recipe->title);
+                                add_recipe_to_queue(recipe->name);
 
                             }
 
@@ -373,7 +376,6 @@ static void handle_player_interaction(struct Player* p) {
                 }
 
             }
-
 
             break;
         }
@@ -422,7 +424,7 @@ static void handle_player_interaction(struct Player* p) {
 
                 // Set side menu for buildings
                 // If the building has a recipe then open buildings side menu, else open select recipe
-                if (player->cursor->selected_building->recipe == NULL && player->cursor->selected_building->type == BUILDING_CRAFTER_1) {
+                if (player->cursor->selected_building->recipe == NULL && (player->cursor->selected_building->type == BUILDING_CRAFTER_1 || player->cursor->selected_building->type == BUILDING_BURNER_SMELTER)) {
                     player->selecting_recipe = TRUE;
                     player->side_menu_state = SM_CRAFTING;
 

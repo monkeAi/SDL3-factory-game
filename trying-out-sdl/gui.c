@@ -838,8 +838,26 @@ void gui_update_sm_crafting(SDL_Renderer* renderer, struct MediaBin* mediaBin) {
 
 	// Load recipes depending on if player is selecting a recipe for a building or is in player crafting mode
 	if (player->selecting_recipe == TRUE) {
-		gui_update_recipe_list(recipes_list, RECIPE_M_CRAFTER);
-		update_text_box(renderer, recipe_title->textBox, mediaBin->font_text, &t_rect, "Select recipe", COLOR_WHITE);
+
+		switch (player->cursor->selected_building->type) {
+			case BUILDING_CRAFTER_1: {
+
+				gui_update_recipe_list(recipes_list, RECIPE_M_CRAFTER);
+				update_text_box(renderer, recipe_title->textBox, mediaBin->font_text, &t_rect, "Select crafter recipe", COLOR_WHITE);
+				
+				break;
+			}
+			case BUILDING_BURNER_SMELTER: {
+
+				gui_update_recipe_list(recipes_list, RECIPE_M_SMELTER);
+				update_text_box(renderer, recipe_title->textBox, mediaBin->font_text, &t_rect, "Select smelter recipe", COLOR_WHITE);
+
+				break;
+			}
+
+
+			
+		}
 	}
 	else {
 		gui_update_recipe_list(recipes_list, RECIPE_M_HAND);
@@ -940,6 +958,7 @@ void gui_update_sm_buildings(SDL_Renderer* renderer, struct MediaBin* mediaBin) 
 	}
 
 	struct GUI_frame* recipe_text = player->gui_side_menu->children[0]->children[0]->children[1];			// side_menu/building/top_container/recipe_text
+	struct GUI_frame* recipe_icon = player->gui_side_menu->children[0]->children[0]->children[0];
 
 	struct CraftingRecipe* selected_recipe = CraftingRecipes[building->recipe];
 
@@ -970,6 +989,11 @@ void gui_update_sm_buildings(SDL_Renderer* renderer, struct MediaBin* mediaBin) 
 		gui_update_progress_bar(progress_bar, selected_recipe->crafting_time, CraftingQueue[building->craft_request_id].time_left);
 	}
 
+	// Update recipe icon
+	if (building->recipe != RECIPE_NONE) {
+
+		recipe_icon->set_color = Item_data_list[selected_recipe->output_items[0].type]->color;
+	}
 
 	//set correct recipe icon
 

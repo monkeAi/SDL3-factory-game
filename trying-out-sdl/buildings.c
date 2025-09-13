@@ -57,6 +57,14 @@ static struct Building* Building_init(enum BuildingType type) {
 		building->tile_height = MINER_HEIGHT;
 		building->building_item_type = ITEM_BURNER_MINER;
 		break;
+
+	case BUILDING_BURNER_SMELTER:
+		building->input_inv = Inventory_create(CRAFTER_MAX_INPUT, CRAFTER_MAX_INPUT);
+		building->output_inv = Inventory_create(CRAFTER_MAX_OUTPUT, CRAFTER_MAX_OUTPUT);
+		building->tile_width = SMELTER_WIDTH;
+		building->tile_height = SMELTER_HEIGHT;
+		building->building_item_type = ITEM_BURNER_SMELTER;
+		break;
 	default:
 		building->input_inv = NULL;
 		building->output_inv = NULL;
@@ -201,6 +209,10 @@ static int Building_placement_available(enum BuildingType type, int* coordinates
 	case BUILDING_BURNER_MINER:
 		building_width = MINER_WIDTH;
 		building_height = MINER_HEIGHT;
+		break;
+	case BUILDING_BURNER_SMELTER:
+		building_width = SMELTER_WIDTH;
+		building_height = SMELTER_HEIGHT;
 		break;
 	}
 

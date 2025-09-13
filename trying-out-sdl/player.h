@@ -24,6 +24,8 @@ struct Player {
     struct PlayerCursor* cursor;
     int selecting_recipe;
 
+    struct WaitingCraftRequest* craft_request;
+
     void (*toggle_inv)(struct Player* self);
 };
 

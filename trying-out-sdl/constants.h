@@ -57,6 +57,9 @@
 #define MINER_WIDTH 2
 #define MINER_HEIGHT 2
 
+#define SMELTER_WIDTH 2
+#define SMELTER_HEIGHT 2
+
 
 // GUI
 #define MAX_GUI_WINDOWS 5
