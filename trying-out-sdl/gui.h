@@ -17,11 +17,10 @@ struct GUI_frame {
 	struct GUI_frame* parent;
 	int max_children;
 	struct GUI_frame** children;
-	enum GUI_class class;
+	enum GUI_class class[MAX_GUI_CLASS];
 	enum GUI_ID id;
 	struct TextBox* textBox;
 	int text_enabled;
-	int is_button;
 	enum RecipeName set_recipe;
 };
 
@@ -92,6 +91,8 @@ void gui_move(struct GUI_frame* frame, int x, int y, int margin_x, int margin_y,
 void gui_set_color(struct GUI_frame* frame, unsigned int new_color);
 void gui_reset_color(struct GUI_frame* frame);
 int gui_add_child(struct GUI_frame* parent, struct GUI_frame* child);
+void gui_add_class(struct GUI_frame* frame, enum GUI_class class);
+int gui_has_class(struct GUI_frame* frame, enum GUI_class class);
 int gui_get_first_index(struct GUI_frame** matches);
 int gui_find_children(struct GUI_frame* parent, enum GUI_class class_name, struct GUI_frame** matches);
 void gui_frame_update(struct GUI_frame* frame);

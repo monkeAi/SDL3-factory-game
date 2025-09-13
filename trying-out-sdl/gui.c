@@ -50,7 +50,11 @@ static struct GUI_frame* gui_frame_init(struct GUI_frame* parent, const int max_
 	frame->height = 50;
 	frame->width = 50;
 
-	frame->class = 0;
+	for (int i = 0; i < MAX_GUI_CLASS; i++) {
+
+		frame->class[i] = C_NONE;
+	}
+
 	frame->id = 0;
 
 	frame->textBox = malloc(sizeof(struct TextBox));
@@ -62,7 +66,6 @@ static struct GUI_frame* gui_frame_init(struct GUI_frame* parent, const int max_
 
 	frame->visibility = SHOWN;
 
-	frame->is_button = FALSE;
 	frame->set_recipe = RECIPE_NONE;
 
 	// If parent isnt NULL then addapt some parameters from it
@@ -258,7 +261,7 @@ int gui_find_children(struct GUI_frame* parent, enum GUI_class class_name, struc
 		int free_space = gui_get_first_index(matches);
 		
 		// If class name matches and there is still space in the list, add pointer to end of list
-		if (parent->children[i]->class == class_name && free_space != -1) {
+		if (gui_has_class(parent->children[i], class_name) && free_space != -1) {
 			matches[free_space] = parent->children[i];
 			matches_count++;
 		}
@@ -268,6 +271,32 @@ int gui_find_children(struct GUI_frame* parent, enum GUI_class class_name, struc
 	}
 
 	return matches_count;
+}
+
+// Adds class to the gui frame
+void gui_add_class(struct GUI_frame* frame, enum GUI_class class) {
+
+	//printf("Adding class %d to frame: %x\n", class, frame);
+
+	// Find class slot with no class
+	for (int c = 0; c < MAX_GUI_CLASS; c++) {
+		if (frame->class[c] == C_NONE) {
+			frame->class[c] = class;
+			//printf("Added class %d to slot %d \n", class, c);
+			return;
+		}
+
+	}
+}
+
+// Returns TRUE if gui_frame contains the provided class
+int gui_has_class(struct GUI_frame* frame, enum GUI_class class) {
+
+	for (int c = 0; c < MAX_GUI_CLASS; c++) {
+		if (frame->class[c] == class) return TRUE;
+	}
+
+	return FALSE;
 }
 
 // Returns pointer to gui frame with matching id
@@ -477,7 +506,7 @@ struct GUI_frame* gui_create_player_inventory() {
 	gui_move(main_frame, 100, 100, 0, 0, (enum GUI_flags[]) { POS_CENTERED_X, POS_CENTERED_Y});
 	gui_set_color(main_frame, COLOR_HEX_SEC);
 	main_frame->visibility = HIDDEN;
-	main_frame->class = C_inventory;
+	gui_add_class(main_frame, C_inventory);
 
 	// Create all components and add them together
 	
@@ -525,7 +554,7 @@ struct GUI_frame* gui_create_tile_box(struct GUI_frame* parent, int tiles_x, int
 			gui_resize(tile, tile_w, tile_h);
 			gui_move(tile, x * tile_w + x * tile_margin, y * tile_h + y * tile_margin, 0, 0, NULL);
 			gui_set_color(tile, tile_color);
-			tile->class = C_inventory_tile;
+			gui_add_class(tile, C_inventory_tile);
 			tile->id = inventory_id;
 
 			slot++;
@@ -540,7 +569,7 @@ void gui_create_item(struct GUI_frame* parent, struct Item* item) {
 	gui_resize(item_frame, parent->width, parent->height);
 	item_frame->default_color = item->color;
 	gui_set_color(item_frame, item->color);
-	item_frame->class = C_inventory_item;
+	gui_add_class(item_frame, C_inventory_item);
 	// Enable text in the frame so it can be rendered
 	item_frame->text_enabled = TRUE;
 }
@@ -724,7 +753,7 @@ void gui_create_recipe_item(struct GUI_frame* parent, struct CraftingRecipe* rec
 	item_frame->default_color = Item_data_list[CraftingRecipes[recipe->name]->output_items[0].type]->color;
 	gui_set_color(item_frame, Item_data_list[CraftingRecipes[recipe->name]->output_items[0].type]->color);
 	item_frame->set_recipe = recipe->name;
-	item_frame->class = C_recipe_item;
+	gui_add_class(item_frame, C_recipe_item);
 
 	// Add menu
 }
@@ -859,7 +888,7 @@ struct GUI_frame* gui_create_sm_buildings(struct GUI_frame* parent) {
 		gui_move(change_recipe_button, 0, 0, 0, 0, (enum GUI_flags[]) { POS_RIGHT, POS_CENTERED_Y });
 		gui_set_color(change_recipe_button, COLOR_HEX_GREEN);
 		change_recipe_button->id = ID_sm_recipe_btn;
-		change_recipe_button->class = C_button;
+		gui_add_class(change_recipe_button, C_button);
 
 
 	// Container for input, output and progress bar

@@ -176,13 +176,15 @@ static void handle_player_interaction(struct Player* p) {
         p->cursor->watching_type = CURSOR_GUI;
 
         // Determine class
-        switch (GUI_WINDOWS[window]->class) {
+        switch (GUI_WINDOWS[window]->class[0]) {
         case C_NONE: {
             break;
         }
 
-        // In case of it beeing inventory then check witch inventory tile is hovered
+        // In case of it beeing inventory then check what inventory tile is beeing hovered
         case C_inventory: {
+
+            //printf("Class inventory");
 
             // List of all inventory tile box frames to go through
             struct GUI_frame* tile_box_frames[4] = {
