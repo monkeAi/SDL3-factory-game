@@ -754,6 +754,8 @@ void gui_create_recipe_item(struct GUI_frame* parent, struct CraftingRecipe* rec
 	gui_set_color(item_frame, Item_data_list[CraftingRecipes[recipe->name]->output_items[0].type]->color);
 	item_frame->set_recipe = recipe->name;
 	gui_add_class(item_frame, C_recipe_item);
+	gui_add_class(item_frame, C_button);
+	item_frame->id = ID_recipe_item;
 
 	// Add menu
 }

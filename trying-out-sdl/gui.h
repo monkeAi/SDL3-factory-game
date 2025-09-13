@@ -67,7 +67,8 @@ enum GUI_ID {
 	ID_sm_output_inv,
 	ID_recipe_list,
 	ID_recipe_frame,
-	ID_sm_recipe_btn
+	ID_sm_recipe_btn,
+	ID_recipe_item
 };
 
 enum GUI_side_menu {

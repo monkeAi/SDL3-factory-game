@@ -332,8 +332,35 @@ static void handle_player_interaction(struct Player* p) {
                             // Set recipe select to true
                             player->selecting_recipe = TRUE;
 
-
                             //printf("Change recipe button pressed!\n");S
+
+                            break;
+                        }
+
+                        case ID_recipe_item: {
+
+                            struct CraftingRecipe* recipe = CraftingRecipes[buttons[btn]->set_recipe];
+
+                            // If selecting_recipe is TRUE -> set recipe to active building and set selecting recipe to FALSE
+
+                            if (player->selecting_recipe == TRUE) {
+
+                                player->cursor->selected_building->recipe = recipe->name;
+                                player->selecting_recipe = FALSE;
+                                
+                                // Open buildings side menu
+                                player->side_menu_state = SM_BUILDING;
+
+                                printf("Recipe %s set for building \n", recipe->title);
+                            }
+                            
+                            // Else add clicked recipe to crafting queue
+                            else {
+
+                                printf("Addign %s to queue \n", recipe->title);
+                                craft_item(player->inventory, player->inventory, recipe->name);
+
+                            }
 
                             break;
                         }
@@ -347,7 +374,6 @@ static void handle_player_interaction(struct Player* p) {
 
             }
 
-            
 
             break;
         }
@@ -396,7 +422,15 @@ static void handle_player_interaction(struct Player* p) {
 
                 // Set side menu for buildings
                 // If the building has a recipe then open buildings side menu, else open select recipe
-                player->side_menu_state = SM_BUILDING;
+                if (player->cursor->selected_building->recipe == NULL && player->cursor->selected_building->type == BUILDING_CRAFTER_1) {
+                    player->selecting_recipe = TRUE;
+                    player->side_menu_state = SM_CRAFTING;
+
+                }
+                else {
+
+                    player->side_menu_state = SM_BUILDING;
+                }
 
                 // Reset mouse state before
                 p->mouse_state_before = p->mouse_state;

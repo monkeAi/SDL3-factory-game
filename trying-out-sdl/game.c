@@ -108,10 +108,6 @@ void game_init() {
 	Building_create(BUILDING_CRAFTER_1, selected_cords2, RIGHT);
 	//Building_create(BUILDING_CRAFTER_1, selected_cords3, LEFT);
 
-	//player->cursor->selected_building = Buildings[0];
-
-	Buildings[0]->recipe = RECIPE_IRON_GEAR;
-
 	struct Item crafter = Item_create(ITEM_CRAFTER_1, 3);
 	Inventory_push_item(player->inventory, &crafter);
 
