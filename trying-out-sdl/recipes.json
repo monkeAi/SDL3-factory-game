@@ -18,6 +18,10 @@
             {
                 "type": "ITEM_IRON_ORE",
                 "quantity": 1
+            },
+            {
+                "type": "ITEM_COAL_ORE",
+                "quantity": 1
             }
         ],
         "output": [
@@ -59,7 +63,12 @@
             {
                 "type": "ITEM_COPPER_ORE",
                 "quantity": 1
+            },
+            {
+                "type": "ITEM_COAL_ORE",
+                "quantity": 1
             }
+
         ],
         "output": [
             {

@@ -9,8 +9,8 @@
 #define FRAME_TARGET_TIME (1000 / FPS)
 
 #define TILE_SIZE 32
-#define MAP_WIDTH 50	
-#define MAP_HEIGHT 50	 
+#define MAP_WIDTH 100	
+#define MAP_HEIGHT 100 
 
 #define CLICK_COOLDOWN 1.0
 
@@ -21,6 +21,9 @@
 #define NOISE_FREQ 0.02
 #define NOISE_AMP 20
 
+#define ORE_NOISE_FREQ 0.04
+#define ORE_NOISE_AMP 2
+
 #define TERRAIN_WATER_RANGE 40		// From 0 to 100
 #define TERRAIN_SAND_RANGE 50
 #define TERRAIN_GRASS_RANGE 70
@@ -29,9 +32,9 @@
 
 // Ore generation
 
-#define IRON_ORE_RANGE 38
-#define COPPER_ORE_RANGE 43
-#define COAL_ORE_RANGE 38
+#define IRON_ORE_RANGE 30
+#define COPPER_ORE_RANGE 30
+#define COAL_ORE_RANGE 20
 
 
 // Player

@@ -9,6 +9,7 @@
 #include "buildings.h"
 #include "gui.h"
 #include "crafting.h"
+#include "OreManager.h"
 
 struct Player* player;  
 
@@ -63,13 +64,14 @@ void update_player(struct Player *p, float delta_time) {
    // Player click debounce function
    if (p->cursor->click_cooldown >= 0) p->cursor->click_cooldown -= delta_time;
 
-   // Update deconstruction time left
-   if (p->cursor->watching_building == p->cursor->decontruct_building && p->cursor->decontruct_building != NULL) {
+   // Update deconstruction time left if mining ore or deconstructing building
+   if ((p->cursor->watching_building == p->cursor->decontruct_building && p->cursor->decontruct_building != NULL) || (p->cursor->watching_ore == p->cursor->mined_ore && p->cursor->mined_ore != NULL)) {
        p->cursor->deconstruct_time_left -= delta_time;
    }
    else {
        p->cursor->deconstruct_time_left = PLAYER_DECONSTRUCT_SPEED;
        p->cursor->decontruct_building = NULL;
+       p->cursor->mined_ore = NULL;
    }
 
    p->mouse_state_before = p->mouse_state;
@@ -508,6 +510,64 @@ static void handle_player_interaction(struct Player* p) {
 
         p->cursor->watching_type = CURSOR_TILE;
 
+        // Check if cursor is over ore tile
+
+        // Loop through all ore
+        // if coords match then save ore pointer
+
+        struct OreManager* ore_manager = getOreManager();
+
+        player->cursor->watching_ore = getOre(selected_cords[0], selected_cords[1]);
+
+        if (player->cursor->watching_ore != NULL) {
+
+            p->cursor->visibility = SHOWN;
+            //printf("Looking at ore: %d \n", player->cursor->watching_ore->ore.type);
+
+            // If holding right click on ore -> mine it
+            if (p->mouse_state == 4) {
+
+                player->cursor->mined_ore = player->cursor->watching_ore;
+
+                // When timer runs out and selected building is still being deconstructed -> destroy building
+                if (p->cursor->deconstruct_time_left <= 0 && player->cursor->mined_ore != NULL) {
+
+                    printf("Ore mined! \n");
+
+                    struct Item ore;
+                    // Get correct item
+                    switch (player->cursor->watching_ore->ore.type) {
+                    case ORE_IRON:
+                        ore = Item_create(ITEM_IRON_ORE, 1);
+                        break;
+                    case ORE_COPPER:
+                        ore = Item_create(ITEM_COPPER_ORE, 1);
+                        break;
+                    case ORE_COAL:
+                        ore = Item_create(ITEM_COAL_ORE, 1);
+                        break;
+                    }
+
+                    // Add ore to player inventory
+                    Inventory_push_item(player->inventory, &ore);
+                    
+                    // Reset deconstruction timer and deconstruct_building
+                    player->cursor->mined_ore = NULL;
+                    player->cursor->deconstruct_time_left = PLAYER_DECONSTRUCT_SPEED;
+
+
+                }
+
+            }
+
+            else {
+
+                // If right click is not held down reset timer
+                player->cursor->mined_ore = NULL;
+                player->cursor->deconstruct_time_left = PLAYER_DECONSTRUCT_SPEED;
+            }
+        }
+
     }
 
 
@@ -582,6 +642,9 @@ struct PlayerCursor* player_cursor_create() {
     cursor->click_cooldown = CLICK_COOLDOWN;
     cursor->deconstruct_time_left = PLAYER_DECONSTRUCT_SPEED;
     cursor->decontruct_building = NULL;
+
+    cursor->mined_ore = NULL;
+    cursor->watching_ore = NULL;
 
     return cursor;
 }

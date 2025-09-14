@@ -55,3 +55,47 @@ void removeOre(struct OreManager* self, int x, int y) {
         curr = &(*curr)->next;
     }
 }
+
+// Check what ore is at the given world cordinate, returns pointer to ore or NULL pointer
+struct OreList* getOre(int world_x, int world_y) {
+
+    // Convert world cordinates to tile index
+    int selected_cords[2];
+    selected_cords[0] = world_x;
+    selected_cords[1] = world_y;
+
+    int selected_tile_index[2];
+    cordinate_to_index(selected_cords, selected_tile_index);
+
+    struct OreManager* ore_manager = getOreManager();
+    struct OreList* curr_ore = ore_manager->oreList;
+
+    struct OreList* result_ore = NULL;
+
+    while (curr_ore->next != NULL) {
+
+        //printf("curr_ore pointer: %x, x: %d, y:%d\n", curr_ore, curr_ore->ore.x, curr_ore->ore.y);/*
+        //printf("mouse pos: x: %d, y:%d \n", selected_cords[0], selected_cords[1]);*/
+
+        if (curr_ore->ore.x == selected_tile_index[0] && curr_ore->ore.y == selected_tile_index[1]) {
+
+            result_ore = curr_ore;
+            break;
+        }
+
+        curr_ore = curr_ore->next;
+
+    }
+
+    return result_ore;
+}
+
+// Returns table of ores that are 
+struct OreList** getOres(int world_x, int world_y, int width, int height) {
+
+    // Create a table
+    // Loop through all coordinates
+    // get ore for each
+    // return table
+
+}

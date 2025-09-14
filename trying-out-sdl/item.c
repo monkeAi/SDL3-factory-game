@@ -44,6 +44,8 @@ void init_item_data_list(void) {
             case ITEM_COPPER_PLATE: { Item_data_list[item] = create_item_data(item, "Copper plate", 100, 0xed8b5fFF, FALSE, BUILDING_NONE); break; }
             case ITEM_COPPER_WIRE: { Item_data_list[item] = create_item_data(item, "Copper wire", 100, 0x964520FF, FALSE, BUILDING_NONE); break; }
 
+            case ITEM_COAL_ORE: { Item_data_list[item] = create_item_data(item, "Coal ore", 100, 0x666666FF, FALSE, BUILDING_NONE); break; }
+
             case ITEM_CRAFTER_1: { Item_data_list[item] = create_item_data(item, "Crafter mk.1", 20, 0xFFAC1CFF, TRUE, BUILDING_CRAFTER_1); break; }
             case ITEM_BURNER_MINER: { Item_data_list[item] = create_item_data(item, "Burner Miner", 20, 0x999999FF, TRUE, BUILDING_BURNER_MINER); break; }
             case ITEM_BURNER_SMELTER: { Item_data_list[item] = create_item_data(item, "Burner Smelter", 20, 0xAAAAAAFF, TRUE, BUILDING_BURNER_SMELTER); break; }

@@ -111,7 +111,7 @@ void game_init() {
 	struct Item crafter = Item_create(ITEM_CRAFTER_1, 3);
 	Inventory_push_item(player->inventory, &crafter);
 
-	struct Item smelter = Item_create(ITEM_BURNER_SMELTER, 10);
+	struct Item smelter = Item_create(ITEM_BURNER_SMELTER, 3);
 	Inventory_push_item(player->inventory, &smelter);
 }
 

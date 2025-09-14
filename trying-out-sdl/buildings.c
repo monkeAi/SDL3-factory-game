@@ -281,23 +281,23 @@ void update_buildings() {
 		switch (Buildings[b]->type) {
 
 			// Crafters
-		case BUILDING_CRAFTER_1: {
+			case BUILDING_CRAFTER_1: {
 
-			// If it has active recipe
-			if (Buildings[b]->recipe != RECIPE_NONE) {
+				// If it has active recipe
+				if (Buildings[b]->recipe != RECIPE_NONE) {
 
-				// if it has enough power - feature to be added
+					// if it has enough power - feature to be added
 
-				// Check state
-					// If idle -> start crafting request and switch state to running
-					// If active -> wait for request to end
+					// Check state
+						// If idle -> start crafting request and switch state to running
+						// If active -> wait for request to end
 
-				switch (Buildings[b]->state) {
+					switch (Buildings[b]->state) {
 					case BUILDING_STATE_IDLE: {
 
 						// If output inventory has enough space start craft request
 						int allow_craft_request = TRUE;
-						
+
 						// Loop through every output recipe item and chek if it has enough space
 						for (int item = 0; item < CraftingRecipes[Buildings[b]->recipe]->output_count; item++) {
 
@@ -329,24 +329,82 @@ void update_buildings() {
 					}
 					case BUILDING_STATE_PAUSED: {
 						// Pause if output inventory is full
-						
+
 					}
+					}
+
+				}
+				// No selected recipe -> reset building
+				else {
+
 				}
 
-			}
-			// No selected recipe -> reset building
-			else {
+				break;
 
 			}
+
+			case BUILDING_BURNER_SMELTER: {
+
+				// If it has active recipe
+				if (Buildings[b]->recipe != RECIPE_NONE) {
+
+					// if it has enough power - feature to be added
+
+					// Check state
+						// If idle -> start crafting request and switch state to running
+						// If active -> wait for request to end
+
+					switch (Buildings[b]->state) {
+					case BUILDING_STATE_IDLE: {
+
+						// If output inventory has enough space start craft request
+						int allow_craft_request = TRUE;
+
+						// Loop through every output recipe item and chek if it has enough space
+						for (int item = 0; item < CraftingRecipes[Buildings[b]->recipe]->output_count; item++) {
+
+							if (!Inventory_enough_space(Buildings[b]->output_inv, CraftingRecipes[Buildings[b]->recipe]->output_items[item].type, CraftingRecipes[Buildings[b]->recipe]->output_items[item].quantity)) {
+								allow_craft_request = FALSE;
+							}
+
+						}
+
+						// If it has continue with crafting
+						if (allow_craft_request) {
+
+							// Start craft request and save id so it can track time left
+							int craft_request_id = craft_item(Buildings[b]->input_inv, Buildings[b]->output_inv, Buildings[b]->recipe);
+							if (craft_request_id != -1) {
+								Buildings[b]->craft_request_id = craft_request_id;
+								Buildings[b]->state = BUILDING_STATE_RUNNING;
+							}
+
+						}
+						break;
+					}
+					case BUILDING_STATE_RUNNING: {
+						if (CraftingQueue[Buildings[b]->craft_request_id].time_left <= 0) {
+							Buildings[b]->state = BUILDING_STATE_IDLE;
+							Buildings[b]->craft_request_id = NULL;
+						}
+						break;
+					}
+					case BUILDING_STATE_PAUSED: {
+						// Pause if output inventory is full
+
+					}
+					}
+
+				}
+				// No selected recipe -> reset building
+				else {
+
+				}
 
 				break;
 			}
 		}
-
-
 	}
-
-
 }
 
 

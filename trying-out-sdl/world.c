@@ -71,13 +71,13 @@ void init_tilemap() {
 		for (int x = 0; x < MAP_WIDTH; x++) {
 
 			GAME_SEED = SEED + 1;
-			float perlinIron = perlin2d(x, y, NOISE_FREQ, NOISE_AMP) * 100.0;
+			float perlinIron = perlin2d(x, y, ORE_NOISE_FREQ, ORE_NOISE_AMP) * 100.0;
 
 			GAME_SEED = SEED + 2;
-			float perlinCopper = perlin2d(x, y, NOISE_FREQ, NOISE_AMP) * 100.0;
+			float perlinCopper = perlin2d(x, y, ORE_NOISE_FREQ, ORE_NOISE_AMP) * 100.0;
 
 			GAME_SEED = SEED + 3;
-			float perlinCoal = perlin2d(x, y, NOISE_FREQ, NOISE_AMP) * 100.0;
+			float perlinCoal = perlin2d(x, y, ORE_NOISE_FREQ, ORE_NOISE_AMP) * 100.0;
 
 			enum OreType oreType;
 			int oreAmount = 0;

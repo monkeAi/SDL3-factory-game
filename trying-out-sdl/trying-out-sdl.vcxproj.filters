@@ -144,7 +144,7 @@
       <Filter>Source Files\Game</Filter>
     </ClInclude>
     <ClInclude Include="OreManager.h">
-      <Filter>Header Files</Filter>
+      <Filter>Source Files\World_generation</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

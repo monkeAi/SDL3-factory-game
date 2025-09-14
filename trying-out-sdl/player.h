@@ -52,6 +52,9 @@ struct PlayerCursor {
 
     float deconstruct_time_left;
     struct Building* decontruct_building;
+
+    struct OreList* mined_ore;
+    struct OreList* watching_ore;
 };
 
 enum CursorWatching {

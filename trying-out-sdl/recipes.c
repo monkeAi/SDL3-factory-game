@@ -149,10 +149,14 @@ static const RecipeCraftMethodMap craft_method_map[] = {
 
 static const ItemTypeMap item_type_map[] = {
     { "ITEM_IRON_ORE", ITEM_IRON_ORE },
-    { "ITEM_COPPER_ORE", ITEM_COPPER_ORE },
     { "ITEM_IRON_PLATE", ITEM_IRON_PLATE },
-    { "ITEM_COPPER_PLATE", ITEM_COPPER_PLATE },
     { "ITEM_IRON_GEAR", ITEM_IRON_GEAR },
+
+    { "ITEM_COPPER_ORE", ITEM_COPPER_ORE },
+    { "ITEM_COPPER_PLATE", ITEM_COPPER_PLATE },
+
+    { "ITEM_COAL_ORE", ITEM_COAL_ORE },
+
     { "ITEM_NONE", ITEM_NONE }
 };
 
