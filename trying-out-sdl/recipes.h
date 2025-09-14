@@ -45,6 +45,7 @@ enum RecipeCraftMethod {
 	RECIPE_M_HAND,
 	RECIPE_M_CRAFTER,
 	RECIPE_M_SMELTER,
+	RECIPE_M_MINER
 };
 
 enum RecipeState {
@@ -56,9 +57,17 @@ enum RecipeState {
 // Every possible recipe list
 enum RecipeName {
 	RECIPE_NONE,
+
+	RECIPE_IRON_ORE,
 	RECIPE_IRON_PLATE,
 	RECIPE_IRON_GEAR,
-	RECIPE_COPPER_PLATE
+
+	RECIPE_COPPER_ORE,
+	RECIPE_COPPER_PLATE,
+	RECIPE_COPPER_WIRE,
+
+	RECIPE_COAL_ORE,
+
 };
 
 // Recipe is a list of parameters for the crafting system 

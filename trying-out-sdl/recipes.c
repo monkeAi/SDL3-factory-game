@@ -129,9 +129,16 @@ typedef struct { const char* name; enum ItemType value; } ItemTypeMap;
 
 // Mapping instructions
 static const RecipeNameMap recipe_name_map[] = {
+    { "RECIPE_IRON_ORE", RECIPE_IRON_ORE },
     { "RECIPE_IRON_PLATE", RECIPE_IRON_PLATE },
-    { "RECIPE_COPPER_PLATE", RECIPE_COPPER_PLATE },
     { "RECIPE_IRON_GEAR", RECIPE_IRON_GEAR },
+
+    { "RECIPE_COPPER_ORE", RECIPE_COPPER_ORE },
+    { "RECIPE_COPPER_PLATE", RECIPE_COPPER_PLATE },
+    { "RECIPE_COPPER_PLATE", RECIPE_COPPER_WIRE },
+
+    { "RECIPE_COAL_ORE", RECIPE_COAL_ORE },
+
     { "RECIPE_NONE", RECIPE_NONE }
 };
 
@@ -144,7 +151,8 @@ static const RecipeStateMap recipe_state_map[] = {
 static const RecipeCraftMethodMap craft_method_map[] = {
     { "RECIPE_HAND", RECIPE_M_HAND },
     { "RECIPE_CRAFTER", RECIPE_M_CRAFTER },
-    { "RECIPE_SMELTER", RECIPE_M_SMELTER }
+    { "RECIPE_SMELTER", RECIPE_M_SMELTER },
+    { "RECIPE_MINER", RECIPE_M_MINER }
 };
 
 static const ItemTypeMap item_type_map[] = {
@@ -154,6 +162,7 @@ static const ItemTypeMap item_type_map[] = {
 
     { "ITEM_COPPER_ORE", ITEM_COPPER_ORE },
     { "ITEM_COPPER_PLATE", ITEM_COPPER_PLATE },
+    { "ITEM_COPPER_WIRE", ITEM_COPPER_WIRE },
 
     { "ITEM_COAL_ORE", ITEM_COAL_ORE },
 

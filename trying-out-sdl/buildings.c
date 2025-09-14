@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "SDL3/SDL.h"
+#include "SDL3/SDL_stdinc.h"
 
 #include "buildings.h"
 #include "tools.h"
@@ -10,6 +11,7 @@
 #include "camera.h"
 #include "crafting.h"
 #include "recipes.h"
+#include "OreManager.h"
 
 // List for all building's pointers
 struct Building* Buildings[MAX_BUILDINGS] = { NULL };
@@ -342,7 +344,102 @@ void update_buildings() {
 				break;
 
 			}
+			
+			// Miner
+			case BUILDING_BURNER_MINER: {
 
+
+					// if it has enough power - feature to be added
+
+					// Check state
+						// If idle -> start crafting request and switch state to running
+						// If active -> wait for request to end
+										
+					switch (Buildings[b]->state) {
+					case BUILDING_STATE_IDLE: {
+
+						// If it has ore under itself start working
+
+						struct OreList* Ores[MINER_WIDTH * MINER_HEIGHT] = { NULL };
+
+						int ore_count = getOres(Buildings[b]->coords->x, Buildings[b]->coords->y, Buildings[b]->tile_width, Buildings[b]->tile_height, Ores);
+
+
+						if (hasOre(Ores)) {
+
+							// Select random ore tile from the list
+							// Assign recipe to building
+
+							int rand_ore = SDL_rand(ore_count);
+
+							printf("%d ", rand_ore);
+
+							switch (Ores[rand_ore]->ore.type) {
+							case ORE_IRON:
+								Buildings[b]->recipe = RECIPE_IRON_ORE;
+								break;
+
+							case ORE_COPPER:
+								Buildings[b]->recipe = RECIPE_COPPER_ORE;
+								break;
+
+							case ORE_COAL:
+								Buildings[b]->recipe = RECIPE_COAL_ORE;
+								break;
+
+							}
+
+							//printf("Recipe set: %d ", Buildings[b]->recipe);
+
+							printf("Building state: %d \n", Buildings[b]->state);
+
+
+							// If output inventory has enough space start craft request
+							int allow_craft_request = TRUE;
+
+							// Loop through every output recipe item and chek if it has enough space
+							for (int item = 0; item < CraftingRecipes[Buildings[b]->recipe]->output_count; item++) {
+
+								if (!Inventory_enough_space(Buildings[b]->output_inv, CraftingRecipes[Buildings[b]->recipe]->output_items[item].type, CraftingRecipes[Buildings[b]->recipe]->output_items[item].quantity)) {
+									allow_craft_request = FALSE;
+								}
+
+							}
+
+							// If it has continue with crafting
+							if (allow_craft_request) {
+
+								// Start craft request and save id so it can track time left
+								int craft_request_id = craft_item(Buildings[b]->input_inv, Buildings[b]->output_inv, Buildings[b]->recipe);
+								if (craft_request_id != -1) {
+									Buildings[b]->craft_request_id = craft_request_id;
+									Buildings[b]->state = BUILDING_STATE_RUNNING;
+									printf("crafting recipe: %d\n", CraftingQueue[craft_request_id].recipe);
+
+									printf("Building state: %d \n", Buildings[b]->state);
+								}
+
+							}
+						}
+						break;
+					}
+					case BUILDING_STATE_RUNNING: {
+						if (CraftingQueue[Buildings[b]->craft_request_id].time_left <= 0) {
+							Buildings[b]->state = BUILDING_STATE_IDLE;
+							Buildings[b]->craft_request_id = NULL;
+						}
+						break;
+					}
+					case BUILDING_STATE_PAUSED: {
+						// Pause if output inventory is full
+
+					}
+				}
+	
+				break;
+			}
+
+			// Smelter
 			case BUILDING_BURNER_SMELTER: {
 
 				// If it has active recipe

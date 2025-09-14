@@ -65,8 +65,6 @@ void init_tilemap() {
 
 	struct OreManager* oreManager = getOreManager();
 
-	printf("Ore manager pointer: %x \n", oreManager);
-
 	for (int y = 0; y < MAP_HEIGHT; y++) {
 		for (int x = 0; x < MAP_WIDTH; x++) {
 

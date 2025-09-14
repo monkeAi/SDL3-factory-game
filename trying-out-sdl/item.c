@@ -42,7 +42,7 @@ void init_item_data_list(void) {
 
             case ITEM_COPPER_ORE: { Item_data_list[item] = create_item_data(item, "Copper ore", 100, 0x964520FF, FALSE, BUILDING_NONE); break; }
             case ITEM_COPPER_PLATE: { Item_data_list[item] = create_item_data(item, "Copper plate", 100, 0xed8b5fFF, FALSE, BUILDING_NONE); break; }
-            case ITEM_COPPER_WIRE: { Item_data_list[item] = create_item_data(item, "Copper wire", 100, 0x964520FF, FALSE, BUILDING_NONE); break; }
+            case ITEM_COPPER_WIRE: { Item_data_list[item] = create_item_data(item, "Copper wire", 100, 0x994520FF, FALSE, BUILDING_NONE); break; }
 
             case ITEM_COAL_ORE: { Item_data_list[item] = create_item_data(item, "Coal ore", 100, 0x666666FF, FALSE, BUILDING_NONE); break; }
 

@@ -90,12 +90,49 @@ struct OreList* getOre(int world_x, int world_y) {
     return result_ore;
 }
 
-// Returns table of ores that are 
-struct OreList** getOres(int world_x, int world_y, int width, int height) {
+// Returns number of ore tiles under the building, stores ore pointers in a table
+int getOres(int world_x, int world_y, int width, int height, struct OreList** Ores) {
 
     // Create a table
     // Loop through all coordinates
     // get ore for each
     // return table
 
+    int ore_index = 0;
+
+    for (int y = 0; y < width; y++) {
+        for (int x = 0; x < height; x++) {
+
+            struct OreList* ore = getOre(world_x + x, world_y + y);
+            if (ore) {
+
+                //printf("Ore found at: %d \n", ore_index);
+                Ores[ore_index] = ore;
+                ore_index++;
+            }
+
+        }
+    }
+
+    return ore_index;
+}
+
+// Returns TRUE if table contains ore
+int hasOre(struct OreList** Ores) {
+
+    // Loop through table
+    // Return true if item not NULL
+
+    for (int i = 0; i < MINER_HEIGHT * MINER_WIDTH; i++) {
+
+        if (Ores[i] != NULL) {
+
+            //printf("Ore found! \n");
+            return TRUE;
+        }
+
+    }
+
+    return FALSE;
+    
 }

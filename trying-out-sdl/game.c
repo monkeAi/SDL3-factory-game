@@ -113,6 +113,9 @@ void game_init() {
 
 	struct Item smelter = Item_create(ITEM_BURNER_SMELTER, 3);
 	Inventory_push_item(player->inventory, &smelter);
+
+	struct Item miner = Item_create(ITEM_BURNER_MINER, 3);
+	Inventory_push_item(player->inventory, &miner);
 }
 
 void game_loop() {

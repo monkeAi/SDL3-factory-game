@@ -29,6 +29,8 @@ struct OreManager* getOreManager(void);
 void initOreManager(void);
 void cleanOreManager(void);
 struct OreList* getOre(int world_x, int world_y);
+int hasOre(struct OreList** Ores);
+int getOres(int world_x, int world_y, int width, int height, struct OreList** Ores);
 
 
 #endif

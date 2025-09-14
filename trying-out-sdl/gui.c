@@ -959,6 +959,7 @@ void gui_update_sm_buildings(SDL_Renderer* renderer, struct MediaBin* mediaBin) 
 
 	struct GUI_frame* recipe_text = player->gui_side_menu->children[0]->children[0]->children[1];			// side_menu/building/top_container/recipe_text
 	struct GUI_frame* recipe_icon = player->gui_side_menu->children[0]->children[0]->children[0];
+	struct GUI_frame* recipe_change_btn = player->gui_side_menu->children[0]->children[0]->children[2];
 
 	struct CraftingRecipe* selected_recipe = CraftingRecipes[building->recipe];
 
@@ -1003,7 +1004,14 @@ void gui_update_sm_buildings(SDL_Renderer* renderer, struct MediaBin* mediaBin) 
 	// update output inventory
 	gui_update_inventory(bottom_container->children[1], building->output_inv, renderer, mediaBin);
 
-	// if there is no selected recipe, reset back
+	// Show change recipe icon only for crafter and smelter
+	
+	if (building->type == BUILDING_CRAFTER_1 || building->type == BUILDING_BURNER_SMELTER) {
+		recipe_change_btn->visibility = SHOWN;
+	}
+	else {
+		recipe_change_btn->visibility = HIDDEN;
+	}
 
 }
 
