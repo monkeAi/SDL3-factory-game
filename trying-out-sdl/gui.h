@@ -68,7 +68,8 @@ enum GUI_ID {
 	ID_recipe_list,
 	ID_recipe_frame,
 	ID_sm_recipe_btn,
-	ID_recipe_item
+	ID_recipe_item,
+	ID_mining_bar
 };
 
 enum GUI_side_menu {
@@ -120,5 +121,6 @@ void gui_update_recipe_list(struct GUI_frame* recipe_list, enum RecipeCraftMetho
 // Other elements
 struct GUI_frame* gui_create_progress_bar(struct GUI_frame* parent, enum GUI_ID bar_id, unsigned int base_color, unsigned int progress_color);
 void gui_update_progress_bar(struct GUI_frame* bar, float crafting_time, float time_left);
+struct GUI_frame* gui_create_player_mining_bar();
 
 #endif

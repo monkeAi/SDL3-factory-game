@@ -194,9 +194,21 @@ int Inventory_transfer_item(struct Inventory* from_inv, struct Inventory* to_inv
 	return 0;
 }
 
-// Transfers all items out of inventory and deletes it.
-//void Inventory_delete()
-// 
+// Get last item slot index
+int Inventory_get_last_item_index(struct Inventory* inv) {
+
+	if (!inv) return -1;
+
+	// Loop through the inventory from the back
+	for (int slot = inv->available_slots - 1; slot >= 0; slot--) {
+		if (inv->slots[slot].type != ITEM_NONE) return slot;
+	}
+
+	// No slot was found
+	return -1;
+		 
+}
+
 
 
 // Free memory of inventory struct

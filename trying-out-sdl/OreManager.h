@@ -5,7 +5,8 @@
 enum OreType {
     ORE_IRON,
     ORE_COPPER,
-    ORE_COAL
+    ORE_COAL,
+    ORE_STONE
 };
 
 struct Ore {

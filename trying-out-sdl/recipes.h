@@ -68,6 +68,8 @@ enum RecipeName {
 
 	RECIPE_COAL_ORE,
 
+	RECIPE_STONE_ORE,
+
 };
 
 // Recipe is a list of parameters for the crafting system 

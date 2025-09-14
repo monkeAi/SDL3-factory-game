@@ -20,6 +20,9 @@ struct Building {
 
 	enum RecipeName recipe;
 	int craft_request_id;
+
+	unsigned int color;
+	float work_time_left;
 };
 
 enum BuildingType {
@@ -28,6 +31,7 @@ enum BuildingType {
 	BUILDING_ELECTRIC_MINER,
 	BUILDING_BURNER_SMELTER,
 	BUILDING_CRAFTER_1,
+	BUILDING_INSERTER
 };
 
 enum BuildingState {
@@ -52,7 +56,7 @@ void Buildings_print();
 void Building_free(struct Building* building);
 int Building_is_inside(struct Building* b, int x_coord, int y_coord);
 
-void update_buildings();
+void update_buildings(float delta_time);
 void render_buildings(SDL_Renderer* renderer);
 
 // Global buildings list

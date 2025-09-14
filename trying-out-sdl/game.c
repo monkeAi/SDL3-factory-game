@@ -116,6 +116,11 @@ void game_init() {
 
 	struct Item miner = Item_create(ITEM_BURNER_MINER, 3);
 	Inventory_push_item(player->inventory, &miner);
+
+
+	struct Item inserter = Item_create(ITEM_INSERTER, 10);
+	Inventory_push_item(player->inventory, &inserter);
+
 }
 
 void game_loop() {
@@ -196,14 +201,14 @@ int game_handle_input() {
 		}
 		if (event.key.key == SDLK_E) {
 
-			//printf("Inventory Player:\n");
-			//Inventory_print(player->inventory);
-
 			// Toggle inventory visibility
 			player->toggle_inv(player);
 			player->side_menu_state = SM_CRAFTING;
+		}
+		if (event.key.key == SDLK_R) {
 
-
+			player->cursor->build_rotation = (player->cursor->build_rotation + 1) % 4;
+			printf("Building rotation: %d", player->cursor->build_rotation);
 		}
 		if(event.key.key == SDLK_B) {
 
@@ -266,7 +271,7 @@ int game_update() {
 	update_camera();
 
 	// Update every building
-	update_buildings();
+	update_buildings(delta_time);
 
 	// Update crafting queue
 	update_craft_queue(delta_time);

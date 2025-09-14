@@ -4,7 +4,6 @@
 #include "tools.h"
 #include "gui.h"
 
-
 struct Player {
     float x_pos;
     float y_pos;
@@ -20,6 +19,7 @@ struct Player {
     struct Inventory* inventory;
     struct GUI_frame* gui_inventory;
     struct GUI_frame* gui_side_menu;
+    struct GUI_frame* gui_mining_bar;
     enum GUI_side_menu side_menu_state;
     struct PlayerCursor* cursor;
     int selecting_recipe;
@@ -47,6 +47,8 @@ struct PlayerCursor {
     struct Inventory* held_item_inventory;
     int held_item_index;
     struct Inventory* watching_inventory;
+
+    enum BuildingRotation build_rotation;
 
     float click_cooldown;
 

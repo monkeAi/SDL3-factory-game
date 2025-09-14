@@ -21,9 +21,13 @@ enum ItemType {
 
     ITEM_COAL_ORE,
 
+    ITEM_STONE_ORE,
+
     ITEM_CRAFTER_1,
     ITEM_BURNER_MINER,
     ITEM_BURNER_SMELTER,
+
+    ITEM_INSERTER
 };
 
 struct Item_data {

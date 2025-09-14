@@ -135,9 +135,11 @@ static const RecipeNameMap recipe_name_map[] = {
 
     { "RECIPE_COPPER_ORE", RECIPE_COPPER_ORE },
     { "RECIPE_COPPER_PLATE", RECIPE_COPPER_PLATE },
-    { "RECIPE_COPPER_PLATE", RECIPE_COPPER_WIRE },
+    { "RECIPE_COPPER_WIRE", RECIPE_COPPER_WIRE },
 
     { "RECIPE_COAL_ORE", RECIPE_COAL_ORE },
+
+    { "RECIPE_STONE_ORE", RECIPE_STONE_ORE },
 
     { "RECIPE_NONE", RECIPE_NONE }
 };
@@ -165,6 +167,8 @@ static const ItemTypeMap item_type_map[] = {
     { "ITEM_COPPER_WIRE", ITEM_COPPER_WIRE },
 
     { "ITEM_COAL_ORE", ITEM_COAL_ORE },
+
+    { "ITEM_STONE_ORE", ITEM_STONE_ORE },
 
     { "ITEM_NONE", ITEM_NONE }
 };

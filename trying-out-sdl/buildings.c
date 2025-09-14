@@ -33,6 +33,7 @@ static struct Building* Building_init(enum BuildingType type) {
 	building->output_size = 0;
 	building->coords = malloc(sizeof(struct Vector2D));
 	building->craft_request_id = NULL;
+	building->work_time_left = 0;
 
 	// Depending on the building type set the parameters
 	switch (type) {
@@ -42,6 +43,7 @@ static struct Building* Building_init(enum BuildingType type) {
 		building->tile_width = 0;
 		building->tile_height = 0;
 		building->building_item_type = ITEM_NONE;
+		building->color = 0x000000ff;
 		break;
 
 	case BUILDING_CRAFTER_1:
@@ -50,14 +52,16 @@ static struct Building* Building_init(enum BuildingType type) {
 		building->tile_width = CRAFTER_WIDTH;
 		building->tile_height = CRAFTER_HEIGHT;
 		building->building_item_type = ITEM_CRAFTER_1;
+		building->color = 0xFFBD33FF;
 		break;
 
 	case BUILDING_BURNER_MINER:
-		building->input_inv = Inventory_create(1, 1);
-		building->output_inv = Inventory_create(1, 1);
+		building->input_inv = Inventory_create(CRAFTER_MAX_INPUT, CRAFTER_MAX_INPUT);
+		building->output_inv = Inventory_create(CRAFTER_MAX_INPUT, CRAFTER_MAX_INPUT);
 		building->tile_width = MINER_WIDTH;
 		building->tile_height = MINER_HEIGHT;
 		building->building_item_type = ITEM_BURNER_MINER;
+		building->color = 0xa84e32ff;
 		break;
 
 	case BUILDING_BURNER_SMELTER:
@@ -66,13 +70,26 @@ static struct Building* Building_init(enum BuildingType type) {
 		building->tile_width = SMELTER_WIDTH;
 		building->tile_height = SMELTER_HEIGHT;
 		building->building_item_type = ITEM_BURNER_SMELTER;
+		building->color = 0xedda5fff;
 		break;
+
+	case BUILDING_INSERTER:
+		building->input_inv = Inventory_create(1, 1);
+		building->output_inv = Inventory_create(1, 1);
+		building->tile_width = 1;
+		building->tile_height = 1;
+		building->building_item_type = ITEM_INSERTER;
+		building->color = 0x325e8aff;
+		building->work_time_left = INSERTER_WORK_TIME;
+		break;
+
 	default:
 		building->input_inv = NULL;
 		building->output_inv = NULL;
 		building->tile_width = 1;
 		building->tile_height = 1;
 		building->building_item_type = ITEM_NONE;
+		building->color = 0x000000ff;
 		break;
 	}
 
@@ -216,6 +233,11 @@ static int Building_placement_available(enum BuildingType type, int* coordinates
 		building_width = SMELTER_WIDTH;
 		building_height = SMELTER_HEIGHT;
 		break;
+	case BUILDING_INSERTER:
+		building_width = 1;
+		building_height = 1;
+		break;
+
 	}
 
 	// Apply rotation
@@ -273,11 +295,16 @@ static int Building_find_free_slot() {
 
 
 // Loops through all the buildings and updates them
-void update_buildings() {
+void update_buildings(float delta_time) {
 
 	for (int b = 0; b < MAX_BUILDINGS; b++) {
 
 		if (Buildings[b] == NULL) continue;
+
+		// Update time left
+		if (Buildings[b]->work_time_left > 0) {
+			Buildings[b]->work_time_left -= delta_time;
+		}
 
 		// Sort by building type
 		switch (Buildings[b]->type) {
@@ -386,12 +413,14 @@ void update_buildings() {
 							case ORE_COAL:
 								Buildings[b]->recipe = RECIPE_COAL_ORE;
 								break;
-
+							case ORE_STONE: 
+								Buildings[b]->recipe = RECIPE_STONE_ORE;
+								break;
 							}
 
 							//printf("Recipe set: %d ", Buildings[b]->recipe);
 
-							printf("Building state: %d \n", Buildings[b]->state);
+							//printf("Building state: %d \n", Buildings[b]->state);
 
 
 							// If output inventory has enough space start craft request
@@ -414,9 +443,9 @@ void update_buildings() {
 								if (craft_request_id != -1) {
 									Buildings[b]->craft_request_id = craft_request_id;
 									Buildings[b]->state = BUILDING_STATE_RUNNING;
-									printf("crafting recipe: %d\n", CraftingQueue[craft_request_id].recipe);
+									//printf("crafting recipe: %d\n", CraftingQueue[craft_request_id].recipe);
 
-									printf("Building state: %d \n", Buildings[b]->state);
+									//printf("Building state: %d \n", Buildings[b]->state);
 								}
 
 							}
@@ -500,6 +529,122 @@ void update_buildings() {
 
 				break;
 			}
+
+			// Inserter
+			case BUILDING_INSERTER: {
+
+				// If it has building in front and in back  
+					// If idle
+						// Take last item from output inventory of back building
+						// Transfer it to input inv of front building
+						// Start cooldown and switch to running state
+					// If running
+						// If time left = 0 set to idle
+
+				// Get back building and front building
+				int back_x_offset, back_y_offset, front_x_offset, front_y_offset;
+				switch (Buildings[b]->rotation) 
+				{
+				case DOWN:
+					back_x_offset = 0;
+					back_y_offset = 1;
+					front_x_offset = 0;
+					front_y_offset = -1;
+					break;
+				case LEFT:
+					back_x_offset = 1;
+					back_y_offset = 0;
+					front_x_offset = -1;
+					front_y_offset = 0;
+					break;
+				case UP:
+					back_x_offset = 0;
+					back_y_offset = -1;
+					front_x_offset = 0;
+					front_y_offset = 1;
+					break;
+				case RIGHT:
+					back_x_offset = -1;
+					back_y_offset = 0;
+					front_x_offset = 1;
+					front_y_offset = 0;
+					break;
+
+				default:
+					break;
+				}
+
+				int back_x = Buildings[b]->coords->x + back_x_offset;
+				int back_y = Buildings[b]->coords->y + back_y_offset;
+				int front_x = Buildings[b]->coords->x + front_x_offset;
+				int front_y = Buildings[b]->coords->y + front_y_offset;
+
+				// Get from and to building pointer
+				struct Building* from_building = NULL;
+				struct Building* to_building = NULL;
+
+
+				for (int i = 0; i < MAX_BUILDINGS; i++) {
+
+					if (Buildings[i] == NULL) continue;
+					if (Buildings[i]->type == BUILDING_INSERTER) continue;
+
+					// From building
+					if (Building_is_inside(Buildings[i], back_x, back_y)) {
+						from_building = Buildings[i];
+					}
+
+					// To building
+					else if (Building_is_inside(Buildings[i], front_x, front_y)) {
+						to_building = Buildings[i];
+					}
+
+				}
+
+				if (from_building && to_building) {
+
+					
+					switch (Buildings[b]->state)
+					{
+					case BUILDING_STATE_IDLE: {
+						int from_index = Inventory_get_last_item_index(from_building->output_inv);
+
+						// If to inventory has enough space transfer 1 item
+						if (from_index != -1) {
+
+							//printf("Item type: %d, slot index: %d\n", from_building->output_inv->slots[from_index].type, from_index);
+
+							if (Inventory_enough_space(to_building->input_inv, from_building->output_inv->slots[from_index].type, 1)) {
+
+								Inventory_transfer_item(
+									from_building->output_inv,
+									to_building->input_inv,
+									from_index,
+									1
+								);
+
+								Buildings[b]->state = BUILDING_STATE_RUNNING;
+								Buildings[b]->work_time_left = INSERTER_WORK_TIME;
+							}
+						}
+					}
+
+					case BUILDING_STATE_RUNNING: {
+
+						if (Buildings[b]->work_time_left <= 0) {
+
+							Buildings[b]->state = BUILDING_STATE_IDLE;
+						}
+
+					}
+
+					default:
+						break;
+					}
+
+				}
+
+			}
 		}
 	}
 }
@@ -524,12 +669,57 @@ void render_buildings(SDL_Renderer* renderer) {
 			TILE_SIZE * b->tile_height
 		};
 		// Correct the offset and account for rotation
-		// 
+		
 		// Set render color depending on building
-		SDL_SetRenderDrawColor(renderer, 255, 189, 51, 255);
+
+		unsigned int rgba_colors[4] = { 0 };
+		Hex2RGBA(b->color, rgba_colors);
+
+		// Set render color
+		SDL_SetRenderDrawColor(renderer, rgba_colors[0], rgba_colors[1], rgba_colors[2], rgba_colors[3]);
+
 
 		// Add to render  
 		SDL_RenderFillRect(renderer, &building_rect);
+
+
+		if (b->type == BUILDING_INSERTER) {
+
+			SDL_FRect arrow_rect;
+
+			switch (b->rotation) {
+			case DOWN:
+				arrow_rect.x = building_rect.x + TILE_SIZE / 2 - 5;
+				arrow_rect.y = building_rect.y + TILE_SIZE - 10;
+				arrow_rect.w = 10;
+				arrow_rect.h = 10;
+				break;
+			case LEFT:
+				arrow_rect.x = building_rect.x;
+				arrow_rect.y = building_rect.y + TILE_SIZE / 2 - 5;
+				arrow_rect.w = 10;
+				arrow_rect.h = 10;
+				break;
+			case UP:
+				arrow_rect.x = building_rect.x + TILE_SIZE / 2 - 5;
+				arrow_rect.y = building_rect.y;
+				arrow_rect.w = 10;
+				arrow_rect.h = 10;
+				break;
+			case RIGHT:
+				arrow_rect.x = building_rect.x + TILE_SIZE - 10;
+				arrow_rect.y = building_rect.y + TILE_SIZE / 2 - 5;
+				arrow_rect.w = 10;
+				arrow_rect.h = 10;
+				break;
+			}
+
+
+			SDL_SetRenderDrawColor(renderer, 38, 176, 255, 255);
+
+			SDL_RenderFillRect(renderer, &arrow_rect);
+
+		}
 	}
 
 }
@@ -548,7 +738,7 @@ void Buildings_print() {
 }
 
 
-// Return true if cursor coordinate is inside building
+// Return true if coordinate is inside building
 int Building_is_inside(struct Building* b, int x_coord, int y_coord) {
 
 	if (x_coord >= b->coords->x && x_coord < b->coords->x + b->tile_width && y_coord >= b->coords->y && y_coord < b->coords->y + b->tile_height) return TRUE;

@@ -77,6 +77,9 @@ void init_tilemap() {
 			GAME_SEED = SEED + 3;
 			float perlinCoal = perlin2d(x, y, ORE_NOISE_FREQ, ORE_NOISE_AMP) * 100.0;
 
+			GAME_SEED = SEED + 4;
+			float perlinStone = perlin2d(x, y, ORE_NOISE_FREQ, ORE_NOISE_AMP) * 100.0;
+
 			enum OreType oreType;
 			int oreAmount = 0;
 			bool hasOre = false;
@@ -94,6 +97,11 @@ void init_tilemap() {
 			if (perlinCoal < COAL_ORE_RANGE) {
 				oreType = ORE_COAL;
 				oreAmount = perlinCoal * 1000;
+				hasOre = true;
+			}
+			if (perlinStone < STONE_ORE_RANGE) {
+				oreType = ORE_STONE;
+				oreAmount = perlinStone * 1000;
 				hasOre = true;
 			}
 			if (hasOre && map[y][x].type != TILE_WATER) {
@@ -221,10 +229,11 @@ int render_ores(SDL_Renderer* renderer) {
 
 		// In future select the right texture
 		switch (ore->type) {
-		case ORE_IRON: rgba[0] = 50; rgba[1] = 50; rgba[2] = 200; rgba[3] = 50; break;
-		case ORE_COPPER: rgba[0] = 200; rgba[1] = 100; rgba[2] = 100; rgba[3] = 50; break;
-		case ORE_COAL: rgba[0] = 50; rgba[1] = 50; rgba[2] = 50; rgba[3] = 50; break;
-		default: rgba[0] = 255; rgba[1] = 255; rgba[2] = 255; rgba[3] = 50; break;
+		case ORE_IRON: rgba[0] = 133; rgba[1] = 201; rgba[2] = 216; break;
+		case ORE_COPPER: rgba[0] = 241; rgba[1] = 145; rgba[2] = 67; break;
+		case ORE_COAL: rgba[0] = 46; rgba[1] = 53; rgba[2] = 50; break;
+		case ORE_STONE: rgba[0] = 215; rgba[1] = 207; rgba[2] = 205; break;
+		default: rgba[0] = 255; rgba[1] = 255; rgba[2] = 255; break;
 		}
 
 		SDL_SetRenderDrawColor(renderer, rgba[0], rgba[1], rgba[2], rgba[3]);

@@ -33,9 +33,9 @@
 // Ore generation
 
 #define IRON_ORE_RANGE 30
-#define COPPER_ORE_RANGE 30
-#define COAL_ORE_RANGE 20
-
+#define COPPER_ORE_RANGE 28
+#define COAL_ORE_RANGE 18
+#define STONE_ORE_RANGE 18
 
 // Player
 
@@ -62,6 +62,8 @@
 
 #define SMELTER_WIDTH 2
 #define SMELTER_HEIGHT 2
+
+#define INSERTER_WORK_TIME 1.0
 
 
 // GUI

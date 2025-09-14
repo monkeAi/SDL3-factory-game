@@ -35,8 +35,9 @@ void init_player() {
     player->inventory = Inventory_create(PLAYER_MAX_INV_SIZE, PLAYER_START_INV_SIZE);
 
     // Player gui initialization
-    player->gui_inventory = gui_create_player_inventory(player);
+    player->gui_inventory = gui_create_player_inventory();
     player->gui_side_menu = gui_create_sm(player->gui_inventory);
+    player->gui_mining_bar = gui_create_player_mining_bar();
 
     player->cursor = player_cursor_create();
 
@@ -47,7 +48,6 @@ void init_player() {
     // Methods
     player->toggle_inv = toggle_inv;
     player->selecting_recipe = FALSE;
-
     
 }  
 
@@ -416,7 +416,7 @@ static void handle_player_interaction(struct Player* p) {
         // If left clicks on building open player inventory and side menu for buildings
         if (p->mouse_state == 1) {
 
-            if (p->cursor->watching_type == CURSOR_BUILDING && p->mouse_state != p->mouse_state_before) {
+            if (p->cursor->watching_type == CURSOR_BUILDING && p->mouse_state != p->mouse_state_before && p->cursor->watching_building->type != BUILDING_INSERTER) {
 
                 // Set selected building to currently watched
                 player->cursor->selected_building = player->cursor->watching_building;
@@ -546,6 +546,9 @@ static void handle_player_interaction(struct Player* p) {
                     case ORE_COAL:
                         ore = Item_create(ITEM_COAL_ORE, 1);
                         break;
+                    case ORE_STONE:
+                        ore = Item_create(ITEM_STONE_ORE, 1);
+                        break;
                     }
 
                     // Add ore to player inventory
@@ -583,7 +586,7 @@ static void handle_player_interaction(struct Player* p) {
             if (p->cursor->watching_type != CURSOR_GUI && Item_data_list[held_item->type]->is_buildable == TRUE) {
 
                 // Create building
-                if (!Building_create(Item_data_list[held_item->type]->building_type, selected_cords, DOWN)) {
+                if (!Building_create(Item_data_list[held_item->type]->building_type, selected_cords, player->cursor->build_rotation)) {
 
                     // Remove one item from held item
                     held_item->quantity -= 1;
@@ -645,6 +648,8 @@ struct PlayerCursor* player_cursor_create() {
 
     cursor->mined_ore = NULL;
     cursor->watching_ore = NULL;
+
+    cursor->build_rotation = RIGHT;
 
     return cursor;
 }

@@ -112,7 +112,7 @@
     {
         "name": "RECIPE_COPPER_WIRE",
         "title": "Copper wire",
-        "state": "RECIPE_LOCKED",
+        "state": "RECIPE_AVAILABLE",
         "craft_method": [ "RECIPE_HAND", "RECIPE_CRAFTER" ],
         "input": [
             {
@@ -139,6 +139,21 @@
         "output": [
             {
                 "type": "ITEM_COAL_ORE",
+                "quantity": 1
+            }
+        ],
+        "crafting_time": 5.0,
+        "required_energy": 10.0
+    },
+    {
+        "name": "RECIPE_STONE_ORE",
+        "title": "Stone ore",
+        "state": "RECIPE_AVAILABLE",
+        "craft_method": [ "RECIPE_MINER" ],
+        "input": [],
+        "output": [
+            {
+                "type": "ITEM_STONE_ORE",
                 "quantity": 1
             }
         ],

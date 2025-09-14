@@ -186,7 +186,7 @@ void gui_move(struct GUI_frame* frame, int x, int y, int margin_x, int margin_y,
 					}
 					// If its based on window
 					else {
-						x_offset = margin_y;
+						y_offset = margin_y;
 					}
 					break;
 
@@ -197,7 +197,7 @@ void gui_move(struct GUI_frame* frame, int x, int y, int margin_x, int margin_y,
 					}
 					// If its based on window
 					else {
-						x_offset = WINDOW_HEIGHT - frame->height - margin_y;;
+						y_offset = WINDOW_HEIGHT - frame->height - margin_y;;
 					}
 					break;
 			}
@@ -407,12 +407,20 @@ void update_gui(SDL_Renderer* renderer, struct MediaBin* mediaBin) {
 				player->gui_side_menu->children[0]->visibility = HIDDEN;		// Show buildings interface
 				player->gui_side_menu->children[1]->visibility = SHOWN;
 			}
-
 		}
-		
-		
 	}
 
+	// Update player mining bar
+	if (player->cursor->deconstruct_time_left == PLAYER_DECONSTRUCT_SPEED) {
+
+		player->gui_mining_bar->visibility = HIDDEN;
+	}
+	else {
+
+		player->gui_mining_bar->visibility = SHOWN;
+		gui_update_progress_bar(player->gui_mining_bar->children[0], PLAYER_DECONSTRUCT_SPEED, player->cursor->deconstruct_time_left);
+		//printf("%f/%f\n", PLAYER_DECONSTRUCT_SPEED, player->cursor->deconstruct_time_left);
+	}
 
 
 }
@@ -944,7 +952,7 @@ struct GUI_frame* gui_create_sm_buildings(struct GUI_frame* parent) {
 		gui_set_color(progress_bar_border, COLOR_HEX_SEC);
 		struct GUI_frame* progress_bar = gui_create_progress_bar(progress_bar_border, ID_sm_building_progress_bar, COLOR_HEX_THIRD, COLOR_HEX_MAIN);
 	
-		gui_update_progress_bar(progress_bar, 300, 180);
+		//gui_update_progress_bar(progress_bar, 300, 180);
 
 	return sm_buildings;
 }
@@ -1052,7 +1060,22 @@ void gui_update_progress_bar(struct GUI_frame* bar, float total, float left) {
 }
 
 
+struct GUI_frame* gui_create_player_mining_bar() {
 
+	// MAIN FRAME
+	struct GUI_frame* frame = gui_frame_init(NULL, 1);
+	gui_resize(frame, WINDOW_WIDTH / 2, 20);
+	gui_move(frame, 0, 0, 0, 20, (enum GUI_flags[]) { POS_CENTERED_X, POS_BOTTOM });
+	gui_set_color(frame, COLOR_HEX_SEC);
+
+	// Add frame composition to list of all gui frames
+	GUI_WINDOWS[gui_find_free_slot()] = frame;
+
+	struct GUI_frame* progress_bar = gui_create_progress_bar(frame, ID_mining_bar, COLOR_HEX_THIRD, COLOR_HEX_MAIN);
+
+
+	return frame;
+}
 
 
 
