@@ -1,4 +1,4 @@
-#pragma once
+
 #ifndef OREMANAGER_H
 #define OREMANAGER_H
 

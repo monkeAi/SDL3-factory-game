@@ -278,31 +278,6 @@ int game_render() {
 	// Render GUI
 	render_gui(renderer);
 
-	
-	// Text rendering example
-	SDL_FRect t_rect = {
-		200,	// x
-		100,	// y
-		300,	// Width
-		100		// Height
-	};
-	render_text(renderer, game_media->font_text, &t_rect, "Hello", COLOR_WHITE);
-
-
-
-	// Text rendering example with textbox
-	//SDL_FRect t_rect2 = {
-	//	200,	// x
-	//	100,	// y
-	//	300,	// Width
-	//	100		// Height
-	//};
-	//struct TextBox* tb = malloc(sizeof(struct TextBox));;
-	//update_text_box(renderer, tb, game_media->font_text, &t_rect2, "30", COLOR_BLACK);
-	//render_text_box(renderer, tb);
-
-
-
 	// Render scene
 	SDL_RenderPresent(renderer);
 
