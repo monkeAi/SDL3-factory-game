@@ -87,9 +87,6 @@
     <ClCompile Include="gui.c">
       <Filter>Source Files\GUI</Filter>
     </ClCompile>
-    <ClCompile Include="button.c">
-      <Filter>Source Files\GUI</Filter>
-    </ClCompile>
     <ClCompile Include="media.c">
       <Filter>Source Files\Game</Filter>
     </ClCompile>
@@ -135,9 +132,6 @@
       <Filter>Source Files\Buildings</Filter>
     </ClInclude>
     <ClInclude Include="gui.h">
-      <Filter>Source Files\GUI</Filter>
-    </ClInclude>
-    <ClInclude Include="button.h">
       <Filter>Source Files\GUI</Filter>
     </ClInclude>
     <ClInclude Include="media.h">

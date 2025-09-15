@@ -143,7 +143,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="buildings.c" />
-    <ClCompile Include="button.c" />
     <ClCompile Include="camera.c" />
     <ClCompile Include="cJSON.c" />
     <ClCompile Include="crafting.c" />
@@ -163,7 +162,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="buildings.h" />
-    <ClInclude Include="button.h" />
     <ClInclude Include="camera.h" />
     <ClInclude Include="cJSON.h" />
     <ClInclude Include="constants.h" />
