@@ -121,6 +121,9 @@ void game_init() {
 	struct Item inserter = Item_create(ITEM_INSERTER, 10);
 	Inventory_push_item(player->inventory, &inserter);
 
+	struct Item conveyor = Item_create(ITEM_CONVEYOR, 100);
+	Inventory_push_item(player->inventory, &conveyor);
+
 }
 
 void game_loop() {
@@ -194,11 +197,6 @@ int game_handle_input() {
 			}
 
 		}
-		if (event.key.key == SDLK_C) {
-
-			craft_item(player->inventory, player->inventory, RECIPE_IRON_GEAR);
-			
-		}
 		if (event.key.key == SDLK_E) {
 
 			// Toggle inventory visibility
@@ -208,31 +206,9 @@ int game_handle_input() {
 		if (event.key.key == SDLK_R) {
 
 			player->cursor->build_rotation = (player->cursor->build_rotation + 1) % 4;
-			printf("Building rotation: %d", player->cursor->build_rotation);
+			printf("Building rotation: %d\n", player->cursor->build_rotation);
 		}
-		if(event.key.key == SDLK_B) {
 
-			player->side_menu_state = SM_BUILDING;
-
-		}
-		if (event.key.key == SDLK_X) {
-	
-			/*int coords[2] = { 0, 0 };
-			if (Building_create(BUILDING_CRAFTER_1, coords, RIGHT)) {
-				printf("Could not create a new building.\n");
-			}*/
-
-			craft_item(Buildings[0]->input_inv, Buildings[0]->output_inv, RECIPE_IRON_GEAR);
-
-		}
-		if (event.key.key == SDLK_Z) {
-
-			Inventory_transfer_item(player->inventory, Buildings[0]->input_inv, 0, 30);
-		}
-		if (event.key.key == SDLK_L) {
-
-			player->cursor->selected_building = Buildings[1];
-		}
 		break;
 	}
 

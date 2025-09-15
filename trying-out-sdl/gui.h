@@ -122,5 +122,7 @@ void gui_update_recipe_list(struct GUI_frame* recipe_list, enum RecipeCraftMetho
 struct GUI_frame* gui_create_progress_bar(struct GUI_frame* parent, enum GUI_ID bar_id, unsigned int base_color, unsigned int progress_color);
 void gui_update_progress_bar(struct GUI_frame* bar, float crafting_time, float time_left);
 struct GUI_frame* gui_create_player_mining_bar();
+void gui_update_player_recipe_hover(SDL_Renderer* renderer, struct MediaBin* mediaBin);
+struct GUI_frame* gui_create_player_recipe_hover();
 
 #endif

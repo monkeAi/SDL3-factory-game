@@ -83,6 +83,16 @@ static struct Building* Building_init(enum BuildingType type) {
 		building->work_time_left = INSERTER_WORK_TIME;
 		break;
 
+	case BUILDING_CONVEYOR:
+		building->input_inv = Inventory_create(1, 1);
+		building->output_inv = Inventory_create(1, 1);
+		building->tile_width = 1;
+		building->tile_height = 1;
+		building->building_item_type = ITEM_CONVEYOR;
+		building->color = 0xffb60aff;
+		building->work_time_left = CONVEYOR_WORK_TIME;
+		break;
+
 	default:
 		building->input_inv = NULL;
 		building->output_inv = NULL;
@@ -205,6 +215,9 @@ void Building_destroy(struct Building* b) {
 	// Create the building item and give it to player
 		// Handle case when player inventory is full
 
+	// Cancel craft request
+	CraftingQueue[b->craft_request_id].output_inv = NULL;
+
 
 	// Free allocated memory 
 	Building_free(b);
@@ -234,6 +247,10 @@ static int Building_placement_available(enum BuildingType type, int* coordinates
 		building_height = SMELTER_HEIGHT;
 		break;
 	case BUILDING_INSERTER:
+		building_width = 1;
+		building_height = 1;
+		break;
+	case BUILDING_CONVEYOR:
 		building_width = 1;
 		building_height = 1;
 		break;
@@ -398,8 +415,6 @@ void update_buildings(float delta_time) {
 							// Assign recipe to building
 
 							int rand_ore = SDL_rand(ore_count);
-
-							printf("%d ", rand_ore);
 
 							switch (Ores[rand_ore]->ore.type) {
 							case ORE_IRON:
@@ -614,7 +629,21 @@ void update_buildings(float delta_time) {
 
 							//printf("Item type: %d, slot index: %d\n", from_building->output_inv->slots[from_index].type, from_index);
 
-							if (Inventory_enough_space(to_building->input_inv, from_building->output_inv->slots[from_index].type, 1)) {
+							// In case of transfering to a conveyor belt
+							if (to_building->type == BUILDING_CONVEYOR) {
+
+								if (to_building->output_inv->slots[0].type == ITEM_NONE) {
+
+									Inventory_transfer_item(
+										from_building->output_inv,
+										to_building->output_inv,
+										0,
+										1
+									);
+								}
+							}
+							
+							else if (Inventory_enough_space(to_building->input_inv, from_building->output_inv->slots[from_index].type, 1)) {
 
 								Inventory_transfer_item(
 									from_building->output_inv,
@@ -644,6 +673,88 @@ void update_buildings(float delta_time) {
 
 				}
 
+				break;
+			}
+
+			// Conveyor belt
+			case BUILDING_CONVEYOR: {
+
+				// Move item from its own inventory to the next conveyor building if it's free
+				
+				// Get back building and front building
+				int front_x_offset, front_y_offset;
+				switch (Buildings[b]->rotation)
+				{
+				case DOWN:
+					front_x_offset = 0;
+					front_y_offset = -1;
+					break;
+				case LEFT:
+					front_x_offset = -1;
+					front_y_offset = 0;
+					break;
+				case UP:
+					front_x_offset = 0;
+					front_y_offset = 1;
+					break;
+				case RIGHT:
+					front_x_offset = 1;
+					front_y_offset = 0;
+					break;
+
+				default:
+					break;
+				}
+
+				int front_x = Buildings[b]->coords->x + front_x_offset;
+				int front_y = Buildings[b]->coords->y + front_y_offset;
+
+				// Get from and to building pointer
+				struct Building* to_building = NULL;
+
+				for (int i = 0; i < MAX_BUILDINGS; i++) {
+
+					if (Buildings[i] == NULL) continue;
+					// Skip if next building is not conveyor
+					if (Buildings[i]->type != BUILDING_CONVEYOR) continue;
+
+					// To building
+					if (Building_is_inside(Buildings[i], front_x, front_y)) {
+						to_building = Buildings[i];
+					}
+				}
+
+				if (to_building) {
+
+					switch (Buildings[b]->state)
+					{
+					case BUILDING_STATE_IDLE: {
+
+						// If next conveyor has no items and this one has, transfer it
+						if (to_building->output_inv->slots[0].type == ITEM_NONE && Buildings[b]->output_inv->slots[0].type != ITEM_NONE) {
+
+							Buildings[b]->state = BUILDING_STATE_RUNNING;
+							Buildings[b]->work_time_left = CONVEYOR_WORK_TIME;
+						}
+
+						break;
+					}
+					case BUILDING_STATE_RUNNING: {
+
+						if (Buildings[b]->work_time_left <= 0) {
+
+							Inventory_transfer_item(Buildings[b]->output_inv, to_building->output_inv, 0, 1);
+							Buildings[b]->state = BUILDING_STATE_IDLE;
+						}
+
+						break;
+					}
+					default:
+						break;
+					}
+				}
+
+				break;
 			}
 		}
 	}
@@ -682,8 +793,8 @@ void render_buildings(SDL_Renderer* renderer) {
 		// Add to render  
 		SDL_RenderFillRect(renderer, &building_rect);
 
-
-		if (b->type == BUILDING_INSERTER) {
+		// Draw square on top of inserter and coveyor to determine facing direction
+		if (b->type == BUILDING_INSERTER || b->type == BUILDING_CONVEYOR) {
 
 			SDL_FRect arrow_rect;
 
@@ -720,7 +831,30 @@ void render_buildings(SDL_Renderer* renderer) {
 			SDL_RenderFillRect(renderer, &arrow_rect);
 
 		}
+
+		// Draw item on top of conveyor if it has one
+		if (b->type == BUILDING_CONVEYOR && b->output_inv->slots[0].type != ITEM_NONE) {
+
+			SDL_FRect item_rect = {
+				building_rect.x + TILE_SIZE / 2 - 8,
+				building_rect.y + TILE_SIZE / 2 - 8,
+				16,
+				16
+			};
+
+			unsigned int rgba_colors[4] = { 0 };
+			Hex2RGBA(Item_data_list[b->output_inv->slots[0].type]->color, rgba_colors);
+
+			// Set render color
+			SDL_SetRenderDrawColor(renderer, rgba_colors[0], rgba_colors[1], rgba_colors[2], rgba_colors[3]);
+
+			SDL_RenderFillRect(renderer, &item_rect);
+
+
+		}
+
 	}
+
 
 }
 

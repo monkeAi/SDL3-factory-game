@@ -159,5 +159,177 @@
         ],
         "crafting_time": 5.0,
         "required_energy": 10.0
+    },
+    {
+        "name": "RECIPE_STONE_BRICK",
+        "title": "Stone bricks",
+        "state": "RECIPE_LOCKED",
+        "craft_method": [ "RECIPE_HAND", "RECIPE_CRAFTER" ],
+        "input": [
+            {
+                "type": "ITEM_STONE_ORE",
+                "quantity": 2
+            }
+
+        ],
+        "output": [
+            {
+                "type": "ITEM_STONE_BRICK",
+                "quantity": 1
+            }
+        ],
+        "crafting_time": 5.0,
+        "required_energy": 10.0
+    },
+    {
+        "name": "RECIPE_GREEN_CHIP",
+        "title": "Green circuit boards",
+        "state": "RECIPE_AVAILABLE",
+        "craft_method": [ "RECIPE_HAND", "RECIPE_CRAFTER" ],
+        "input": [
+            {
+                "type": "ITEM_IRON_PLATE",
+                "quantity": 2
+            },
+            {
+                "type": "ITEM_COPPER_WIRE",
+                "quantity": 4
+            }
+
+        ],
+        "output": [
+            {
+                "type": "ITEM_GREEN_CHIP",
+                "quantity": 1
+            }
+        ],
+        "crafting_time": 3.0,
+        "required_energy": 10.0
+    },
+    {
+        "name": "RECIPE_CRAFTER_1",
+        "title": "Crafter mk.1",
+        "state": "RECIPE_AVAILABLE",
+        "craft_method": [ "RECIPE_HAND", "RECIPE_CRAFTER" ],
+        "input": [
+            {
+                "type": "ITEM_IRON_GEAR",
+                "quantity": 5
+            },
+            {
+                "type": "ITEM_GREEN_CHIP",
+                "quantity": 5
+            }
+
+        ],
+        "output": [
+            {
+                "type": "ITEM_CRAFTER_1",
+                "quantity": 1
+            }
+        ],
+        "crafting_time": 10.0,
+        "required_energy": 10.0
+    },
+    {
+        "name": "RECIPE_BURNER_MINER",
+        "title": "Burner miner",
+        "state": "RECIPE_AVAILABLE",
+        "craft_method": [ "RECIPE_HAND", "RECIPE_CRAFTER" ],
+        "input": [
+            {
+                "type": "ITEM_STONE_ORE",
+                "quantity": 20
+            },
+            {
+                "type": "ITEM_IRON_PLATE",
+                "quantity": 10
+            }
+
+        ],
+        "output": [
+            {
+                "type": "ITEM_BURNER_MINER",
+                "quantity": 1
+            }
+        ],
+        "crafting_time": 10.0,
+        "required_energy": 10.0
+    },
+    {
+        "name": "RECIPE_BURNER_SMELTER",
+        "title": "Burner smelter",
+        "state": "RECIPE_AVAILABLE",
+        "craft_method": [ "RECIPE_HAND", "RECIPE_CRAFTER" ],
+        "input": [
+            {
+                "type": "ITEM_STONE_ORE",
+                "quantity": 20
+            },
+            {
+                "type": "ITEM_IRON_PLATE",
+                "quantity": 10
+            }
+
+        ],
+        "output": [
+            {
+                "type": "ITEM_BURNER_SMELTER",
+                "quantity": 1
+            }
+        ],
+        "crafting_time": 10.0,
+        "required_energy": 10.0
+    },
+    {
+        "name": "RECIPE_INSERTER",
+        "title": "Inserter",
+        "state": "RECIPE_AVAILABLE",
+        "craft_method": [ "RECIPE_HAND", "RECIPE_CRAFTER" ],
+        "input": [
+            {
+                "type": "ITEM_GREEN_CHIP",
+                "quantity": 1
+            },
+            {
+                "type": "ITEM_IRON_PLATE",
+                "quantity": 5
+            }
+
+        ],
+        "output": [
+            {
+                "type": "ITEM_INSERTER",
+                "quantity": 1
+            }
+        ],
+        "crafting_time": 5.0,
+        "required_energy": 10.0
+    },
+    {
+        "name": "RECIPE_CONVEYOR",
+        "title": "Conveyor belt",
+        "state": "RECIPE_AVAILABLE",
+        "craft_method": [ "RECIPE_HAND", "RECIPE_CRAFTER" ],
+        "input": [
+            {
+                "type": "ITEM_IRON_PLATE",
+                "quantity": 2
+            },
+            {
+                "type": "ITEM_IRON_GEAR",
+                "quantity": 1
+            }
+
+        ],
+        "output": [
+            {
+                "type": "ITEM_CONVEYOR",
+                "quantity": 1
+            }
+        ],
+        "crafting_time": 3.0,
+        "required_energy": 10.0
     }
+
 ]

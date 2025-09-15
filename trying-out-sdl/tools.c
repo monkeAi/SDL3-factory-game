@@ -1,6 +1,7 @@
 #include "tools.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 void Hex2RGBA(unsigned int hex_color, unsigned int* rgba_colors) {
 
@@ -47,4 +48,13 @@ void intToStr(int N, char* str) {
         str[j] = str[k];
         str[k] = temp;
     }
+}
+
+void concat(char s1[], char s2[]) {
+
+    // Go to the end of the string s1
+    s1 = s1 + strlen(s1);
+
+    // Copy characters from s2 to s1 using pointers
+    while (*s1++ = *s2++);
 }

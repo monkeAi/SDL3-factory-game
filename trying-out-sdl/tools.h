@@ -9,5 +9,6 @@ struct Vector2D {
 
 void Hex2RGBA(unsigned int hex_color, int* rgba_colors);
 void intToStr(int N, char* str);
+void concat(char s1[], char s2[]);
 
 #endif

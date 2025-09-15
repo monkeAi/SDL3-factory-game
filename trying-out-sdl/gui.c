@@ -423,6 +423,9 @@ void update_gui(SDL_Renderer* renderer, struct MediaBin* mediaBin) {
 	}
 
 
+	gui_update_player_recipe_hover(renderer, mediaBin);
+
+
 }
 
 // Renders a passed GUI frame and its children
@@ -1077,6 +1080,220 @@ struct GUI_frame* gui_create_player_mining_bar() {
 	return frame;
 }
 
+
+struct GUI_frame* gui_create_player_recipe_hover() {
+
+	// Main frame
+	struct GUI_frame* main_frame = gui_frame_init(NULL, 3);
+	gui_resize(main_frame, 200, 320);
+	gui_move(main_frame, 0, 0, 0, 0, NULL);
+	gui_set_color(main_frame, COLOR_HEX_MAIN);
+	main_frame->visibility = HIDDEN;
+
+	int item_height = 24;
+
+	// Top container
+	struct GUI_frame* top_container = gui_frame_init(main_frame, 1);
+	gui_resize(top_container, main_frame->width - GUI_PADDING * 2, 40);
+	gui_move(top_container, 0, 0, 0, GUI_PADDING, (enum GUI_flags[]) { POS_CENTERED_X, POS_TOP });
+	gui_set_color(top_container, COLOR_HEX_MAIN);
+
+		// Recipe text
+		struct GUI_frame* selected_recipe_text = gui_frame_init(top_container, 0);
+		gui_resize(selected_recipe_text, top_container->width, item_height);
+		gui_move(selected_recipe_text, 0, 0, 0, 0, (enum GUI_flags[]) { POS_LEFT, POS_TOP });
+		gui_set_color(selected_recipe_text, COLOR_HEX_MAIN);
+		selected_recipe_text->text_enabled = TRUE;
+
+	// Middle container
+	struct GUI_frame* middle_container = gui_frame_init(main_frame, 4);
+	gui_resize(middle_container, main_frame->width - GUI_PADDING * 2, 100);
+	gui_move(middle_container, 0, 0, 0, 60 + 2 * GUI_PADDING, (enum GUI_flags[]) { POS_CENTERED_X, POS_TOP});
+	gui_set_color(middle_container, COLOR_HEX_MAIN);
+
+
+		// Ingredients text
+		struct GUI_frame* ingredients_text = gui_frame_init(middle_container, 0);
+		gui_resize(ingredients_text, middle_container->width, item_height);
+		gui_move(ingredients_text, 0, 0, 0, 0, (enum GUI_flags[]) { POS_LEFT, POS_TOP });
+		gui_set_color(ingredients_text, COLOR_HEX_MAIN);
+		ingredients_text->text_enabled = TRUE;
+
+		// Create 3 input items
+		for (int item = 0; item < 3; item++) {
+
+			struct GUI_frame* ingredient_item = gui_frame_init(middle_container, 0);
+			gui_resize(ingredient_item, middle_container->width, item_height);
+			gui_move(ingredient_item, 0, 0, 0, (item + 1) * item_height + GUI_TILE_MARGIN * (item + 1), (enum GUI_flags[]) { POS_CENTERED_X, POS_TOP });
+			gui_set_color(ingredient_item, COLOR_HEX_MAIN);
+			ingredient_item->text_enabled = TRUE;
+		}
+		
+	// Bottom container
+	struct GUI_frame* bottom_container = gui_frame_init(main_frame, 3);
+	gui_resize(bottom_container, main_frame->width - GUI_PADDING * 2, 100);
+	gui_move(bottom_container, 0, 0, 0, GUI_PADDING, (enum GUI_flags[]) { POS_CENTERED_X, POS_BOTTOM });
+	gui_set_color(bottom_container, COLOR_HEX_MAIN);
+
+		// Output text
+		struct GUI_frame* output_text = gui_frame_init(bottom_container, 0);
+		gui_resize(output_text, bottom_container->width, item_height);
+		gui_move(output_text, 0, 0, 0, 0, (enum GUI_flags[]) { POS_LEFT, POS_TOP });
+		gui_set_color(output_text, COLOR_HEX_MAIN);
+		output_text->text_enabled = TRUE;
+
+		// Create 1 output items
+		for (int item = 0; item < 1; item++) {
+
+			struct GUI_frame* output_item = gui_frame_init(bottom_container, 0);
+			gui_resize(output_item, bottom_container->width, item_height);
+			gui_move(output_item, 0, 0, 0, (item + 1) * item_height + GUI_TILE_MARGIN * (item + 1), (enum GUI_flags[]) { POS_CENTERED_X, POS_TOP });
+			gui_set_color(output_item, COLOR_HEX_MAIN);
+			output_item->text_enabled = TRUE;
+		}
+
+		// Crafting time
+		struct GUI_frame* crafting_time_text = gui_frame_init(bottom_container, 0);
+		gui_resize(crafting_time_text, bottom_container->width, item_height);
+		gui_move(crafting_time_text, 0, 0, 0, 0, (enum GUI_flags[]) { POS_LEFT, POS_BOTTOM });
+		gui_set_color(crafting_time_text, COLOR_HEX_MAIN);
+		crafting_time_text->text_enabled = TRUE;
+
+
+	// Add frame composition to list of all gui frames
+	GUI_WINDOWS[gui_find_free_slot()] = main_frame;
+
+	return main_frame;
+
+
+}
+
+void gui_update_player_recipe_hover(SDL_Renderer* renderer, struct MediaBin* mediaBin) {
+
+	struct GUI_frame* top_container = player->gui_recipe_hover->children[0];
+	struct GUI_frame* middle_container = player->gui_recipe_hover->children[1];
+	struct GUI_frame* bottom_container = player->gui_recipe_hover->children[2];
+
+
+	gui_move(top_container, 0, 0, 0, GUI_PADDING, (enum GUI_flags[]) { POS_CENTERED_X, POS_TOP });
+	gui_move(middle_container, 0, 0, 0, 60 + 2 * GUI_PADDING, (enum GUI_flags[]) { POS_CENTERED_X, POS_TOP });
+	gui_move(bottom_container, 0, 0, 0, GUI_PADDING, (enum GUI_flags[]) { POS_CENTERED_X, POS_BOTTOM });
+
+	gui_move(top_container->children[0], 0, 0, 0, 0, (enum GUI_flags[]) { POS_LEFT, POS_TOP });
+
+	int item_height = 24;
+
+	struct CraftingRecipe* recipe = player->cursor->watching_recipe;
+
+	if (recipe == NULL) return;
+
+	// Update recipe title
+
+	// Set text size and position to item
+	SDL_FRect t_rect = {
+		top_container->children[0]->position[0],
+		top_container->children[0]->position[1],
+		top_container->children[0]->width,
+		top_container->children[0]->height
+	};
+	update_text_box(renderer, top_container->children[0]->textBox, mediaBin->font_text, &t_rect, recipe->title, COLOR_BLACK);
+
+
+	// Update ingredients 
+	struct GUI_frame* ingredients_text = middle_container->children[0];
+	gui_move(ingredients_text, 0, 0, 0, 0, (enum GUI_flags[]) { POS_LEFT, POS_TOP });
+
+	SDL_FRect t_rect_2 = {
+		ingredients_text->position[0],
+		ingredients_text->position[1],
+		ingredients_text->width,
+		ingredients_text->height
+	};
+
+	update_text_box(renderer, ingredients_text->textBox, mediaBin->font_text, &t_rect_2, "Ingredients:", COLOR_BLACK);
+
+
+	for (int item = 0; item < 3; item++) {
+		struct GUI_frame* ingredient_item = middle_container->children[item + 1];
+		gui_move(ingredient_item, 0, 0, 0, (item + 1)* item_height + GUI_TILE_MARGIN * (item + 1), (enum GUI_flags[]) { POS_CENTERED_X, POS_TOP });
+
+		SDL_FRect t_rect_3 = {
+			ingredient_item->position[0],
+			ingredient_item->position[1],
+			ingredient_item->width,
+			ingredient_item->height
+		};
+
+		char result[128];
+
+		if (recipe->input_items[item].type != ITEM_NONE && recipe->input_count > item) {
+
+			snprintf(result, sizeof(result), "%dX %s", recipe->input_items[item].quantity, Item_data_list[recipe->input_items[item].type]->name_string);
+
+			update_text_box(renderer, ingredient_item->textBox, mediaBin->font_text, &t_rect_3, result, COLOR_BLACK);
+		}
+		else {
+			update_text_box(renderer, ingredient_item->textBox, mediaBin->font_text, &t_rect_3, " ", COLOR_BLACK);
+		}
+	}
+
+
+	// Output items:
+
+	struct GUI_frame* output_text = bottom_container->children[0];
+	gui_move(output_text, 0, 0, 0, 0, (enum GUI_flags[]) { POS_LEFT, POS_TOP });
+
+	SDL_FRect t_rect_4 = {
+		output_text->position[0],
+		output_text->position[1],
+		output_text->width,
+		output_text->height
+	};
+	update_text_box(renderer, output_text->textBox, mediaBin->font_text, &t_rect_4, "Output:", COLOR_BLACK);
+
+
+	for (int item = 0; item < 1; item++) {
+		struct GUI_frame* output_item = bottom_container->children[item + 1];
+		gui_move(output_item, 0, 0, 0, (item + 1) * item_height + GUI_TILE_MARGIN * (item + 1), (enum GUI_flags[]) { POS_CENTERED_X, POS_TOP });
+
+		SDL_FRect t_rect_5 = {
+			output_item->position[0],
+			output_item->position[1],
+			output_item->width,
+			output_item->height
+		};
+
+		char result[128];
+
+		if (recipe->output_items[item].type != ITEM_NONE && recipe->output_count > item) {
+
+			snprintf(result, sizeof(result), "%dX %s", recipe->output_items[item].quantity, Item_data_list[recipe->output_items[item].type]->name_string);
+
+			update_text_box(renderer, output_item->textBox, mediaBin->font_text, &t_rect_5, result, COLOR_BLACK);
+		}
+		else {
+			update_text_box(renderer, output_item->textBox, mediaBin->font_text, &t_rect_5, " ", COLOR_BLACK);
+		}
+	}
+
+	// Crafting time text
+
+	struct GUI_frame* crafting_time_text = bottom_container->children[2];
+	gui_move(crafting_time_text, 0, 0, 0, 0, (enum GUI_flags[]) { POS_LEFT, POS_BOTTOM });
+
+	SDL_FRect t_rect_6 = {
+			crafting_time_text->position[0],
+			crafting_time_text->position[1],
+			crafting_time_text->width,
+			crafting_time_text->height
+	};
+
+	char result[128];
+	snprintf(result, sizeof(result), "%.1f s", recipe->crafting_time);
+
+	update_text_box(renderer, crafting_time_text->textBox, mediaBin->font_text, &t_rect_6, result, COLOR_BLACK);
+
+}
 
 
 

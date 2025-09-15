@@ -20,6 +20,7 @@ struct Player {
     struct GUI_frame* gui_inventory;
     struct GUI_frame* gui_side_menu;
     struct GUI_frame* gui_mining_bar;
+    struct GUI_frame* gui_recipe_hover;
     enum GUI_side_menu side_menu_state;
     struct PlayerCursor* cursor;
     int selecting_recipe;
@@ -47,6 +48,7 @@ struct PlayerCursor {
     struct Inventory* held_item_inventory;
     int held_item_index;
     struct Inventory* watching_inventory;
+    struct CraftingRecipe* watching_recipe;
 
     enum BuildingRotation build_rotation;
 

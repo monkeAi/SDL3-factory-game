@@ -47,13 +47,17 @@ void init_item_data_list(void) {
             case ITEM_COAL_ORE: { Item_data_list[item] = create_item_data(item, "Coal ore", 100, 0x666666FF, FALSE, BUILDING_NONE); break; }
 
             case ITEM_STONE_ORE: { Item_data_list[item] = create_item_data(item, "Stone ore", 100, 0xD7CFCDFF, FALSE, BUILDING_NONE); break; }
+            case ITEM_STONE_BRICK: { Item_data_list[item] = create_item_data(item, "Stone brick", 100, 0xe6d9bcFF, FALSE, BUILDING_NONE); break; }
+
+            case ITEM_GREEN_CHIP: { Item_data_list[item] = create_item_data(item, "Green chip", 100, 0x2fad3eFF, FALSE, BUILDING_NONE); break; }
 
             case ITEM_CRAFTER_1: { Item_data_list[item] = create_item_data(item, "Crafter mk.1", 20, 0xFFBD33FF, TRUE, BUILDING_CRAFTER_1); break; }
             case ITEM_BURNER_MINER: { Item_data_list[item] = create_item_data(item, "Burner Miner", 20, 0xa84e32ff, TRUE, BUILDING_BURNER_MINER); break; }
             case ITEM_BURNER_SMELTER: { Item_data_list[item] = create_item_data(item, "Burner Smelter", 20, 0xedda5fff, TRUE, BUILDING_BURNER_SMELTER); break; }
 
+            case ITEM_INSERTER: { Item_data_list[item] = create_item_data(item, "Inserter", 50, 0x325e8aff, TRUE, BUILDING_INSERTER); break; }
+            case ITEM_CONVEYOR: { Item_data_list[item] = create_item_data(item, "Conveyor belt", 200, 0xffb60aff, TRUE, BUILDING_CONVEYOR); break; }
 
-            case ITEM_INSERTER: { Item_data_list[item] = create_item_data(item, "Inserter", 20, 0x325e8aff, TRUE, BUILDING_INSERTER); break; }
 
 
             default: { Item_data_list[item] = NULL; break; }
