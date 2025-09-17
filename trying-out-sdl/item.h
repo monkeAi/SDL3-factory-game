@@ -31,6 +31,7 @@ enum ItemType {
     ITEM_BURNER_SMELTER,
 
     ITEM_INSERTER,
+    ITEM_INSERTER_LONG,
     ITEM_CONVEYOR
 };
 

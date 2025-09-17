@@ -104,22 +104,24 @@ void game_init() {
 	int selected_cords[2] = { 0 };
 	int selected_cords2[2] = { 10, 8 };
 	int selected_cords3[2] = { -4, - 15 };
-	Building_create(BUILDING_CRAFTER_1, selected_cords, RIGHT);
-	Building_create(BUILDING_CRAFTER_1, selected_cords2, RIGHT);
+	//Building_create(BUILDING_CRAFTER_1, selected_cords, RIGHT);
+	//Building_create(BUILDING_CRAFTER_1, selected_cords2, RIGHT);
 	//Building_create(BUILDING_CRAFTER_1, selected_cords3, LEFT);
 
-	struct Item crafter = Item_create(ITEM_CRAFTER_1, 3);
+	struct Item crafter = Item_create(ITEM_CRAFTER_1, 20);
 	Inventory_push_item(player->inventory, &crafter);
 
-	struct Item smelter = Item_create(ITEM_BURNER_SMELTER, 3);
+	struct Item smelter = Item_create(ITEM_BURNER_SMELTER, 20);
 	Inventory_push_item(player->inventory, &smelter);
 
-	struct Item miner = Item_create(ITEM_BURNER_MINER, 3);
+	struct Item miner = Item_create(ITEM_BURNER_MINER, 20);
 	Inventory_push_item(player->inventory, &miner);
 
-
-	struct Item inserter = Item_create(ITEM_INSERTER, 10);
+	struct Item inserter = Item_create(ITEM_INSERTER, 50);
 	Inventory_push_item(player->inventory, &inserter);
+
+	struct Item long_inserter = Item_create(ITEM_INSERTER_LONG, 50);
+	Inventory_push_item(player->inventory, &long_inserter);
 
 	struct Item conveyor = Item_create(ITEM_CONVEYOR, 100);
 	Inventory_push_item(player->inventory, &conveyor);
@@ -206,7 +208,6 @@ int game_handle_input() {
 		if (event.key.key == SDLK_R) {
 
 			player->cursor->build_rotation = (player->cursor->build_rotation + 1) % 4;
-			printf("Building rotation: %d\n", player->cursor->build_rotation);
 		}
 
 		break;
@@ -256,8 +257,52 @@ int game_update() {
 	update_gui(renderer, game_media);
 
 
+
 	return 0;
 }
+
+void game_render_debug() {
+
+
+	// Building rotation
+	const char* rotation = "rotation";
+
+	switch (player->cursor->build_rotation)
+	{
+	case UP:    rotation = "UP";    break;
+	case DOWN:  rotation = "DOWN";  break;
+	case LEFT:  rotation = "LEFT";  break;
+	case RIGHT: rotation = "RIGHT"; break;
+	}
+
+	char building_rotation[128];
+	 
+	snprintf(building_rotation, sizeof(building_rotation), "Building rotation: %s", rotation);
+	SDL_FRect rotation_text = { 20, 20, 100, 20 };
+	render_text(renderer, game_media->font_text, &rotation_text, building_rotation, COLOR_BLACK);
+
+
+	// Crafting queue text
+	char crafting_queue[128];
+
+	char* recipe = "no recipe";
+
+	if (player->craft_request) recipe = CraftingRecipes[player->craft_request->recipe]->title;
+
+	snprintf(crafting_queue, sizeof(crafting_queue), "Crafting: %s", recipe);
+	SDL_FRect crafting_text = { 20, 40, 100, 20 };
+	render_text(renderer, game_media->font_text, &crafting_text, crafting_queue, COLOR_BLACK);
+
+	// Keybinds
+
+	SDL_FRect inventory_text = { 20, WINDOW_HEIGHT - 60, 100, 20 };
+	render_text(renderer, game_media->font_text, &inventory_text, "[E] Open inventory", COLOR_BLACK);
+
+	SDL_FRect rotate_b_text = { 20, WINDOW_HEIGHT - 40, 100, 20 };
+	render_text(renderer, game_media->font_text, &rotate_b_text, "[R] Rotate building", COLOR_BLACK);
+
+}
+
 
 int game_render() {
 
@@ -278,11 +323,16 @@ int game_render() {
 	// Render GUI
 	render_gui(renderer);
 
+	game_render_debug();
+
+
+
 	// Render scene
 	SDL_RenderPresent(renderer);
 
 	return 0;
 }
+
 
 
 

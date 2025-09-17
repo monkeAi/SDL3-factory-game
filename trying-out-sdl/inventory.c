@@ -4,6 +4,7 @@
 #include "inventory.h"
 #include "constants.h"
 #include "item.h"
+#include "recipes.h"
 
 // Create and initialize new inventory
 struct Inventory* Inventory_create(unsigned int max_slots, unsigned int available_slots) {
@@ -232,5 +233,41 @@ void Inventory_remove_item(struct Inventory* from_inv, int from_slot, unsigned i
 
 	// Delete trash inventory
 	Inventory_free(trash_inv);
+
+}
+
+
+// Returns TRUE if there is enough items of one type for the selected recipe
+int Inventory_enough_item_for_recipe(struct Inventory* inv, enum RecipeName recipe_name, struct Item item) {
+
+	struct CraftingRecipe* recipe = CraftingRecipes[recipe_name];
+	
+	// Loop through recipe ingredients
+		// if ingredient matches item
+			// compare quantity
+
+	int recipe_item_quantity;
+
+	// Get recipe item
+	for (int y = 0; y < recipe->input_count; y++) {
+
+		if (recipe->input_items[y].type == item.type) {
+
+			recipe_item_quantity = recipe->input_items[y].quantity;
+		}
+	}
+
+	// Check every slot of inventory for the item and if its enough by the recipe return true
+	for (int i = 0; i < inv->available_slots; i++) {
+
+		if (inv->slots[i].type != item.type) continue;
+
+		if (inv->slots[i].quantity >= recipe_item_quantity) {
+			//printf("quantity: %d\n", recipe_item_quantity);
+			return TRUE;
+		}
+	}
+
+	return FALSE;
 
 }

@@ -1,7 +1,7 @@
 #define FALSE 0
 #define TRUE 1
 
-#define WINDOW_WIDTH 1920					
+#define WINDOW_WIDTH 1000					
 #define WINDOW_HEIGHT 1080
 #define WINDOW_TITLE "Victorio the game"
 
@@ -64,7 +64,7 @@
 #define SMELTER_HEIGHT 2
 
 #define INSERTER_WORK_TIME 1.0
-#define CONVEYOR_WORK_TIME 0.5
+#define CONVEYOR_WORK_TIME 0.3
 
 
 // GUI

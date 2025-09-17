@@ -345,7 +345,7 @@ void gui_frame_update(struct GUI_frame* frame) {
 	// Update values
 	switch (frame->state) {
 		case GUI_HOVERING: {
-			frame->set_color = 0x111111FF;
+			frame->set_color = COLOR_HEX_SEC_2;
 			break;
 		}
 	}
@@ -423,7 +423,20 @@ void update_gui(SDL_Renderer* renderer, struct MediaBin* mediaBin) {
 	}
 
 
+	// Update player crafting bar
+	if (player->craft_request == NULL) {
+
+		player->gui_crafting_bar->visibility = HIDDEN;
+	}
+	else {
+
+		player->gui_crafting_bar->visibility = SHOWN;
+		gui_update_progress_bar(player->gui_crafting_bar->children[0], CraftingRecipes[player->craft_request->recipe]->crafting_time, player->craft_request->time_left);
+	}
+
+	// Update hover boxes
 	gui_update_player_recipe_hover(renderer, mediaBin);
+	gui_update_player_item_hover(renderer, mediaBin);
 
 
 }
@@ -1080,6 +1093,59 @@ struct GUI_frame* gui_create_player_mining_bar() {
 	return frame;
 }
 
+struct GUI_frame* gui_create_player_crafting_bar() {
+
+	// MAIN FRAME
+	struct GUI_frame* frame = gui_frame_init(NULL, 1);
+	gui_resize(frame, 100, 10);
+	gui_move(frame, 20, 65, 0, 0, NULL);
+	gui_set_color(frame, COLOR_HEX_SEC);
+
+	// Add frame composition to list of all gui frames
+	GUI_WINDOWS[gui_find_free_slot()] = frame;
+
+	struct GUI_frame* progress_bar = gui_create_progress_bar(frame, ID_none, COLOR_HEX_THIRD, COLOR_HEX_MAIN);
+
+
+	return frame;
+}
+
+struct GUI_frame* gui_create_player_item_hover() {
+	
+	// Main frame
+	struct GUI_frame* main_frame = gui_frame_init(NULL, 0);
+	gui_resize(main_frame, 200, GUI_TILE_SIZE);
+	gui_move(main_frame, 0, 0, 0, 0, NULL);
+	gui_set_color(main_frame, COLOR_HEX_MAIN);
+	//main_frame->visibility = HIDDEN;
+	main_frame->text_enabled = TRUE;
+
+	// Add frame composition to list of all gui frames
+	GUI_WINDOWS[gui_find_free_slot()] = main_frame;
+
+	return main_frame;
+}
+
+void gui_update_player_item_hover(SDL_Renderer* renderer, struct MediaBin* mediaBin) {
+
+	struct Item_data* item = player->cursor->watching_item;
+	struct GUI_frame* main_frame = player->gui_item_hover;
+
+	if (item == NULL) return;
+
+	// Update item name
+
+	// Set text size and position to item
+	SDL_FRect t_rect = {
+		main_frame->position[0] + GUI_PADDING,
+		main_frame->position[1] + 8,
+		main_frame->width - GUI_PADDING * 2,
+		main_frame->height - GUI_PADDING
+	};
+
+	update_text_box(renderer, main_frame->textBox, mediaBin->font_text, &t_rect, item->name_string, COLOR_BLACK);
+
+}
 
 struct GUI_frame* gui_create_player_recipe_hover() {
 

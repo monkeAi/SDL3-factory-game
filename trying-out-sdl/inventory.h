@@ -21,5 +21,7 @@ void Inventory_free(struct Inventory* inv);
 int Inventory_enough_space(struct Inventory* inv, enum ItemType item_type, int required_amount);
 void Inventory_remove_item(struct Inventory* from_inv, int from_slot, unsigned int quantity);
 int Inventory_get_last_item_index(struct Inventory* inv);
+int Inventory_enough_item_for_recipe(struct Inventory* inv, enum RecipeName recipe_name, struct Item item);
+
 
 #endif

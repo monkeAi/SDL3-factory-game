@@ -307,6 +307,31 @@
         "required_energy": 10.0
     },
     {
+        "name": "RECIPE_INSERTER_LONG",
+        "title": "Long Inserter",
+        "state": "RECIPE_AVAILABLE",
+        "craft_method": [ "RECIPE_HAND", "RECIPE_CRAFTER" ],
+        "input": [
+            {
+                "type": "ITEM_GREEN_CHIP",
+                "quantity": 1
+            },
+            {
+                "type": "ITEM_IRON_PLATE",
+                "quantity": 8
+            }
+
+        ],
+        "output": [
+            {
+                "type": "ITEM_INSERTER_LONG",
+                "quantity": 1
+            }
+        ],
+        "crafting_time": 5.0,
+        "required_energy": 10.0
+    },
+    {
         "name": "RECIPE_CONVEYOR",
         "title": "Conveyor belt",
         "state": "RECIPE_AVAILABLE",

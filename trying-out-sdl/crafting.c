@@ -205,3 +205,5 @@ void update_waiting_queue(float delta_time) {
 		player->craft_request = player->craft_request->next_request;
 	}
 }
+
+

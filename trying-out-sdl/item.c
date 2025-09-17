@@ -36,26 +36,27 @@ void init_item_data_list(void) {
         switch (item) {
         case ITEM_NONE: { Item_data_list[item] = create_item_data(item, "Item none", 0, 0x000000FF, FALSE, BUILDING_NONE); break; }
 
-            case ITEM_IRON_ORE: { Item_data_list[item] = create_item_data(item, "Iron ore", 100, 0x0b4b80FF, FALSE, BUILDING_NONE); break; }
-            case ITEM_IRON_PLATE: { Item_data_list[item] = create_item_data(item, "Iron plate", 100, 0xa3cdf0FF, FALSE, BUILDING_NONE); break; }
-            case ITEM_IRON_GEAR: { Item_data_list[item] = create_item_data(item, "Iron gear", 50, 0xabbcc9FF, FALSE, BUILDING_NONE); break; }
+            case ITEM_IRON_ORE: { Item_data_list[item] = create_item_data(item, "Iron ore", 100, 0x85c9d8FF, FALSE, BUILDING_NONE); break; }
+            case ITEM_IRON_PLATE: { Item_data_list[item] = create_item_data(item, "Iron plate", 100, 0x6de7fcFF, FALSE, BUILDING_NONE); break; }
+            case ITEM_IRON_GEAR: { Item_data_list[item] = create_item_data(item, "Iron gear", 50, 0xabdfebFF, FALSE, BUILDING_NONE); break; }
 
-            case ITEM_COPPER_ORE: { Item_data_list[item] = create_item_data(item, "Copper ore", 100, 0x964520FF, FALSE, BUILDING_NONE); break; }
-            case ITEM_COPPER_PLATE: { Item_data_list[item] = create_item_data(item, "Copper plate", 100, 0xed8b5fFF, FALSE, BUILDING_NONE); break; }
-            case ITEM_COPPER_WIRE: { Item_data_list[item] = create_item_data(item, "Copper wire", 100, 0x994520FF, FALSE, BUILDING_NONE); break; }
+            case ITEM_COPPER_ORE: { Item_data_list[item] = create_item_data(item, "Copper ore", 100, 0xf19143FF, FALSE, BUILDING_NONE); break; }
+            case ITEM_COPPER_PLATE: { Item_data_list[item] = create_item_data(item, "Copper plate", 100, 0xf5984cFF, FALSE, BUILDING_NONE); break; }
+            case ITEM_COPPER_WIRE: { Item_data_list[item] = create_item_data(item, "Copper wire", 100, 0xfcae3fFF, FALSE, BUILDING_NONE); break; }
 
-            case ITEM_COAL_ORE: { Item_data_list[item] = create_item_data(item, "Coal ore", 100, 0x666666FF, FALSE, BUILDING_NONE); break; }
+            case ITEM_COAL_ORE: { Item_data_list[item] = create_item_data(item, "Coal ore", 100, 0x2e3535FF, FALSE, BUILDING_NONE); break; }
 
-            case ITEM_STONE_ORE: { Item_data_list[item] = create_item_data(item, "Stone ore", 100, 0xD7CFCDFF, FALSE, BUILDING_NONE); break; }
-            case ITEM_STONE_BRICK: { Item_data_list[item] = create_item_data(item, "Stone brick", 100, 0xe6d9bcFF, FALSE, BUILDING_NONE); break; }
+            case ITEM_STONE_ORE: { Item_data_list[item] = create_item_data(item, "Stone ore", 100, 0xd7cfcdFF, FALSE, BUILDING_NONE); break; }
+            case ITEM_STONE_BRICK: { Item_data_list[item] = create_item_data(item, "Stone brick", 100, 0xded2c5FF, FALSE, BUILDING_NONE); break; }
 
-            case ITEM_GREEN_CHIP: { Item_data_list[item] = create_item_data(item, "Green chip", 100, 0x2fad3eFF, FALSE, BUILDING_NONE); break; }
+            case ITEM_GREEN_CHIP: { Item_data_list[item] = create_item_data(item, "Green circuits", 100, 0x5ed160FF, FALSE, BUILDING_NONE); break; }
 
             case ITEM_CRAFTER_1: { Item_data_list[item] = create_item_data(item, "Crafter mk.1", 20, 0xFFBD33FF, TRUE, BUILDING_CRAFTER_1); break; }
             case ITEM_BURNER_MINER: { Item_data_list[item] = create_item_data(item, "Burner Miner", 20, 0xa84e32ff, TRUE, BUILDING_BURNER_MINER); break; }
             case ITEM_BURNER_SMELTER: { Item_data_list[item] = create_item_data(item, "Burner Smelter", 20, 0xedda5fff, TRUE, BUILDING_BURNER_SMELTER); break; }
 
             case ITEM_INSERTER: { Item_data_list[item] = create_item_data(item, "Inserter", 50, 0x325e8aff, TRUE, BUILDING_INSERTER); break; }
+            case ITEM_INSERTER_LONG: { Item_data_list[item] = create_item_data(item, "Long Inserter", 50, 0xc4063cff, TRUE, BUILDING_INSERTER_LONG); break; }
             case ITEM_CONVEYOR: { Item_data_list[item] = create_item_data(item, "Conveyor belt", 200, 0xffb60aff, TRUE, BUILDING_CONVEYOR); break; }
 
 

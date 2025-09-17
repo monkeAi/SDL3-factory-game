@@ -38,7 +38,9 @@ void init_player() {
     player->gui_inventory = gui_create_player_inventory();
     player->gui_side_menu = gui_create_sm(player->gui_inventory);
     player->gui_mining_bar = gui_create_player_mining_bar();
+    player->gui_crafting_bar = gui_create_player_crafting_bar();
     player->gui_recipe_hover = gui_create_player_recipe_hover();
+    player->gui_item_hover = gui_create_player_item_hover();
 
     player->cursor = player_cursor_create();
 
@@ -171,9 +173,9 @@ static void handle_player_interaction(struct Player* p) {
     p->cursor->watching_type = CURSOR_NONE;
     p->cursor->watching_building = NULL;
 
-
     player->cursor->watching_recipe = NULL;
     player->gui_recipe_hover->visibility = HIDDEN;
+    player->gui_item_hover->visibility = HIDDEN;
 
     // 1) Check if mouse is over visible gui
     for (int window = 0; window < MAX_GUI_WINDOWS; window++) {
@@ -244,6 +246,16 @@ static void handle_player_interaction(struct Player* p) {
                     case ID_player_inventory: { player->cursor->watching_inventory = player->inventory; break; }
                     default: { player->cursor->watching_inventory = NULL; break; }
 
+                    }
+
+                    // Set watching item and show item hover box
+                    if (player->cursor->watching_inventory && inv_tiles[tile]->children[0]) {
+
+                        player->cursor->watching_item = Item_data_list[player->cursor->watching_inventory->slots[tile].type];
+                        
+                        // Show and move item hover box to the item
+                        player->gui_item_hover->visibility = SHOWN;
+                        gui_move(player->gui_item_hover, inv_tiles[tile]->position[0] + TILE_SIZE + GUI_PADDING, inv_tiles[tile]->position[1], 0, 0, NULL);
                     }
 
                     // When left clicked on a tile
@@ -435,7 +447,7 @@ static void handle_player_interaction(struct Player* p) {
         // If left clicks on building open player inventory and side menu for buildings
         if (p->mouse_state == 1) {
 
-            if (p->cursor->watching_type == CURSOR_BUILDING && p->mouse_state != p->mouse_state_before && p->cursor->watching_building->type != BUILDING_INSERTER && p->cursor->watching_building->type != BUILDING_CONVEYOR) {
+            if (p->cursor->watching_type == CURSOR_BUILDING && p->mouse_state != p->mouse_state_before && p->cursor->watching_building->type != BUILDING_INSERTER && p->cursor->watching_building->type != BUILDING_INSERTER_LONG && p->cursor->watching_building->type != BUILDING_CONVEYOR) {
 
                 // Set selected building to currently watched
                 player->cursor->selected_building = player->cursor->watching_building;
@@ -671,6 +683,7 @@ struct PlayerCursor* player_cursor_create() {
     cursor->build_rotation = RIGHT;
 
     cursor->watching_recipe = NULL;
+    cursor->watching_item = NULL;
 
     return cursor;
 }

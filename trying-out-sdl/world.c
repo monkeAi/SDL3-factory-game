@@ -231,7 +231,7 @@ int render_ores(SDL_Renderer* renderer) {
 		switch (ore->type) {
 		case ORE_IRON: rgba[0] = 133; rgba[1] = 201; rgba[2] = 216; break;
 		case ORE_COPPER: rgba[0] = 241; rgba[1] = 145; rgba[2] = 67; break;
-		case ORE_COAL: rgba[0] = 46; rgba[1] = 53; rgba[2] = 50; break;
+		case ORE_COAL: rgba[0] = 46; rgba[1] = 53; rgba[2] = 53; break;
 		case ORE_STONE: rgba[0] = 215; rgba[1] = 207; rgba[2] = 205; break;
 		default: rgba[0] = 255; rgba[1] = 255; rgba[2] = 255; break;
 		}

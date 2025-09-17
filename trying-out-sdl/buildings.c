@@ -92,6 +92,16 @@ static struct Building* Building_init(enum BuildingType type) {
 		building->color = 0xffb60aff;
 		building->work_time_left = CONVEYOR_WORK_TIME;
 		break;
+		
+	case BUILDING_INSERTER_LONG:
+		building->input_inv = Inventory_create(1, 1);
+		building->output_inv = Inventory_create(1, 1);
+		building->tile_width = 1;
+		building->tile_height = 1;
+		building->building_item_type = ITEM_INSERTER_LONG;
+		building->color = 0xc4063cff;
+		building->work_time_left = INSERTER_WORK_TIME;
+		break;
 
 	default:
 		building->input_inv = NULL;
@@ -102,6 +112,7 @@ static struct Building* Building_init(enum BuildingType type) {
 		building->color = 0x000000ff;
 		break;
 	}
+
 
 	return building;
 }
@@ -247,6 +258,10 @@ static int Building_placement_available(enum BuildingType type, int* coordinates
 		building_height = SMELTER_HEIGHT;
 		break;
 	case BUILDING_INSERTER:
+		building_width = 1;
+		building_height = 1;
+		break;
+	case BUILDING_INSERTER_LONG:
 		building_width = 1;
 		building_height = 1;
 		break;
@@ -545,11 +560,13 @@ void update_buildings(float delta_time) {
 				break;
 			}
 
-			// Inserter
+			// Inserters
+			case BUILDING_INSERTER_LONG:
 			case BUILDING_INSERTER: {
 
 				// If it has building in front and in back  
 					// If idle
+						// If building in front is crafter/smelter check if recipe has enough items -> if so dont move
 						// Take last item from output inventory of back building
 						// Transfer it to input inv of front building
 						// Start cooldown and switch to running state
@@ -558,6 +575,8 @@ void update_buildings(float delta_time) {
 
 				// Get back building and front building
 				int back_x_offset, back_y_offset, front_x_offset, front_y_offset;
+
+				
 				switch (Buildings[b]->rotation) 
 				{
 				case DOWN:
@@ -589,6 +608,15 @@ void update_buildings(float delta_time) {
 					break;
 				}
 
+				// In case its a long inserter multiply offset by 2
+				if (Buildings[b]->type == BUILDING_INSERTER_LONG) {
+
+					back_x_offset = back_x_offset * 2;
+					back_y_offset = back_y_offset * 2;
+					front_x_offset = front_x_offset * 2;
+					front_y_offset = front_y_offset * 2;
+				}
+
 				int back_x = Buildings[b]->coords->x + back_x_offset;
 				int back_y = Buildings[b]->coords->y + back_y_offset;
 				int front_x = Buildings[b]->coords->x + front_x_offset;
@@ -602,7 +630,7 @@ void update_buildings(float delta_time) {
 				for (int i = 0; i < MAX_BUILDINGS; i++) {
 
 					if (Buildings[i] == NULL) continue;
-					if (Buildings[i]->type == BUILDING_INSERTER) continue;
+					if (Buildings[i]->type == BUILDING_INSERTER || Buildings[i]->type == BUILDING_INSERTER_LONG) continue;
 
 					// From building
 					if (Building_is_inside(Buildings[i], back_x, back_y)) {
@@ -624,7 +652,7 @@ void update_buildings(float delta_time) {
 					case BUILDING_STATE_IDLE: {
 						int from_index = Inventory_get_last_item_index(from_building->output_inv);
 
-						// If to inventory has enough space transfer 1 item
+						// If to inventory has enough space and the to building isn't working transfer 1 item
 						if (from_index != -1) {
 
 							//printf("Item type: %d, slot index: %d\n", from_building->output_inv->slots[from_index].type, from_index);
@@ -643,7 +671,16 @@ void update_buildings(float delta_time) {
 								}
 							}
 							
-							else if (Inventory_enough_space(to_building->input_inv, from_building->output_inv->slots[from_index].type, 1)) {
+							else if (Inventory_enough_space(
+								to_building->input_inv, from_building->output_inv->slots[from_index].type, 1) 
+								&& to_building->state == BUILDING_STATE_IDLE 
+								&& !Inventory_enough_item_for_recipe(to_building->input_inv, to_building->recipe, from_building->output_inv->slots[from_index]) 
+								&& to_building->recipe != RECIPE_NONE) 
+							
+							{
+
+								// if building has enouugh of the currently selected item for the recipe dont transfer
+								printf("inserter working");
 
 								Inventory_transfer_item(
 									from_building->output_inv,
@@ -794,7 +831,7 @@ void render_buildings(SDL_Renderer* renderer) {
 		SDL_RenderFillRect(renderer, &building_rect);
 
 		// Draw square on top of inserter and coveyor to determine facing direction
-		if (b->type == BUILDING_INSERTER || b->type == BUILDING_CONVEYOR) {
+		if (b->type == BUILDING_INSERTER || b->type == BUILDING_CONVEYOR || b->type == BUILDING_INSERTER_LONG) {
 
 			SDL_FRect arrow_rect;
 

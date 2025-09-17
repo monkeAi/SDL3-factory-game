@@ -37,6 +37,8 @@ int recipe_match_method(struct CraftingRecipe* recipe, enum RecipeCraftMethod cr
 
 }
 
+
+
 void recipe_load_from_json(const char* filename) {  
    FILE* f = fopen(filename, "rb");  
    if (!f) { perror("Failed to open JSON file"); exit(1); }  
@@ -149,6 +151,7 @@ static const RecipeNameMap recipe_name_map[] = {
     { "RECIPE_BURNER_SMELTER", RECIPE_BURNER_SMELTER },
 
     { "RECIPE_INSERTER", RECIPE_INSERTER },
+    { "RECIPE_INSERTER_LONG", RECIPE_INSERTER_LONG },
     { "RECIPE_CONVEYOR", RECIPE_CONVEYOR },
 
 
@@ -189,6 +192,7 @@ static const ItemTypeMap item_type_map[] = {
     { "ITEM_BURNER_SMELTER", ITEM_BURNER_SMELTER },
 
     { "ITEM_INSERTER", ITEM_INSERTER },
+    { "ITEM_INSERTER_LONG", ITEM_INSERTER_LONG },
     { "ITEM_CONVEYOR", ITEM_CONVEYOR },
 
     { "ITEM_NONE", ITEM_NONE }
