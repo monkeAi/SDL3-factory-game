@@ -680,7 +680,7 @@ void update_buildings(float delta_time) {
 							{
 
 								// if building has enouugh of the currently selected item for the recipe dont transfer
-								printf("inserter working");
+								//printf("inserter working");
 
 								Inventory_transfer_item(
 									from_building->output_inv,

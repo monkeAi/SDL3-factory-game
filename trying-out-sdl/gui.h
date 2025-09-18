@@ -83,7 +83,7 @@ extern struct GUI_frame* GUI_WINDOWS[MAX_GUI_WINDOWS];
 void init_gui();
 void update_gui(SDL_Renderer* renderer, struct MediaBin* mediaBin);
 void render_gui(SDL_Renderer* renderer);
-
+	
 static struct GUI_frame* gui_frame_init(struct GUI_frame* parent, const int max_children);
 void gui_frame_destroy(struct GUI_frame* frame);
 void gui_frame_render(SDL_Renderer* renderer, struct GUI_frame* frame);
